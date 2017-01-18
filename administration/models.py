@@ -10,7 +10,7 @@ import datetime
 class Team(models.Model):
     name = models.CharField(max_length=200)
     size = models.IntegerField(default=0)
-    join_date   = models.DateTimeField('date joined', default=timezone.now())
+    join_date   = models.DateTimeField('date joined', default=timezone.now)
     ranking     = models.IntegerField(default=0)
     total_legs_played   = models.IntegerField(default=0)
     total_legs_won      = models.IntegerField(default=0)
@@ -36,7 +36,7 @@ class Player(models.Model):
         blank=True,
         null=True
     )
-    join_date   = models.DateTimeField('date joined', default=timezone.now())
+    join_date   = models.DateTimeField('date joined', default=timezone.now)
     ranking_pts = models.FloatField(default=1000.)
     ranking     = models.IntegerField(default=0)
     total_matches_played = models.IntegerField(default=0)

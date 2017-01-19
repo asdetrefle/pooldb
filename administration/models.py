@@ -7,10 +7,10 @@ import datetime
 # Create your models here.
 
 
-class Team(models.Model):
+class Group(models.Model):
     name = models.CharField(max_length=200)
     size = models.IntegerField(default=0)
-    join_date   = models.DateTimeField('date joined', default=timezone.now)
+    create_date   = models.DateTimeField('date joined', default=timezone.now)
     ranking     = models.IntegerField(default=0)
     total_legs_played   = models.IntegerField(default=0)
     total_legs_won      = models.IntegerField(default=0)
@@ -19,6 +19,21 @@ class Team(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class League():
+    name = models.CharField(max_length=200)
+    create_date = models.DateTimeField('date created', default=timezone.now)
+
+    def __str__(self):
+        return self.name
+
+
+class Team(Group):
+    league = models.ForeignKey(
+        League,
+        models.CASCADE
+    )
 
 
 class Player(models.Model):
@@ -30,15 +45,29 @@ class Player(models.Model):
     name    = models.CharField(max_length=200)
     username = models.CharField(max_length=200)
     sex     = models.CharField(max_length=1, choices=SEX_CHOICES)
-    team    = models.ForeignKey(
-        Team,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True
+
+    def __str__(self):
+        return self.username
+
+
+class Member(models.Model):
+    player = models.ForeignKey(
+        Player,
+        models.CASCADE
     )
-    join_date   = models.DateTimeField('date joined', default=timezone.now)
-    ranking_pts = models.FloatField(default=1000.)
-    ranking     = models.IntegerField(default=0)
+
+    group = models.ForeignKey(
+        Group,
+        models.CASCADE,
+        blank=True,
+        null=True,              # we allow null here to allow player to play for himself
+    )
+
+    create_date = models.DateTimeField('date joined', default=timezone.now)
+    cancel_date = models.DateTimeField('date quitted', blank=True, null=True)
+
+    points  = models.FloatField(default=1000.)
+    ranking = models.IntegerField(default=0)
     total_matches_played = models.IntegerField(default=0)
     total_matches_won   = models.IntegerField(default=0)
     season_matches_played = models.IntegerField(default=0)
@@ -46,4 +75,4 @@ class Player(models.Model):
     no_groups = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.name
+        return "{}({})".format(self.player, self.group)

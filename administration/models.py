@@ -21,9 +21,10 @@ class Group(models.Model):
         return self.name
 
 
-class League():
+class League(models.Model):
     name = models.CharField(max_length=200)
     create_date = models.DateTimeField('date created', default=timezone.now)
+    level = models.IntegerField(default=1, blank=True, null=True)
 
     def __str__(self):
         return self.name

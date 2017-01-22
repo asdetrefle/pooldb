@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.utils import timezone
+from django.core.validators import RegexValidator
 import datetime
 
 # Create your models here.
@@ -43,9 +44,13 @@ class Player(models.Model):
         ('M', 'Male'),
         ('I', 'Intersex')
     )
+    phone_regex = RegexValidator(regex=r'^\+\d{8,15}$',
+                                 message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     name    = models.CharField(max_length=200)
     username = models.CharField(max_length=200)
     sex     = models.CharField(max_length=1, choices=SEX_CHOICES)
+    phone   = models.CharField(validators=[phone_regex], max_length=16, blank=True, null=True);
+    email   = models.EmailField(max_length=200, blank=True, null=True)
 
     def __str__(self):
         return self.username

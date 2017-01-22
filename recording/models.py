@@ -44,6 +44,7 @@ class Match(models.Model):
     venue = models.CharField(max_length=200, blank=True, null=True)
     create_date = models.DateTimeField('match date')
     nb_frames   = models.IntegerField(default=0)
+    table_size  = models.IntegerField(default=9)
     match_type  = models.CharField(
         max_length=1,
         choices=MATCH_TYPE_CHOICES,

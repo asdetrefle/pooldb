@@ -109,7 +109,6 @@ class Match(AbstractMatch):
         return "{} {} vs. {} ".format(self.create_date.date(), self.away_player, self.home_player)
 
 
-
 class Leg(AbstractMatch):
     home_team = models.ForeignKey(
         Team,
@@ -215,7 +214,7 @@ class Frame(AbstractFrame):
         super(Frame, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.pk
+        return str(self.pk)
 
 
 class LeagueFrame(AbstractFrame):

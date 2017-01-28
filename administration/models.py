@@ -69,8 +69,8 @@ class Member(models.Model):
         null=True,              # we allow null here to allow player to play for himself
     )
 
-    create_date = models.DateTimeField('date joined', default=timezone.now)
-    cancel_date = models.DateTimeField('date quitted', blank=True, null=True)
+    create_date = models.DateTimeField('Date joined', default=timezone.now)
+    cancel_date = models.DateTimeField('Date quitted', blank=True, null=True)
 
     points  = models.FloatField(default=1000.)
     ranking = models.IntegerField(default=0)

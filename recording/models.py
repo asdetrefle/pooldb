@@ -103,7 +103,7 @@ class Match(AbstractMatch):
         super(Match, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.pk
+        return str(self.pk)
 
 
 class Leg(AbstractMatch):
@@ -180,7 +180,7 @@ class Frame(AbstractFrame):
         super(Frame, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.pk
+        return str(self.pk)
 
 
 class LeagueFrame(AbstractFrame):

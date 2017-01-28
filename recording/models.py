@@ -95,6 +95,9 @@ class Match(AbstractMatch):
         related_name='winner_player',
     )
 
+    def calculate(self):
+        pass
+
     def validate(self):
         pass
 
@@ -103,7 +106,8 @@ class Match(AbstractMatch):
         super(Match, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.pk
+        return "{} {} vs. {} ".format(self.create_date.date(), self.away_player, self.home_player)
+
 
 
 class Leg(AbstractMatch):
@@ -128,7 +132,38 @@ class Leg(AbstractMatch):
         Team,
         models.CASCADE,
         related_name='winner_team',
+        blank=True,
+        null=True
     )
+
+    def calculate(self):
+        len_ = 0
+        home_score_ = 0
+        away_score_ = 0
+
+        for f in self.leagueframe_set.all():
+            len_ += 1
+            if self.score_type == 'P':
+                home_score_ += f.home_score
+                away_score_ += f.away_score
+            else:
+                if f.home_score > f.away_score:
+                    home_score_ += 1
+                elif f.home_score < f.away_score:
+                    away_score_ += 1
+
+        self.home_score = home_score_
+        self.away_score = away_score_
+
+        if self.home_score > self.away_score:
+            self.winner = self.home_team
+        elif self.home_score < self.away_score:
+            self.winner = self.away_team
+        else:
+            self.winner = None
+
+        self.number_frames = len_
+        return
 
     def validate(self):
         pass

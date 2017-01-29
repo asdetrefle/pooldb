@@ -9,13 +9,13 @@ def default_season():
 
 def calc_elo(result, opp, sef):
     if sef < 2100:
-        K=32
+        K=32.
     elif sef < 2400:
-        K=24
+        K=24.
     else:
-        K=16
+        K=16.
 
     diff = opp - sef
-    esp = 1. / (1. + 10**(diff / 400))
+    esp = 1. / (1. + 10.**(diff / 400.))
     return K * (result - diff)
 

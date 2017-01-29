@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from .models import Match, Leg, Frame, LeagueFrame
 from .forms import LeagueFrameForm
+from administration.models import Member, Team, League
 
 # Create your views here.
 
@@ -12,9 +13,26 @@ def index(request):
 
 
 def view_match(request, match_id):
+    # TODO: now view_match and add_frame are using the same frame; maybe separate them for clarity
+    # TODO: use django form and add validation
     match = get_object_or_404(Match, pk=match_id)
+    if request.method == 'POST':
+        break_player = get_object_or_404(Member, pk=int(request.POST['break_player']))
+        home_score = int(request.POST['home_score'])
+        away_score = int(request.POST['away_score'])
+        clear_player_id = int(request.POST['clear_player'])
+        # TODO: handle frame number
+        frame = Frame(match=match, home_score=home_score, away_score=away_score, break_player=break_player)
+        if clear_player_id < 0:  # not a clearance
+            frame.is_clearance = False
+        else:
+            frame.is_clearance = True
+            clear_player = get_object_or_404(Member, pk=clear_player_id)
+            frame.cleared_by = clear_player
+        frame.save()
     frames = match.frame_set.all()
     return render(request, 'match.html', {'match': match, 'frames': frames})
+
 
 
 def view_league_frame(request, league_frame_id):

@@ -3,19 +3,38 @@
 {% block title %} Edit Match {% endblock %}
 
 {% block content %}
-    <h2>Epic match: {{ match.away_player }} V.S. {{ match.home_player }}! </h2>
+
+    <style>
+    .home_win {background-color: greenyellow; margin: 5pt}
+    .draw {background-color: deepskyblue; margin: 5pt}
+    .away_win {background-color: red; margin: 5pt}
+    </style>
+
+
+    <h2>Epic match: {{ match.away_player }} (home) V.S. {{ match.home_player }} (away)! </h2>
 
     <h3>Date of Match: {{match.create_date}}  Score : {{match.away_score}}:{{match.home_score}} </h3> 
 
-<h3> Here needs a table to display all frames </h3>
+<h3> Played Frames: </h3>
     {% for frame in frames %}
-    <h6> Frame  {{ frame }} </h6>
+    <span class="{% if frame.home_score > frame.away_score %}home_win{% elif frame.home_score == frame.away_score %}draw{% else %}away_win{% endif %}"> {{ frame.home_score }}/{{ frame.away_score }} </span>
     {% endfor %}
 
-<h3>Add a new frame: (TODO: finish) </h3>
-    winner: <select>
-                <option value="{{ match.home_player.pk }}">{{ match.home_player }}</option>
-                <option value="{{ match.away_player.pk }}">{{ match.away_player }}</option>
-            </select>
+<h3>Add a new frame: (TODO: now it's a hand-made form without validation; add validation to it or use forms created by Django) </h3>
+    <form method="post">
+        {% csrf_token %}
+        <p>Break Player:
+            <input type="radio" name="break_player" value="{{ match.home_player.pk }}">{{ match.home_player }}
+            <input type="radio" name="break_player" value="{{ match.away_player.pk }}">{{ match.away_player }}
+        </p>
+        <p>Score of {{ match.home_player }} (home):  <input type="text" name="home_score"> </p>
+        <p>Score of {{ match.away_player }} (away):  <input type="text" name="away_score"> </p>
+        <p>Cleared by:
+            <input type="radio" name="clear_player" value="-1">Not a Clearance
+            <input type="radio" name="clear_player" value="{{ match.home_player.pk }}">{{ match.home_player }}
+            <input type="radio" name="clear_player" value="{{ match.away_player.pk }}">{{ match.away_player }}
+        </p>
+        <input type="submit" value="Add this new frame">
+    </form>
 {% endblock %}
 

@@ -74,11 +74,18 @@ class Member(models.Model):
 
     points  = models.FloatField(default=1000.)
     ranking = models.IntegerField(default=0)
+
+    # the following three fields stores adjustment to Member ranking information during a ranking cycle
+    # Members' ranking could change every week or every day.
+    _point_adj = models.FloatField(default=0.)
+    _match_adj  = models.IntegerField(default=0.)
+    _match_won_adj = models.IntegerField(default=0)
+
     total_matches_played = models.IntegerField(default=0)
     total_matches_won   = models.IntegerField(default=0)
     season_matches_played = models.IntegerField(default=0)
     season_matches_won  = models.IntegerField(default=0)
-    no_groups = models.IntegerField(default=0)
+    nb_groups = models.IntegerField('Number of groups', default=0)
 
     def __str__(self):
         return "{}({})".format(self.player, self.group)

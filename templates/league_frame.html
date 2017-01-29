@@ -1,0 +1,20 @@
+{% extends "base_site.html" %}
+
+{% block title %} Edit League Frame {% endblock %}
+
+{% block content %}
+    <h2>Epic Frame: {{ league_frame.home_player }} V.S. {{ league_frame.away_player }}! </h2>
+
+
+<h3>frames: </h3>
+        {{ league_frame }}
+
+<!--
+<h3>add a new frame: (TODO: finish) </h3>
+    winner: <select>
+                <option value="{{ match.home_player.pk }}">{{ match.home_player }}</option>
+                <option value="{{ match.away_player.pk }}">{{ match.away_player }}</option>
+            </select>
+            -->
+{% endblock %}
+

@@ -2,8 +2,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.utils import timezone
-from django.forms import ModelForm
-from django.core.exceptions import ValidationError
+from utils import default_season, calc_elo
 
 from administration.models import Member, Team, League
 # Create your models here.
@@ -40,8 +39,10 @@ class AbstractMatch(models.Model):
 
     venue = models.CharField(max_length=200, blank=True, null=True)
     create_date = models.DateTimeField('Event date', default=timezone.now)
+    season = models.CharField(max_length=10, default=default_season)
     number_frames = models.IntegerField(default=0)
     table_size  = models.IntegerField(default=9)
+    is_updated = models.BooleanField(default=False)
 
     pool_type  = models.CharField(
         max_length=10,
@@ -93,17 +94,56 @@ class Match(AbstractMatch):
         Member,
         models.CASCADE,
         related_name='winner_player',
+        blank=True,
+        null=True
     )
 
-    def calculate(self):
-        pass
+    def update_all(self):
+        if self.is_updated:
+            return
 
-    def validate(self):
-        pass
+        len_ = 0
+        home_score_ = 0
+        away_score_ = 0
 
-    def save(self, *args, **kwargs):
-        self.validate()
-        super(Match, self).save(*args, **kwargs)
+        for f in self.frame_set.all():
+            len_ += 1
+            if self.score_type == 'P':
+                home_score_ += f.home_score
+                away_score_ += f.away_score
+            else:
+                if f.home_score > f.away_score:
+                    home_score_ += 1
+                elif f.home_score < f.away_score:
+                    away_score_ += 1
+
+        self.number_frames = len_
+
+        self.home_score = home_score_
+        self.away_score = away_score_
+
+        # adjust matchs information for members.
+        self.home_player._match_adj += 1
+        self.away_player._match_adj += 1
+
+        if self.home_score > self.away_score:
+            self.winner = self.home_player
+            self.home_player._match_won_adj += 1
+        elif self.home_score < self.away_score:
+            self.winner = self.away_player
+            self.away_player._match_won_adj += 1
+        else:
+            self.winner = None
+
+        # adjust points for members using ELO Ranking systems
+        self.home_player._point_adj += calc_elo(float(home_score_) / (home_score_ + away_score_),
+                                                self.away_player.points,
+                                                self.home_player.points)
+        self.away_player._point_adj += calc_elo(float(away_score_) / (home_score_ + away_score_),
+                                                self.home_player.points,
+                                                self.away_player.points)
+        self.is_updated = True
+        return
 
     def __str__(self):
         return "{} {} vs. {} ".format(self.create_date.date(), self.away_player, self.home_player)
@@ -135,7 +175,10 @@ class Leg(AbstractMatch):
         null=True
     )
 
-    def calculate(self):
+    def update_all(self):
+        if self.is_updated:
+            return
+
         len_ = 0
         home_score_ = 0
         away_score_ = 0
@@ -151,6 +194,8 @@ class Leg(AbstractMatch):
                 elif f.home_score < f.away_score:
                     away_score_ += 1
 
+        self.number_frames = len_
+
         self.home_score = home_score_
         self.away_score = away_score_
 
@@ -161,15 +206,8 @@ class Leg(AbstractMatch):
         else:
             self.winner = None
 
-        self.number_frames = len_
+        self.is_updated = True
         return
-
-    def validate(self):
-        pass
-
-    def save(self, *args, **kwargs):
-        self.validate()
-        super(Leg, self).save(*args, **kwargs)
 
     def __str__(self):
         return "{} {} vs. {} Leg {}".format(self.create_date.date(), self.away_team, self.home_team, self.leg_id)
@@ -181,6 +219,7 @@ class AbstractFrame(models.Model):
         models.CASCADE,
         related_name = '%(class)s_break_player'
     )
+    frame_number = models.IntegerField(default=0)
     home_score = models.IntegerField(default=0)
     away_score = models.IntegerField(default=0)
     is_clearance = models.BooleanField(default=False)
@@ -196,7 +235,7 @@ class AbstractFrame(models.Model):
         abstract = True
 
     def __str__(self):
-        return self.pk
+        return str(self.frame_number)
 
 
 class Frame(AbstractFrame):
@@ -205,16 +244,6 @@ class Frame(AbstractFrame):
         Match,
         models.CASCADE
     )
-
-    def validate(self):
-        pass
-
-    def save(self, *args, **kwargs):
-        self.validate()
-        super(Frame, self).save(*args, **kwargs)
-
-    def __str__(self):
-        return str(self.pk)
 
 
 class LeagueFrame(AbstractFrame):
@@ -235,24 +264,6 @@ class LeagueFrame(AbstractFrame):
         models.CASCADE
     )
 
-    def validate(self):
-        for f in self.leg.league_frame_set.all():
-            if f.home_player.group != self.home_player.group:
-                raise ValidationError, "Frames in a Leg should have players from the same home team!"
-            if f.away_player.group != self.away_player.group:
-                raise ValidationError, "Frames in a Leg should have players from the same away team!"
-        pass
-        return
-
-    def save(self, *args, **kwargs):
-        self.validate()
-        super(LeagueFrame, self).save(*args, **kwargs)
-
     def __str__(self):
         return "{} {} vs. {} Leg {}".format(self.leg.create_date.date(), self.away_player, self.home_player, self.leg.leg_id)
 
-
-class LeagueFrameForm(ModelForm):
-    class Meta:
-        model = LeagueFrame
-        fields = '__all__'

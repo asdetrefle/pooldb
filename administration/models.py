@@ -88,4 +88,4 @@ class Member(models.Model):
     nb_groups = models.IntegerField('Number of groups', default=0)
 
     def __str__(self):
-        return "{}({})".format(self.player, self.group)
+        return "{} ({})".format(self.player, self.group)

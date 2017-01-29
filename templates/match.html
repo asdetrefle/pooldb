@@ -3,14 +3,16 @@
 {% block title %} Edit Match {% endblock %}
 
 {% block content %}
-    <h2>Epic match: {{ match.home_player }} V.S. {{ match.away_player }}! </h2>
+    <h2>Epic match: {{ match.away_player }} V.S. {{ match.home_player }}! </h2>
 
+    <h3>Date of Match: {{match.create_date}}  Score : {{match.away_score}}:{{match.home_score}} </h3> 
 
-<h3>frames: </h3>
+<h3> Here needs a table to display all frames </h3>
     {% for frame in frames %}
-        {{ frame }}
+    <h6> Frame  {{ frame }} </h6>
     {% endfor %}
-<h3>add a new frame: (TODO: finish) </h3>
+
+<h3>Add a new frame: (TODO: finish) </h3>
     winner: <select>
                 <option value="{{ match.home_player.pk }}">{{ match.home_player }}</option>
                 <option value="{{ match.away_player.pk }}">{{ match.away_player }}</option>

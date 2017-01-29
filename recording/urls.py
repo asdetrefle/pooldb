@@ -4,5 +4,6 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.index, name='recording'),
-    url(r'^match/(?P<match_id>\d+)/$', views.show_match, name='show_match'),
+    url(r'^match/(?P<match_id>\d+)/$', views.view_match, name='view_match'),
+    url(r'^league_frame/$', views.create_league_frame, name='create_league_frame'),
 ]

@@ -3,8 +3,6 @@ from __future__ import unicode_literals
 from django.db import models
 from django.utils import timezone
 from utils import default_season, calc_elo
-from django.forms import ModelForm
-from django.core.exceptions import ValidationError
 
 from administration.models import Member, Team, League
 # Create your models here.
@@ -147,13 +145,6 @@ class Match(AbstractMatch):
         self.is_updated = True
         return
 
-    def validate(self):
-        pass
-
-    def save(self, *args, **kwargs):
-        self.validate()
-        super(Match, self).save(*args, **kwargs)
-
     def __str__(self):
         return "{} {} vs. {} ".format(self.create_date.date(), self.away_player, self.home_player)
 
@@ -218,13 +209,6 @@ class Leg(AbstractMatch):
         self.is_updated = True
         return
 
-    def validate(self):
-        pass
-
-    def save(self, *args, **kwargs):
-        self.validate()
-        super(Leg, self).save(*args, **kwargs)
-
     def __str__(self):
         return "{} {} vs. {} Leg {}".format(self.create_date.date(), self.away_team, self.home_team, self.leg_id)
 
@@ -235,6 +219,7 @@ class AbstractFrame(models.Model):
         models.CASCADE,
         related_name = '%(class)s_break_player'
     )
+    frame_number = models.IntegerField(default=0)
     home_score = models.IntegerField(default=0)
     away_score = models.IntegerField(default=0)
     is_clearance = models.BooleanField(default=False)
@@ -250,7 +235,7 @@ class AbstractFrame(models.Model):
         abstract = True
 
     def __str__(self):
-        return self.pk
+        return str(self.frame_number)
 
 
 class Frame(AbstractFrame):
@@ -259,16 +244,6 @@ class Frame(AbstractFrame):
         Match,
         models.CASCADE
     )
-
-    def validate(self):
-        pass
-
-    def save(self, *args, **kwargs):
-        self.validate()
-        super(Frame, self).save(*args, **kwargs)
-
-    def __str__(self):
-        return str(self.pk)
 
 
 class LeagueFrame(AbstractFrame):
@@ -289,24 +264,6 @@ class LeagueFrame(AbstractFrame):
         models.CASCADE
     )
 
-    def validate(self):
-        for f in self.leg.league_frame_set.all():
-            if f.home_player.group != self.home_player.group:
-                raise ValidationError, "Frames in a Leg should have players from the same home team!"
-            if f.away_player.group != self.away_player.group:
-                raise ValidationError, "Frames in a Leg should have players from the same away team!"
-        pass
-        return
-
-    def save(self, *args, **kwargs):
-        self.validate()
-        super(LeagueFrame, self).save(*args, **kwargs)
-
     def __str__(self):
         return "{} {} vs. {} Leg {}".format(self.leg.create_date.date(), self.away_player, self.home_player, self.leg.leg_id)
 
-
-class LeagueFrameForm(ModelForm):
-    class Meta:
-        model = LeagueFrame
-        fields = '__all__'

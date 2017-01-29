@@ -86,12 +86,12 @@ class Player(models.Model):
     email   = models.EmailField(max_length=200, blank=True, null=True)
     nb_groups = models.IntegerField('Number of groups', default=0)
 
-    def update_nb_groups(self):
+    def _update_nb_groups(self):
         self.nb_groups = len(self.member_set.all())
         return
 
     def update_all(self):
-        self.update_nb_groups()
+        self._update_nb_groups()
         return
 
     def __str__(self):

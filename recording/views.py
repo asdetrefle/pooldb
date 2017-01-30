@@ -16,13 +16,14 @@ def view_match(request, match_id):
     # TODO: now view_match and add_frame are using the same frame; maybe separate them for clarity
     # TODO: use django form and add validation
     match = get_object_or_404(Match, pk=match_id)
+    match.update_all()
     if request.method == 'POST':
         break_player = get_object_or_404(Member, pk=int(request.POST['break_player']))
         home_score = int(request.POST['home_score'])
         away_score = int(request.POST['away_score'])
         clear_player_id = request.POST['clear_player']
-        # TODO: handle frame number
-        frame = Frame(match=match, home_score=home_score, away_score=away_score, break_player=break_player)
+        nb = match.number_frames + 1;
+        frame = Frame(frame_number=nb, match=match, home_score=home_score, away_score=away_score, break_player=break_player)
         if clear_player_id == "":  # not a clearance
             frame.is_clearance = False
         else:
@@ -31,9 +32,10 @@ def view_match(request, match_id):
             clear_player = get_object_or_404(Member, pk=clear_player_id)
             frame.cleared_by = clear_player
         frame.save()
+    match.update_all()
+    match.save()
     frames = match.frame_set.all()
     return render(request, 'match.html', {'match': match, 'frames': frames})
-
 
 
 def view_league_frame(request, league_frame_id):

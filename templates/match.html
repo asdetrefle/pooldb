@@ -8,12 +8,12 @@
     .header     {font-size:1.17em; color:dimgrey; font-weight:normal}
     .header_loss    {font-size:1.5em; color:dimgrey; font-weight:normal}
     .header_win {font-size:1.5em; color:dodgerblue; font-weight:bold}
-    .frame_win   {font-weight:bold}
+    .frame_win   {font-weight:bold; color:dodgerblue}
     .draw {background-color: deepskyblue; margin: 5pt}
     .away_win {background-color: red; margin: 5pt}
     </style>
 
-<h3>Date of Match: {{match.create_date}}</h3> 
+    <h3>Date of Match: {{match.create_date}} {% if match.is_completed %} Match Completed. {% else %} Match in Progress. {% endif %}</h3> 
 
 <table border="0"> 
     <col width="80">
@@ -23,13 +23,13 @@
   <tr>
     <td align="right"><h2><span class="header"> Away : </span></h2></td>
     <td><h2><span class="header"> {{match.away_player}} </span></h2></td>
-    <td align="right"><h2> {% if match.away_score > match.home_score%} ✔ {% endif %} </h2></td>
+    <td align="right"><h2> {% if match.away_score > match.home_score and match.is_completed %} ✔ {% endif %} </h2></td>
     <td align="center"><h2><span class="{% if match.away_score > match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.away_score}} </span></h2></td>
   </tr>
   <tr>
     <td align="right"><h2><span class="header"> Home : </span></h2></td>
     <td><h2><span class="header"> {{match.home_player}} </span></h2></td>
-    <td align="right"><h2> {% if match.away_score < match.home_score%} ✔ {% endif %} </h2></td>
+    <td align="right"><h2> {% if match.away_score < match.home_score and match.is_completed %} ✔ {% endif %} </h2></td>
     <td align="center"><h2><span class="{% if match.away_score < match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.home_score}}</span></h2></td>
   </tr>
 </table>
@@ -58,37 +58,34 @@
         <td align="center"> {%if frame.is_clearance %} {{frame.cleared_by.player}}{% else %} - {% endif %} </td>
     </tr>
     {% endfor %}
+    {% if match.is_completed %}
+    {% else %}
+    <tr> 
+        <form method="post">
+
+            <td align="center"> {{ frames.count|add:"1" }} </td>
+        <td align="center"><select name="break_player" >
+                <option value="{{ match.home_player.pk }}">{{ match.home_player.player }}</option>
+                <option value="{{ match.away_player.pk }}">{{ match.away_player.player }}</option>
+            </select></td>
+        <td align="center"><input type="text" name="away_score" size="4"></td>
+        <td align="center"><input type="text" name="home_score" size="4"></td>
+        <td align="center"><select name="clear_player">
+                <option value="" selected=""> - </option>
+                <option value="{{ match.home_player.pk }}">{{ match.home_player.player }}</option>
+                <option value="{{ match.away_player.pk }}">{{ match.away_player.player }}</option>
+            </select></td>
+    </tr>
+    {% endif %}
 </table>
 
 <p></p>
-
-
-<h3>Add a new frame: (TODO: now it's a hand-made form without validation; add validation to it or use forms created by Django) </h3>
-    <form method="post">
+{% if match.is_completed %}
+{% else %}      
+<h3>Add the new frame to current match: (TODO: now it's a hand-made form without validation; add validation to it or use forms created by Django) </h3>
         {% csrf_token %}
-        <p>Break Player:
-            <select name="break_player" >
-                <option value="{{ match.home_player.pk }}">{{ match.home_player }}</option>
-                <option value="{{ match.away_player.pk }}">{{ match.away_player }}</option>
-            </select>
-            <!-- <input type="radio" name="break_player" value="{{ match.home_player.pk }}">{{ match.home_player }}
-            <input type="radio" name="break_player" value="{{ match.away_player.pk }}">{{ match.away_player }}-->
-        </p>
-        <p>Score of {{ match.home_player }} (home):  <input type="text" name="home_score"> </p>
-        <p>Score of {{ match.away_player }} (away):  <input type="text" name="away_score"> </p>
-        <p>Cleared by:
-            
-            <select name="clear_player">
-                <option vaule=""> - </option>
-                <option value="{{ match.home_player.pk }}">{{ match.home_player }}</option>
-                <option value="{{ match.away_player.pk }}">{{ match.away_player }}</option>
-            </select>
-
-            <!--<input type="radio" name="clear_player" value="-1">Not a Clearance
-            <input type="radio" name="clear_player" value="{{ match.home_player.pk }}">{{ match.home_player }}
-            <input type="radio" name="clear_player" value="{{ match.away_player.pk }}">{{ match.away_player }}-->
-        </p>
         <input type="submit" value="Add this new frame">
     </form>
+{% endif %}
 {% endblock %}
 

@@ -42,6 +42,7 @@ class AbstractMatch(models.Model):
     season = models.CharField(max_length=10, default=default_season)
     number_frames = models.IntegerField(default=0)
     table_size  = models.IntegerField(default=9)
+    is_completed = models.BooleanField(default=False)
     is_updated = models.BooleanField(default=False)
 
     pool_type  = models.CharField(
@@ -73,6 +74,7 @@ class Match(AbstractMatch):
         (INTERNAL, 'Internal'),
     )
 
+    race_to = models.IntegerField(default=7)
     match_type  = models.CharField(
         max_length=1,
         choices=MATCH_TYPE_CHOICES,
@@ -98,10 +100,7 @@ class Match(AbstractMatch):
         null=True
     )
 
-    def update_all(self):
-        if self.is_updated:
-            return
-
+    def _update_progress(self):
         len_ = 0
         home_score_ = 0
         away_score_ = 0
@@ -122,7 +121,16 @@ class Match(AbstractMatch):
         self.home_score = home_score_
         self.away_score = away_score_
 
-        # adjust matchs information for members.
+        if self.home_score>=self.race_to or self.away_score>=self.race_to:
+            self.is_completed = True
+
+        return
+
+    def _submit(self):
+        if not self.is_completed:
+            return
+
+                # adjust matchs information for members.
         self.home_player._match_adj += 1
         self.away_player._match_adj += 1
 
@@ -135,6 +143,8 @@ class Match(AbstractMatch):
         else:
             self.winner = None
 
+        home_score_ = self.home_score
+        away_score_ = self.away_score
         # adjust points for members using ELO Ranking systems
         self.home_player._point_adj += calc_elo(float(home_score_) / (home_score_ + away_score_),
                                                 self.away_player.points,
@@ -143,6 +153,11 @@ class Match(AbstractMatch):
                                                 self.home_player.points,
                                                 self.away_player.points)
         self.is_updated = True
+        return
+
+    def update_all(self):
+        self._update_progress()
+        self._submit()
         return
 
     def __str__(self):

@@ -12,7 +12,8 @@ def index(request):
 
 
 def match_index(request):
-    return render(request, 'match_index.html')
+    matches = Match.objects.all()
+    return render(request, 'match_index.html', {'matches': matches})
 
 
 def match_view(request, match_id):
@@ -35,8 +36,8 @@ def match_view(request, match_id):
             clear_player = get_object_or_404(Member, pk=clear_player_id)
             frame.cleared_by = clear_player
         frame.save()
-    match.update_all()
-    match.save()
+        match.update_all()
+        #match.save()
     frames = match.frame_set.all()
     return render(request, 'match.html', {'match': match, 'frames': frames})
 

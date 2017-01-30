@@ -20,12 +20,13 @@ def view_match(request, match_id):
         break_player = get_object_or_404(Member, pk=int(request.POST['break_player']))
         home_score = int(request.POST['home_score'])
         away_score = int(request.POST['away_score'])
-        clear_player_id = int(request.POST['clear_player'])
+        clear_player_id = request.POST['clear_player']
         # TODO: handle frame number
         frame = Frame(match=match, home_score=home_score, away_score=away_score, break_player=break_player)
-        if clear_player_id < 0:  # not a clearance
+        if clear_player_id == "":  # not a clearance
             frame.is_clearance = False
         else:
+            clear_player_id = int(clear_player_id)
             frame.is_clearance = True
             clear_player = get_object_or_404(Member, pk=clear_player_id)
             frame.cleared_by = clear_player

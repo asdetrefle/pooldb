@@ -42,7 +42,8 @@ class AbstractMatch(models.Model):
     season = models.CharField(max_length=10, default=default_season)
     number_frames = models.IntegerField(default=0)
     table_size  = models.IntegerField(default=9)
-    is_updated = models.BooleanField(default=False)
+    is_completed = models.BooleanField(default=False)
+    is_submitted = models.BooleanField(default=False)
 
     pool_type  = models.CharField(
         max_length=10,
@@ -73,6 +74,7 @@ class Match(AbstractMatch):
         (INTERNAL, 'Internal'),
     )
 
+    race_to = models.IntegerField(default=7)
     match_type  = models.CharField(
         max_length=1,
         choices=MATCH_TYPE_CHOICES,
@@ -98,10 +100,7 @@ class Match(AbstractMatch):
         null=True
     )
 
-    def update_all(self):
-        if self.is_updated:
-            return
-
+    def _update_progress(self):
         len_ = 0
         home_score_ = 0
         away_score_ = 0
@@ -122,27 +121,55 @@ class Match(AbstractMatch):
         self.home_score = home_score_
         self.away_score = away_score_
 
+        if self.home_score>=self.race_to or self.away_score>=self.race_to:
+            self.is_completed = True
+
+        return
+
+    def _submit(self):
+        if not self.is_completed:
+            return
+
+        if self.is_submitted:
+            return
+
+        print self.is_completed
+
         # adjust matchs information for members.
-        self.home_player._match_adj += 1
-        self.away_player._match_adj += 1
+        self.home_player.total_matches_played += 1
+        self.away_player.season_matches_played += 1
 
         if self.home_score > self.away_score:
             self.winner = self.home_player
-            self.home_player._match_won_adj += 1
+            self.home_player.total_matches_won += 1
+            self.home_player.season_matches_won += 1
         elif self.home_score < self.away_score:
             self.winner = self.away_player
-            self.away_player._match_won_adj += 1
+            self.away_player.total_matches_won += 1
+            self.away_player.season_matches_won += 1
         else:
             self.winner = None
 
+        home_score_ = self.home_score
+        away_score_ = self.away_score
+
         # adjust points for members using ELO Ranking systems
+        # print " toto ", self.home_player._point_adj
         self.home_player._point_adj += calc_elo(float(home_score_) / (home_score_ + away_score_),
                                                 self.away_player.points,
                                                 self.home_player.points)
         self.away_player._point_adj += calc_elo(float(away_score_) / (home_score_ + away_score_),
                                                 self.home_player.points,
                                                 self.away_player.points)
-        self.is_updated = True
+        self.home_player.save()
+        self.away_player.save()
+        # print " tata", self.home_player._point_adj
+        self.is_submitted = True
+        return
+
+    def update_all(self):
+        self._update_progress()
+        self._submit()
         return
 
     def __str__(self):
@@ -176,7 +203,7 @@ class Leg(AbstractMatch):
     )
 
     def update_all(self):
-        if self.is_updated:
+        if self.is_submitted:
             return
 
         len_ = 0
@@ -206,7 +233,7 @@ class Leg(AbstractMatch):
         else:
             self.winner = None
 
-        self.is_updated = True
+        self.is_submitted = True
         return
 
     def __str__(self):
@@ -234,9 +261,6 @@ class AbstractFrame(models.Model):
     class Meta:
         abstract = True
 
-    def __str__(self):
-        return str(self.frame_number)
-
 
 class Frame(AbstractFrame):
 
@@ -244,6 +268,9 @@ class Frame(AbstractFrame):
         Match,
         models.CASCADE
     )
+
+    def __str__(self):
+        return "{} - Frame {}".format(self.match, self.frame_number)
 
 
 class LeagueFrame(AbstractFrame):

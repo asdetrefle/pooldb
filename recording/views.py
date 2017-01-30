@@ -8,11 +8,14 @@ from administration.models import Member, Team, League
 
 
 def index(request):
-    # return HttpResponse("Hello World!")
-    return render(request, 'base_site.html', {'content': 'Hello recording'})
+    return render(request, 'recording_index.html')
 
 
-def view_match(request, match_id):
+def match_index(request):
+    return render(request, 'match_index.html')
+
+
+def match_view(request, match_id):
     # TODO: now view_match and add_frame are using the same frame; maybe separate them for clarity
     # TODO: use django form and add validation
     match = get_object_or_404(Match, pk=match_id)

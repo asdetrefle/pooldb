@@ -35,6 +35,28 @@ class League(models.Model):
         self.size = len(self.team_set.all())
         return
 
+    def _update_ranking(self):
+        ts = self.team_set.all()
+
+        pk_set = []
+        point_set = []
+        for t in ts:
+            for m in t.member_set.all():
+                m._update_points()
+                pk_set.append(m.pk)
+                point_set.append(m.points)
+
+        #print pk_set, point_set
+
+        order = sorted(range(len(point_set)), key=lambda k: -point_set[k])
+        for i,j in enumerate(order):
+            mb = Member.objects.get(pk=pk_set[j])
+            mb.ranking = i + 1
+            mb.save()
+
+        return
+
+
     def update_all(self):
         self._update_size()
         return
@@ -120,8 +142,6 @@ class Member(models.Model):
     # the following three fields stores adjustment to Member ranking information during a ranking cycle
     # Members' ranking could change every week or every day.
     _point_adj = models.FloatField('Points to be added', default=0.)
-    _match_adj  = models.IntegerField('Matches to be added', default=0)
-    _match_won_adj = models.IntegerField('Matches won to be added', default=0)
 
     total_matches_played = models.IntegerField(default=0)
     total_matches_won   = models.IntegerField(default=0)
@@ -138,22 +158,13 @@ class Member(models.Model):
         return
 
     def _update_points(self):
-        self.points += _point_adj
+        self.points += self._point_adj
         self._point_adj = 0
-        return
-
-    def _update_ranking(self):
-        # TODO
-        return
-
-    def _update_matches(self):
-        #TODO
+        self.save()
         return
 
     def update_all(self):
-        self._update_ranking()
         self._update_points()
-        self._update_matches()
         return
 
     def __str__(self):

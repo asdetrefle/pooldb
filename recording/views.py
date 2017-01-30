@@ -38,18 +38,3 @@ def view_match(request, match_id):
     return render(request, 'match.html', {'match': match, 'frames': frames})
 
 
-def view_league_frame(request, league_frame_id):
-    frame = get_object_or_404(LeagueFrame, pk=frame_id)
-    return render(request, 'league_frame.html', {'league_frame': frame})
-
-
-def create_league_frame(request):
-    if request.method =='POST':
-        form = LeagueFrameForm(request.POST)
-        if lf.is_valid():
-            new_lf = form.save()
-            return HttpResponseRedirect('/league_frame/' + str(new_article.pk))
-
-    form = LeagueFrameForm(request)
-    return render(request, '.html', {'form': form})
-

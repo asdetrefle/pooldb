@@ -3,6 +3,24 @@
 {% block title %} Matches {% endblock %}
 
 {% block content %}
-    See the only <a href="{% url 'match_view' 1 %}">match</a>
+# TODO Add filters that allows to select all matches by player, date, team
+
+ <table border="0">    
+    <col width="50">
+    <col width="100">
+    <col width="600">
+    <tr>
+        <td align="center"><h3> ID </h3></td>
+        <td align="center"><h3> Date </h3></td>
+        <td align="left"><h3> Match </h3></td>
+    </tr>
+    {% for match in matches %}
+    <tr>
+        <td align="center"> {{ forloop.counter }} </td>
+        <td align="center"> {{ match.create_date.date|date:"Y-m-d" }} </td>
+        <td align="left"> <a href="{% url 'match_view' match.pk %}"> {{ match.away_player }} vs. {{ match.home_player }}</a> </td>
+    </tr>
+    {% endfor %}
+</table>
 {% endblock %}
 

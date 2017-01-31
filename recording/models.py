@@ -53,7 +53,7 @@ class AbstractMatch(models.Model):
     score_type = models.CharField(
         max_length=1,
         choices=SCORE_SYSTEM_CHOICES,
-        default='P'
+        default='F'
     )
 
     home_score = models.IntegerField(default=0)

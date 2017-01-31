@@ -52,7 +52,11 @@
     </div>
     <!-- END Header -->
     {% block breadcrumbs %}
-    <div class="breadcrumbs"> 
+    <div class="breadcrumbs">
+        <style>
+            div.breadcrumbs a {margin: 3pt}
+        </style>
+
         <a href="{% url 'index' %}">{% trans 'Home' %} </a>
         <a href="{% url 'recording' %}">{% trans 'Recording' %}</a>
     {% if title %} &rsaquo; {{ title }}{% endif %}

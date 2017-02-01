@@ -16,8 +16,8 @@
             var home_selected = home_player_select.find("option:selected");
             var away_selected = away_player_select.find("option:selected");
 
-            var old_break_selected_val = break_player_select.find("option:selected").val();
-            var old_clear_selected_val = clear_player_select.find("option:selected").val();
+            var old_break_selected_val = parseInt(break_player_select.find("option:selected").val());
+            var old_clear_selected_val = parseInt(clear_player_select.find("option:selected").val());
             var not_clearance = $('<option>').val(-1).html("None");
 
             break_player_select.empty();
@@ -56,6 +56,8 @@
     .frame_win   {font-weight:bold; color:dodgerblue}
     .draw {background-color: deepskyblue; margin: 5pt}
     .away_win {background-color: red; margin: 5pt}
+    td {vertical-align: middle}
+    #add_new_frame {padding: 4pt}
     </style>
 
     <h3>Date of leg: {{leg.create_date}} {% if leg.is_completed %} leg Completed. {% else %} leg in Progress. {% endif %}</h3> 
@@ -95,6 +97,7 @@
         <td align="center"><h3> Home Player </h3></td>
         <td align="center"><h3> Break By </h3></td>
         <td align="center"><h3> Clear By </h3></td>
+        <td align="center"></td>
     </tr>
     {% for frame in frames %}
     <tr>
@@ -103,6 +106,7 @@
         <td align="center"> {% if frame.away_score > frame.home_score %} <span class="frame_win"> {{ frame.away_score }} </span> {% else %} {{ frame.away_score }}{% endif %} </td>
         <td align="center"> {% if frame.away_score < frame.home_score %} <span class="frame_win"> {{ frame.home_score }} </span> {% else %} {{ frame.home_score }}{% endif %} </td>
         <td align="center"> {%if frame.is_clearance %} {{frame.home_player.player}}{% else %} {{frame.home_player.player}} {% endif %} </td>
+        <td align="center"></td>
     </tr>
     {% endfor %}
     {% if leg.is_completed %}
@@ -125,6 +129,7 @@
 {#        TODO: these two lists will change width when the options change; use css to have a fixed size #}
         <td><select name="break_player"></select></td>
         <td><select name="clear_player"></select></td>
+        <td><input type="submit" value="Add" id="add_new_frame"></td>
     </tr>
     {% endif %}
 </table>
@@ -132,9 +137,8 @@
 <p></p>
 {% if leg.is_completed %}
 {% else %}      
-<h3>Add the new frame to current leg: (TODO: now it's a hand-made form without validation; add validation to it or use forms created by Django) </h3>
+<h3> (TODO: now it's a hand-made form without validation; add validation to it or use forms created by Django) </h3>
         {% csrf_token %}
-        <input type="submit" value="Add this new frame">
     </form>
 {% endif %}
 {% endblock %}

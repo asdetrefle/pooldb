@@ -18,7 +18,7 @@
 
             var old_break_selected_val = parseInt(break_player_select.find("option:selected").val());
             var old_clear_selected_val = parseInt(clear_player_select.find("option:selected").val());
-            var not_clearance = $('<option>').val(-1).html("None");
+            var not_clearance = $('<option>').val(-1).html("-");
 
             break_player_select.empty();
             break_player_select.append(home_selected.clone());

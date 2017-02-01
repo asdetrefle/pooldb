@@ -50,6 +50,7 @@ def leg_view(request, leg_id):
     # TODO: now view_match and add_frame are using the same frame; maybe separate them for clarity
     # TODO: use django form and add validation
     leg = get_object_or_404(Leg, leg_id=leg_id)
+    leg.update_all()
     if request.method == 'POST':
         break_player = get_object_or_404(Member, pk=int(request.POST['break_player']))
         home_score = int(request.POST['home_score'])

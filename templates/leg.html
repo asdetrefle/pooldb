@@ -8,25 +8,49 @@
     <script>
     $(document).ready(function () {
         var home_player_select = $("select[name=home_player]");
+
         var away_player_select = $("select[name=away_player]");
         var break_player_select = $("select[name=break_player]");
         var clear_player_select = $("select[name=clear_player]");
+        var leg_id = parseInt($("#leg_id").val());
+{#        console.log(leg_id);#}
         function update_list() {
-
             var home_selected = home_player_select.find("option:selected");
+            var home_selected_val = parseInt(home_selected.val());
             var away_selected = away_player_select.find("option:selected");
+            var away_selected_val = parseInt(away_selected.val());
 
             var old_break_selected_val = parseInt(break_player_select.find("option:selected").val());
+{#            var old_break_is_home = (home_selected_val == old_break_selected_val);#}
             var old_clear_selected_val = parseInt(clear_player_select.find("option:selected").val());
             var not_clearance = $('<option>').val(-1).html("-");
 
             break_player_select.empty();
             break_player_select.append(home_selected.clone());
             break_player_select.append(away_selected.clone());
-            // keep the value unchanged if it's still valid
-            if (old_break_selected_val != undefined) {
-                if (old_break_selected_val == home_selected.val() || old_break_selected_val == away_selected.val()) {
-                    break_player_select.val(old_break_selected_val);
+            if (old_break_selected_val == undefined || isNaN(old_break_selected_val)) { // at initializaion, select the player according to parity of frame number
+                if (leg_id % 2 == 1) { // default home
+                    break_player_select.val(home_selected_val);
+                } else { // default away
+                    break_player_select.val(away_selected_val);
+                }
+            } else { // keep the break player with the currently selected home/away team
+                //if (old_break_selected_val == home_selected.val() || old_break_selected_val == away_selected.val()) {
+                //    break_player_select.val(old_break_selected_val);
+                //}
+                var old_break_is_home = false;
+                var home_options = home_player_select.find("option");
+                var i;
+                for (i = 0; i < home_options.length; i++) {
+                    if (parseInt(home_options[i].value) == old_break_selected_val) {
+                        old_break_is_home = true;
+                        break;
+                    }
+                }
+                if (old_break_is_home) {
+                    break_player_select.val(home_selected_val);
+                } else {
+                    break_player_select.val(away_selected_val);
                 }
             }
 
@@ -115,6 +139,7 @@
     {% else %}
     <tr> 
         <form method="post">
+        <input type="hidden" id="leg_id" value="{{ leg.leg_id }}">
         <td align="center"> {{ frames.count|add:"1" }} </td>
         <td align="center"><select name="away_player" >
                 {% for p in away_team_members %}

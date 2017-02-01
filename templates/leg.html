@@ -105,7 +105,9 @@
         <td align="center"> {{frame.away_player.player}} </td>
         <td align="center"> {% if frame.away_score > frame.home_score %} <span class="frame_win"> {{ frame.away_score }} </span> {% else %} {{ frame.away_score }}{% endif %} </td>
         <td align="center"> {% if frame.away_score < frame.home_score %} <span class="frame_win"> {{ frame.home_score }} </span> {% else %} {{ frame.home_score }}{% endif %} </td>
-        <td align="center"> {%if frame.is_clearance %} {{frame.home_player.player}}{% else %} {{frame.home_player.player}} {% endif %} </td>
+        <td align="center"> {{frame.home_player.player}} </td>
+        <td align="center"> {{frame.break_player.player}} </td>
+        <td align="center"> {%if frame.is_clearance %} {{frame.cleared_by.player}} {% else %} - {% endif %} </td>
         <td align="center"></td>
     </tr>
     {% endfor %}

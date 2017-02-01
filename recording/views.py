@@ -49,24 +49,32 @@ def match_view(request, match_id):
 def leg_view(request, leg_id):
     # TODO: now view_match and add_frame are using the same frame; maybe separate them for clarity
     # TODO: use django form and add validation
-    leg = get_object_or_404(Leg, pk=leg_id)
-    leg.update_all()
+    leg = get_object_or_404(Leg, leg_id=leg_id)
     if request.method == 'POST':
         break_player = get_object_or_404(Member, pk=int(request.POST['break_player']))
         home_score = int(request.POST['home_score'])
         away_score = int(request.POST['away_score'])
-        clear_player_id = request.POST['clear_player']
-        nb = match.number_frames + 1
-        frame = Frame(frame_number=nb, match=match, home_score=home_score, away_score=away_score, break_player=break_player)
-        if clear_player_id == "":  # not a clearance
+        clear_player_id = int(request.POST['clear_player'])
+        home_player = get_object_or_404(Member, pk=int(request.POST['home_player']))
+        away_player = get_object_or_404(Member, pk=int(request.POST['away_player']))
+        nb = leg.number_frames + 1
+        frame = LeagueFrame(frame_number=nb,
+                            leg=leg,
+                            home_score=home_score,
+                            away_score=away_score,
+                            break_player=break_player,
+                            home_player=home_player,
+                            away_player=away_player)
+        if clear_player_id < 0:  # not a clearance
             frame.is_clearance = False
         else:
-            clear_player_id = int(clear_player_id)
+            # clear_player_id = int(clear_player_id)
             frame.is_clearance = True
             clear_player = get_object_or_404(Member, pk=clear_player_id)
             frame.cleared_by = clear_player
         frame.save()
-        match.update_all()
+        # leg.update_all()
+    leg.update_all()  # we must update here so the latest frame is taken into account; I don't know why.....
     frames = leg.leagueframe_set.all()
     away_team_members = leg.away_team.member_set.all()
     home_team_members = leg.home_team.member_set.all()

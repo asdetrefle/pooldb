@@ -124,6 +124,7 @@ class Match(AbstractMatch):
         if self.home_score>=self.race_to or self.away_score>=self.race_to:
             self.is_completed = True
 
+        self.save()
         return
 
     def _submit(self):
@@ -165,6 +166,7 @@ class Match(AbstractMatch):
         self.away_player.save()
         # print " tata", self.home_player._point_adj
         self.is_submitted = True
+        self.save()
         return
 
     def update_all(self):

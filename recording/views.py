@@ -25,7 +25,7 @@ def match_view(request, match_id):
     # TODO: now view_match and add_frame are using the same frame; maybe separate them for clarity
     # TODO: use django form and add validation
     match = get_object_or_404(Match, pk=match_id)
-    match.update_all()
+    # match.update_all()
     if request.method == 'POST':
         break_player = get_object_or_404(Member, pk=int(request.POST['break_player']))
         home_score = int(request.POST['home_score'])
@@ -50,7 +50,7 @@ def leg_view(request, leg_id):
     # TODO: now view_match and add_frame are using the same frame; maybe separate them for clarity
     # TODO: use django form and add validation
     leg = get_object_or_404(Leg, leg_id=leg_id)
-    leg.update_all()
+    # leg.update_all()
     if request.method == 'POST':
         break_player = get_object_or_404(Member, pk=int(request.POST['break_player']))
         home_score = int(request.POST['home_score'])
@@ -74,8 +74,7 @@ def leg_view(request, leg_id):
             clear_player = get_object_or_404(Member, pk=clear_player_id)
             frame.cleared_by = clear_player
         frame.save()
-        # leg.update_all()
-    leg.update_all()  # we must update here so the latest frame is taken into account; I don't know why.....
+        leg.update_all()
     frames = leg.leagueframe_set.all()
     away_team_members = leg.away_team.member_set.all()
     home_team_members = leg.home_team.member_set.all()

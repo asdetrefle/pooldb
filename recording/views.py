@@ -31,7 +31,7 @@ def match_view(request, match_id):
         home_score = int(request.POST['home_score'])
         away_score = int(request.POST['away_score'])
         clear_player_id = request.POST['clear_player']
-        nb = match.number_frames + 1;
+        nb = match.number_frames + 1
         frame = Frame(frame_number=nb, match=match, home_score=home_score, away_score=away_score, break_player=break_player)
         if clear_player_id == "":  # not a clearance
             frame.is_clearance = False
@@ -56,7 +56,7 @@ def leg_view(request, leg_id):
         home_score = int(request.POST['home_score'])
         away_score = int(request.POST['away_score'])
         clear_player_id = request.POST['clear_player']
-        nb = match.number_frames + 1;
+        nb = match.number_frames + 1
         frame = Frame(frame_number=nb, match=match, home_score=home_score, away_score=away_score, break_player=break_player)
         if clear_player_id == "":  # not a clearance
             frame.is_clearance = False

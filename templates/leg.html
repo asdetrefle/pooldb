@@ -1,9 +1,54 @@
 {% extends "base_site.html" %}
 
-{% block title %} Edit Match {% endblock %}
+{% block title %} Edit leg {% endblock %}
 
 {% block content %}
+    {% load static %}
+    <script src="{% static "js/jquery-3.1.1.min.js" %}"></script>
+    <script>
+    $(document).ready(function () {
+        var home_player_select = $("select[name=home_player]");
+        var away_player_select = $("select[name=away_player]");
+        var break_player_select = $("select[name=break_player]");
+        var clear_player_select = $("select[name=clear_player]");
+        function update_list() {
 
+            var home_selected = home_player_select.find("option:selected");
+            var away_selected = away_player_select.find("option:selected");
+
+            var old_break_selected_val = parseInt(break_player_select.find("option:selected").val());
+            var old_clear_selected_val = parseInt(clear_player_select.find("option:selected").val());
+            var not_clearance = $('<option>').val(-1).html("-");
+
+            break_player_select.empty();
+            break_player_select.append(home_selected.clone());
+            break_player_select.append(away_selected.clone());
+            // keep the value unchanged if it's still valid
+            if (old_break_selected_val != undefined) {
+                if (old_break_selected_val == home_selected.val() || old_break_selected_val == away_selected.val()) {
+                    break_player_select.val(old_break_selected_val);
+                }
+            }
+
+            clear_player_select.empty();
+            clear_player_select.append(not_clearance);
+            clear_player_select.append(home_selected.clone());
+            clear_player_select.append(away_selected.clone());
+            // keep the value unchanged if it's still valid
+            if (old_clear_selected_val != undefined) {
+                if (old_clear_selected_val == home_selected.val() ||
+                    old_clear_selected_val == away_selected.val() ||
+                    old_clear_selected_val < 0) {
+                    clear_player_select.val(old_clear_selected_val);
+                }
+            }
+
+        }
+        update_list();
+        $(home_player_select).change(update_list);
+        $(away_player_select).change(update_list);
+    });
+    </script>
     <style>
     .header     {font-size:1.17em; color:dimgrey; font-weight:normal}
     .header_loss    {font-size:1.5em; color:dimgrey; font-weight:normal}
@@ -11,9 +56,11 @@
     .frame_win   {font-weight:bold; color:dodgerblue}
     .draw {background-color: deepskyblue; margin: 5pt}
     .away_win {background-color: red; margin: 5pt}
+    td {vertical-align: middle}
+    #add_new_frame {padding: 4pt}
     </style>
 
-    <h3>Date of Match: {{match.create_date}} {% if match.is_completed %} Match Completed. {% else %} Match in Progress. {% endif %}</h3> 
+    <h3>Date of leg: {{leg.create_date}} {% if leg.is_completed %} leg Completed. {% else %} leg in Progress. {% endif %}</h3> 
 
 <table border="0"> 
     <col width="80">
@@ -22,15 +69,15 @@
     <col width="120">
   <tr>
     <td align="right"><h2><span class="header"> Away : </span></h2></td>
-    <td><h2><span class="header"> {{match.away_player}} </span></h2></td>
-    <td align="right"><h2> {% if match.away_score > match.home_score and match.is_completed %} ✔ {% endif %} </h2></td>
-    <td align="center"><h2><span class="{% if match.away_score > match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.away_score}} </span></h2></td>
+    <td><h2><span class="header"> {{leg.away_team}} </span></h2></td>
+    <td align="right"><h2> {% if leg.away_score > leg.home_score and leg.is_completed %} ✔ {% endif %} </h2></td>
+    <td align="center"><h2><span class="{% if leg.away_score > leg.home_score %}header_win{% else %}header_loss{% endif %}"> {{leg.away_score}} </span></h2></td>
   </tr>
   <tr>
     <td align="right"><h2><span class="header"> Home : </span></h2></td>
-    <td><h2><span class="header"> {{match.home_player}} </span></h2></td>
-    <td align="right"><h2> {% if match.away_score < match.home_score and match.is_completed %} ✔ {% endif %} </h2></td>
-    <td align="center"><h2><span class="{% if match.away_score < match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.home_score}}</span></h2></td>
+    <td><h2><span class="header"> {{leg.home_team}} </span></h2></td>
+    <td align="right"><h2> {% if leg.away_score < leg.home_score and leg.is_completed %} ✔ {% endif %} </h2></td>
+    <td align="center"><h2><span class="{% if leg.away_score < leg.home_score %}header_win{% else %}header_loss{% endif %}"> {{leg.home_score}}</span></h2></td>
   </tr>
 </table>
 
@@ -44,46 +91,56 @@
     <col width="150">
     <tr>
         <td align="center"><h3> Frame </h3></td>
+        <td align="center"><h3> Away Player </h3></td>
+        <td align="center"><h3> Away Score </h3></td>
+        <td align="center"><h3> Home Score </h3></td>
+        <td align="center"><h3> Home Player </h3></td>
         <td align="center"><h3> Break By </h3></td>
-        <td align="center"><h3> {{ match.away_player.player}} </h3></td>
-        <td align="center"><h3> {{ match.home_player.player}} </h3></td>
         <td align="center"><h3> Clear By </h3></td>
+        <td align="center"></td>
     </tr>
     {% for frame in frames %}
     <tr>
         <td align="center"> {{frame.frame_number}} </td>
-        <td align="center"> {{frame.break_player.player}} </td>
+        <td align="center"> {{frame.away_player.player}} </td>
         <td align="center"> {% if frame.away_score > frame.home_score %} <span class="frame_win"> {{ frame.away_score }} </span> {% else %} {{ frame.away_score }}{% endif %} </td>
         <td align="center"> {% if frame.away_score < frame.home_score %} <span class="frame_win"> {{ frame.home_score }} </span> {% else %} {{ frame.home_score }}{% endif %} </td>
-        <td align="center"> {%if frame.is_clearance %} {{frame.cleared_by.player}}{% else %} - {% endif %} </td>
+        <td align="center"> {{frame.home_player.player}} </td>
+        <td align="center"> {{frame.break_player.player}} </td>
+        <td align="center"> {%if frame.is_clearance %} {{frame.cleared_by.player}} {% else %} - {% endif %} </td>
+        <td align="center"></td>
     </tr>
     {% endfor %}
-    {% if match.is_completed %}
+    {% if leg.is_completed %}
     {% else %}
     <tr> 
         <form method="post">
         <td align="center"> {{ frames.count|add:"1" }} </td>
-        <td align="center"><select name="break_player" >
-                <option value="{{ match.away_player.pk }}">{{ match.away_player.player }}</option>
-                <option value="{{ match.home_player.pk }}">{{ match.home_player.player }}</option>
+        <td align="center"><select name="away_player" >
+                {% for p in away_team_members %}
+                <option value="{{ p.pk }}">{{ p.player }}</option>
+                {% endfor %}
             </select></td>
         <td align="center"><input type="text" name="away_score" size="4"></td>
         <td align="center"><input type="text" name="home_score" size="4"></td>
-        <td align="center"><select name="clear_player">
-                <option value="" selected=""> - </option>
-                <option value="{{ match.away_player.pk }}">{{ match.away_player.player }}</option>
-                <option value="{{ match.home_player.pk }}">{{ match.home_player.player }}</option>
+        <td align="center"><select name="home_player">
+                {% for p in home_team_members %}
+                <option value="{{ p.pk }}">{{ p.player }}</option>
+                {% endfor %}
             </select></td>
+{#        TODO: these two lists will change width when the options change; use css to have a fixed size #}
+        <td><select name="break_player"></select></td>
+        <td><select name="clear_player"></select></td>
+        <td><input type="submit" value="Add" id="add_new_frame"></td>
     </tr>
     {% endif %}
 </table>
 
 <p></p>
-{% if match.is_completed %}
+{% if leg.is_completed %}
 {% else %}      
-<h3>Add the new frame to current match: (TODO: now it's a hand-made form without validation; add validation to it or use forms created by Django) </h3>
+<h3> (TODO: now it's a hand-made form without validation; add validation to it or use forms created by Django) </h3>
         {% csrf_token %}
-        <input type="submit" value="Add this new frame">
     </form>
 {% endif %}
 {% endblock %}

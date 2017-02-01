@@ -1,0 +1,9 @@
+{% extends "base_site.html" %}
+
+{% block title %} Recording {% endblock %}
+
+{% block content %}
+    <p>See <a href="{% url 'listmatch' %}">all the matches</a></p>
+    <p>See <a href="{% url 'listleg' %}">all the legs</a></p>
+{% endblock %}
+

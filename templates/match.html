@@ -11,6 +11,8 @@
     .frame_win   {font-weight:bold; color:dodgerblue}
     .draw {background-color: deepskyblue; margin: 5pt}
     .away_win {background-color: red; margin: 5pt}
+    td {vertical-align: middle}
+    #add_new_frame {padding: 4pt}
     </style>
 
     <h3>Date of Match: {{match.create_date}} {% if match.is_completed %} Match Completed. {% else %} Match in Progress. {% endif %}</h3> 
@@ -48,6 +50,7 @@
         <td align="center"><h3> {{ match.away_player.player}} </h3></td>
         <td align="center"><h3> {{ match.home_player.player}} </h3></td>
         <td align="center"><h3> Clear By </h3></td>
+        <td></td>
     </tr>
     {% for frame in frames %}
     <tr>
@@ -56,6 +59,7 @@
         <td align="center"> {% if frame.away_score > frame.home_score %} <span class="frame_win"> {{ frame.away_score }} </span> {% else %} {{ frame.away_score }}{% endif %} </td>
         <td align="center"> {% if frame.away_score < frame.home_score %} <span class="frame_win"> {{ frame.home_score }} </span> {% else %} {{ frame.home_score }}{% endif %} </td>
         <td align="center"> {%if frame.is_clearance %} {{frame.cleared_by.player}}{% else %} - {% endif %} </td>
+        <td></td>
     </tr>
     {% endfor %}
     {% if match.is_completed %}
@@ -74,6 +78,7 @@
                 <option value="{{ match.away_player.pk }}">{{ match.away_player.player }}</option>
                 <option value="{{ match.home_player.pk }}">{{ match.home_player.player }}</option>
             </select></td>
+        <td><input type="submit" value="Add" id="add_new_frame"></td>
     </tr>
     {% endif %}
 </table>
@@ -81,9 +86,8 @@
 <p></p>
 {% if match.is_completed %}
 {% else %}      
-<h3>Add the new frame to current match: (TODO: now it's a hand-made form without validation; add validation to it or use forms created by Django) </h3>
+<h3>(TODO: now it's a hand-made form without validation; add validation to it or use forms created by Django) </h3>
         {% csrf_token %}
-        <input type="submit" value="Add this new frame">
     </form>
 {% endif %}
 {% endblock %}

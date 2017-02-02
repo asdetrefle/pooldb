@@ -1,4 +1,5 @@
 {% extends "base_site.html" %}
+{% load mathfilters %}
 
 {% block title %} Edit leg {% endblock %}
 
@@ -78,6 +79,7 @@
     .header_loss    {font-size:1.5em; color:dimgrey; font-weight:normal}
     .header_win {font-size:1.5em; color:dodgerblue; font-weight:bold}
     .frame_win   {font-weight:bold; color:dodgerblue}
+    .handicap   {font-size:0.8em; color:green}
     .draw {background-color: deepskyblue; margin: 5pt}
     .away_win {background-color: red; margin: 5pt}
     td {vertical-align: middle}
@@ -90,18 +92,21 @@
     <col width="80">
     <col width="350">
     <col width="50">
-    <col width="120">
+    <col width="70">
+    <col width="50">
   <tr>
     <td align="right"><h2><span class="header"> Away : </span></h2></td>
     <td><h2><span class="header"> {{leg.away_team}} </span></h2></td>
     <td align="right"><h2> {% if leg.away_score > leg.home_score and leg.is_completed %} ✔ {% endif %} </h2></td>
-    <td align="center"><h2><span class="{% if leg.away_score > leg.home_score %}header_win{% else %}header_loss{% endif %}"> {{leg.away_score}} </span></h2></td>
+    <td align="right"><h2><span class="{% if leg.away_score > leg.home_score %}header_win{% else %}header_loss{% endif %}"> {{leg.away_score}} </span></h2></td>
+    <td align="left">{% if leg.handicap < 0 %}<h2><span class="handicap"> ({{ leg.handicap|abs }}) </span></h2>{% endif %}</td>
   </tr>
   <tr>
     <td align="right"><h2><span class="header"> Home : </span></h2></td>
     <td><h2><span class="header"> {{leg.home_team}} </span></h2></td>
     <td align="right"><h2> {% if leg.away_score < leg.home_score and leg.is_completed %} ✔ {% endif %} </h2></td>
-    <td align="center"><h2><span class="{% if leg.away_score < leg.home_score %}header_win{% else %}header_loss{% endif %}"> {{leg.home_score}}</span></h2></td>
+    <td align="right"><h2><span class="{% if leg.away_score < leg.home_score %}header_win{% else %}header_loss{% endif %}"> {{leg.home_score}}</span></h2></td>
+    <td align="left">{% if leg.handicap > 0 %}<h2><span class="handicap"> ({{ leg.handicap }})</span></h2>{% endif %}</td>
   </tr>
 </table>
 

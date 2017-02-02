@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from abc import abstractmethod
 
 from django.db import models
 from django.utils import timezone
@@ -62,6 +63,39 @@ class AbstractMatch(models.Model):
     class Meta:
         abstract = True
 
+    def _update_progress(self):
+        len_ = 0
+        home_score_ = 0
+        away_score_ = 0
+
+        for f in self.leagueframe_set.all():
+            len_ += 1
+            if self.score_type == 'P':
+                home_score_ += f.home_score
+                away_score_ += f.away_score
+            else:
+                if f.home_score > f.away_score:
+                    home_score_ += 1
+                elif f.home_score < f.away_score:
+                    away_score_ += 1
+
+        self.number_frames = len_
+
+        self.home_score = home_score_
+        self.away_score = away_score_
+        self.save()
+        return
+
+    @abstractmethod
+    def _upon_completion(self):
+        """to override in child classes"""
+        pass
+
+    @abstractmethod
+    def update_all(self):
+        """to override in child classes"""
+        pass
+
     def __str__(self):
         return self.pk
 
@@ -100,33 +134,10 @@ class Match(AbstractMatch):
         null=True
     )
 
-    def _update_progress(self):
-        len_ = 0
-        home_score_ = 0
-        away_score_ = 0
-
-        for f in self.frame_set.all():
-            len_ += 1
-            if self.score_type == 'P':
-                home_score_ += f.home_score
-                away_score_ += f.away_score
-            else:
-                if f.home_score > f.away_score:
-                    home_score_ += 1
-                elif f.home_score < f.away_score:
-                    away_score_ += 1
-
-        self.number_frames = len_
-
-        self.home_score = home_score_
-        self.away_score = away_score_
-
+    def _upon_completion(self):
         if self.home_score>=self.race_to or self.away_score>=self.race_to:
             self.is_completed = True
 
-        return
-
-    def _submit(self):
         if not self.is_completed:
             return
 
@@ -148,7 +159,7 @@ class Match(AbstractMatch):
             self.away_player.total_matches_won += 1
             self.away_player.season_matches_won += 1
         else:
-            self.winner = None
+            self.winner = none
 
         home_score_ = self.home_score
         away_score_ = self.away_score
@@ -165,11 +176,12 @@ class Match(AbstractMatch):
         self.away_player.save()
         # print " tata", self.home_player._point_adj
         self.is_submitted = True
+        self.save()
         return
 
     def update_all(self):
         self._update_progress()
-        self._submit()
+        self._upon_completion()
         return
 
     def __str__(self):
@@ -202,29 +214,27 @@ class Leg(AbstractMatch):
         null=True
     )
 
-    def update_all(self):
-        if self.is_submitted:
+    def _update_handicap(self):
+        """
+        This method needs to be called everytime after _update_progress
+        """
+        if self.handicap > 0:
+            self.home_score += self.handicap
+        else:
+            self.away_score += -self.handicap
+
+        self.save()
+        return
+
+    def _upon_completion(self):
+        # TODO this one does not work yet
+        # We need to create a way for Leg to be completed
+        # Currently it nevers finishes.
+        if not self.is_completed:
             return
 
-        len_ = 0
-        home_score_ = 0
-        away_score_ = 0
-
-        for f in self.leagueframe_set.all():
-            len_ += 1
-            if self.score_type == 'P':
-                home_score_ += f.home_score
-                away_score_ += f.away_score
-            else:
-                if f.home_score > f.away_score:
-                    home_score_ += 1
-                elif f.home_score < f.away_score:
-                    away_score_ += 1
-
-        self.number_frames = len_
-
-        self.home_score = home_score_
-        self.away_score = away_score_
+        if self.is_submitted:
+            return
 
         if self.home_score > self.away_score:
             self.winner = self.home_team
@@ -234,6 +244,13 @@ class Leg(AbstractMatch):
             self.winner = None
 
         self.is_submitted = True
+        self.save()
+        return
+
+    def update_all(self):
+        self._update_progress()
+        self._update_handicap()
+        self._upon_completion()
         return
 
     def __str__(self):

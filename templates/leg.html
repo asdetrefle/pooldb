@@ -22,8 +22,8 @@
         var away_player_select = $("select[name=away_player]");
         var break_player_select = $("select[name=break_player]");
         var clear_player_select = $("select[name=clear_player]");
-        var leg_id = parseInt($("#leg_id").val());
-{#        console.log(leg_id);#}
+        var leg_id = {{ leg.pk }};
+
         function update_list() {
             var home_selected = home_player_select.find("option:selected");
             var home_selected_val = parseInt(home_selected.val());
@@ -31,7 +31,6 @@
             var away_selected_val = parseInt(away_selected.val());
 
             var old_break_selected_val = parseInt(break_player_select.find("option:selected").val());
-{#            var old_break_is_home = (home_selected_val == old_break_selected_val);#}
             var old_clear_selected_val = parseInt(clear_player_select.find("option:selected").val());
             var not_clearance = $('<option>').val(-1).html("-");
 
@@ -95,7 +94,7 @@
     #add_new_frame {padding: 4pt}
     </style>
 
-    <h3>Date of leg: {{leg.create_date}} {% if leg.is_completed %} leg Completed. {% else %} leg in Progress. {% endif %}</h3>
+    <h3>Date of leg: {{leg.create_date}} {% if leg.is_completed %} leg Completed. {% else %} leg in Progress. <a class="button" href="{% url 'leg_close' leg_id=leg.pk %}">Close the leg</a>{% endif %}</h3>
 
 <table border="0">
     <col width="80">
@@ -153,7 +152,6 @@
     {% else %}
     <tr> 
         <form method="post">
-        <input type="hidden" id="leg_id" value="{{ leg.leg_id }}">
         <td align="center"> {{ frames.count|add:"1" }} </td>
         <td align="center"><select name="away_player" >
                 {% for p in away_team_members %}

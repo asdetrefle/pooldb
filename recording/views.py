@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from .models import Match, Leg, Frame, LeagueFrame
 from .forms import LeagueFrameForm
 from administration.models import Member, Team, League
@@ -49,7 +49,7 @@ def match_view(request, match_id):
 def leg_view(request, leg_id):
     # TODO: now view_match and add_frame are using the same frame; maybe separate them for clarity
     # TODO: use django form and add validation
-    leg = get_object_or_404(Leg, leg_id=leg_id)
+    leg = get_object_or_404(Leg, pk=leg_id)
     # leg.update_all()
     if request.method == 'POST':
         break_player = get_object_or_404(Member, pk=int(request.POST['break_player']))
@@ -81,3 +81,14 @@ def leg_view(request, leg_id):
     return render(request, 'leg.html', {'leg': leg, 'frames': frames, 'away_team_members': away_team_members,
                                         'home_team_members': home_team_members})
 
+
+def leg_close(request, leg_id):
+    # TODO: why there is leg_id field? why not use pk? this ms
+    leg = get_object_or_404(Leg, pk=leg_id)
+    if leg.is_completed:
+        raise Http404
+    else:
+        leg.is_completed = True
+        leg.save()
+        # TODO: add a text frame in the redirected page to confirm the close action
+        return HttpResponseRedirect('/recording/leg/{}/'.format(leg_id))

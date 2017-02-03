@@ -63,12 +63,19 @@ class AbstractMatch(models.Model):
     class Meta:
         abstract = True
 
+    @abstractmethod
+    def get_frames(self):
+        """to override in child classes"""
+        pass
+
     def _update_progress(self):
         len_ = 0
         home_score_ = 0
         away_score_ = 0
 
-        for f in self.leagueframe_set.all():
+        frames = self.get_frames()
+
+        for f in frames:
             len_ += 1
             if self.score_type == 'P':
                 home_score_ += f.home_score
@@ -133,6 +140,9 @@ class Match(AbstractMatch):
         blank=True,
         null=True
     )
+
+    def get_frames(self):
+        return self.frame_set.all()
 
     def _upon_completion(self):
         if self.home_score>=self.race_to or self.away_score>=self.race_to:
@@ -214,6 +224,9 @@ class Leg(AbstractMatch):
         null=True
     )
 
+    def get_frames(self):
+        return self.leagueframe_set.all()
+
     def _update_handicap(self):
         """
         This method needs to be called everytime after _update_progress
@@ -257,7 +270,7 @@ class Leg(AbstractMatch):
         return "{} {} vs. {} Leg {}".format(self.create_date.date(), self.away_team, self.home_team, self.leg_number)
 
 
-class AbstractFrame(models.Model):
+class Frame(models.Model):
     break_player = models.ForeignKey(
         Member,
         models.CASCADE,
@@ -275,22 +288,18 @@ class AbstractFrame(models.Model):
         related_name = '%(class)s_cleared_by'
     )
 
-    class Meta:
-        abstract = True
-
-
-class Frame(AbstractFrame):
-
     match = models.ForeignKey(
         Match,
-        models.CASCADE
+        models.CASCADE,
+        blank=True,
+        null=True,
     )
 
     def __str__(self):
         return "{} - Frame {}".format(self.match, self.frame_number)
 
 
-class LeagueFrame(AbstractFrame):
+class LeagueFrame(Frame):
 
     home_player = models.ForeignKey(
         Member,

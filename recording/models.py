@@ -200,7 +200,7 @@ class Leg(AbstractMatch):
         related_name='away_team'
     )
 
-    leg_id = models.IntegerField('Leg ID', default=0)
+    leg_number = models.IntegerField('Leg Number', default=0)
     # Handicap is always for home_team
     # If handicap is positive, then it is added to home_team when computing final scores
     # If handicap is negative, then its opposite value is added to away_team
@@ -254,7 +254,7 @@ class Leg(AbstractMatch):
         return
 
     def __str__(self):
-        return "{} {} vs. {} Leg {}".format(self.create_date.date(), self.away_team, self.home_team, self.leg_id)
+        return "{} {} vs. {} Leg {}".format(self.create_date.date(), self.away_team, self.home_team, self.leg_number)
 
 
 class AbstractFrame(models.Model):
@@ -309,5 +309,5 @@ class LeagueFrame(AbstractFrame):
     )
 
     def __str__(self):
-        return "{} {} vs. {} Leg {}".format(self.leg.create_date.date(), self.away_player, self.home_player, self.leg.leg_id)
+        return "{} {} vs. {} Leg {}".format(self.leg.create_date.date(), self.away_player, self.home_player, self.leg.leg_number)
 

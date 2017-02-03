@@ -83,7 +83,6 @@ def leg_view(request, leg_id):
 
 
 def leg_close(request, leg_id):
-    # TODO: why there is leg_id field? why not use pk? this ms
     leg = get_object_or_404(Leg, pk=leg_id)
     if leg.is_completed:
         raise Http404

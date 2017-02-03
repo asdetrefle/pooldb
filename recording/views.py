@@ -3,6 +3,7 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from .models import Match, Leg, Frame, LeagueFrame
 from .forms import LeagueFrameForm
 from administration.models import Member, Team, League
+from django.contrib import messages
 
 # Create your views here.
 
@@ -89,5 +90,5 @@ def leg_close(request, leg_id):
     else:
         leg.is_completed = True
         leg.save()
-        # TODO: add a text frame in the redirected page to confirm the close action
+        messages.success(request, 'Successfully closed the leg.')
         return HttpResponseRedirect('/recording/leg/{}/'.format(leg_id))

@@ -23,5 +23,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^administration/', include('administration.urls')),
     url(r'^recording/', include('recording.urls')),
+    url(r'^stats/', include('stats.urls')),
+    url(r'^schedule/', include('schedule.urls')),
     url(r'^$', RedirectView.as_view(url='/administration/', permanent=False))
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

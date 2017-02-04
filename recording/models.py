@@ -158,6 +158,8 @@ class Match(AbstractMatch):
 
         # adjust matchs information for members.
         self.home_player.total_matches_played += 1
+        self.home_player.season_matches_played += 1
+        self.away_player.total_matches_played += 1
         self.away_player.season_matches_played += 1
 
         if self.home_score > self.away_score:
@@ -171,11 +173,20 @@ class Match(AbstractMatch):
         else:
             self.winner = none
 
+        # add clearance info to players
+        for f in self.get_frames():
+            if f.is_clearance:
+                if f.cleared_by==self.home_player:
+                    self.home_player.total_clearance += 1
+                    self.home_player.season_clearance += 1;
+                else:
+                    self.away_player.total_clearance += 1
+                    self.away_player.season_clearance += 1
+
+        # adjust points for members using ELO Ranking systems
         home_score_ = self.home_score
         away_score_ = self.away_score
 
-        # adjust points for members using ELO Ranking systems
-        # print " toto ", self.home_player._point_adj
         self.home_player._point_adj += calc_elo(float(home_score_) / (home_score_ + away_score_),
                                                 self.away_player.points,
                                                 self.home_player.points)
@@ -184,7 +195,7 @@ class Match(AbstractMatch):
                                                 self.away_player.points)
         self.home_player.save()
         self.away_player.save()
-        # print " tata", self.home_player._point_adj
+        print " tata", self.home_player._point_adj
         self.is_submitted = True
         self.save()
         return

@@ -59,6 +59,8 @@
 
         <a href="{% url 'index' %}">{% trans 'Home' %} </a>
         <a href="{% url 'recording' %}">{% trans 'Recording' %}</a>
+        <a href="{% url 'stats' %}">{% trans 'Stats' %}</a>
+        <a href="{% url 'schedule' %}">{% trans 'Schedule' %}</a>
     {% if title %} &rsaquo; {{ title }}{% endif %}
     </div>
     {% endblock %}

@@ -17,5 +17,5 @@ def calc_elo(result, opp, sef):
 
     diff = opp - sef
     esp = 1. / (1. + 10.**(diff / 400.))
-    return K * (result - diff)
+    return K * (result - esp)
 

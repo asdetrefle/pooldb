@@ -4,6 +4,7 @@ from django.db import models
 from django.utils import timezone
 from django.core.validators import RegexValidator
 import datetime
+import scipy.stats as ss
 
 # Create your models here.
 
@@ -44,14 +45,16 @@ class League(models.Model):
             for m in t.member_set.all():
                 m._update_points()
                 pk_set.append(m.pk)
-                point_set.append(m.points)
-
+                # scipy rankdata only ranks from smallest to highest so here needs the minus sign.
+                point_set.append(-m.points)
         #print pk_set, point_set
 
-        order = sorted(range(len(point_set)), key=lambda k: -point_set[k])
-        for i,j in enumerate(order):
-            mb = Member.objects.get(pk=pk_set[j])
-            mb.ranking = i + 1
+        #order = sorted(range(len(point_set)), key=lambda k: -point_set[k])
+        order = ss.rankdata(point_set, method='min')
+        #print order
+        for i, mpk in enumerate(pk_set):
+            mb = Member.objects.get(pk=mpk)
+            mb.ranking = order[i]
             mb.save()
 
         return
@@ -60,6 +63,18 @@ class League(models.Model):
     def update_all(self):
         self._update_size()
         return
+
+    def get_ranking(self):
+        ts = self.team_set.all()
+
+        members = []
+
+        for t in ts:
+            for m in t.member_set.all():
+                members.append(m)
+
+        members.sort(key=lambda m: m.ranking)
+        return members
 
     def __str__(self):
         return self.name

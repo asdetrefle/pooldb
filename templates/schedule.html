@@ -3,7 +3,24 @@
 {% block title %} Recording {% endblock %}
 
 {% block content %}
-<p>#TODO</p
-<p>Add Schedule Here</p>
+<p> This week's matches</p>
+
+ <table border="0">    
+    <col width="50">
+    <col width="100">
+    <col width="600">
+    <tr>
+        <td align="center"><h3> ID </h3></td>
+        <td align="center"><h3> Date </h3></td>
+        <td align="left"><h3> Match </h3></td>
+    </tr>
+    {% for match in matches %}
+    <tr>
+        <td align="center"> {{ forloop.counter }} </td>
+        <td align="center"> {{ match.create_date.date|date:"Y-m-d" }} </td>
+        <td align="left"> {{ match.away_player }} vs. {{ match.home_player }} </td>
+    </tr>
+    {% endfor %}
+</table>
 {% endblock %}
 

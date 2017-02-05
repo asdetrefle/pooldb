@@ -1,6 +1,10 @@
 from django.shortcuts import render
+from recording.models import Match
+import datetime
 
 # Create your views here.
 
 def index(request):
-    return render(request, 'schedule.html')
+    matches = Match.objects.filter(create_date__gt = datetime.datetime.today().date())
+    return render(request, 'schedule.html', { 'matches': matches })
+

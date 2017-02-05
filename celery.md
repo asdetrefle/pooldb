@@ -17,6 +17,10 @@ celery -A pooldb worker -l info
 
 Tasks can be defined in the code and scheduled via the django admin app. See `recording/tasks.py` for example.
 
+It seems that every time changes are made in the schedule (via admin),
+one should restart the beat process for the new schedule to take
+place.
+
 ## Links
 
 <http://docs.celeryproject.org/en/latest/userguide/periodic-tasks.html>

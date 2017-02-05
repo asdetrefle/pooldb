@@ -17,7 +17,7 @@
     {% for match in matches %}
     <tr>
         <td align="center"> {{ forloop.counter }} </td>
-        <td align="center"> {{ match.create_date.date|date:"Y-m-d" }} </td>
+        <td align="center"> {{ match.match_date.date|date:"Y-m-d" }} </td>
         <td align="left"> <a href="{% url 'match_view' match.pk %}"> {{ match.away_player }} vs. {{ match.home_player }}</a> </td>
     </tr>
     {% endfor %}

@@ -3,8 +3,8 @@ from dateutil import relativedelta
 
 def default_season():
     n = timezone.now()
-    season_date = n + relativedelta.relativedelta(months=-2)
-    return '{}-{}'.format(season_date.year, season_date.year+1)
+    season_date = n + relativedelta.relativedelta(months=-1)
+    return season_date.year - 2014
 
 
 def calc_elo(result, opp, sef):

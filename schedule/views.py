@@ -4,6 +4,8 @@ from recording.models import Match
 from pooldb.settings import TIME_ZONE
 from collections import OrderedDict
 import datetime, pytz
+from utils import default_season
+from .models import Season, MatchWeek
 
 # Create your views here.
 
@@ -20,17 +22,14 @@ def match_to_dict(l):
                      ('Friday',     []),
                      ('Saturday',   [])))
     for m in l:
-        d[m.create_date.strftime('%A')].append(m)
+        d[m.match_date.strftime('%A')].append(m)
     return d
 
-def index(request):
-    today = with_timezone(datetime.datetime.today()).replace(hour=0,
-                                                             minute=0,
-                                                             second=0,
-                                                             microsecond=0)
-
-    start_date = today - datetime.timedelta(days=(today.isoweekday() % 7))
-    end_date = today + datetime.timedelta(days=7)
-    matches = Match.objects.filter(Q(create_date__gt=start_date), Q(create_date__lt=end_date))
-    return render(request, 'schedule.html', {'matches': match_to_dict(matches)})
+def index(request, week_number=1, season=default_season()):
+    s = Season.objects.get(season=season)
+    w = MatchWeek.objects.get(Q(season=s), Q(week_number=week_number))
+    start_date = with_timezone(datetime.datetime.combine(w.start_date, datetime.datetime.min.time()))
+    end_date = with_timezone(datetime.datetime.combine(w.end_date, datetime.datetime.min.time()))
+    matches = Match.objects.filter(Q(match_date__gt=start_date), Q(match_date__lt=end_date))
+    return render(request, 'schedule.html', {'week': w, 'matches': match_to_dict(matches)})
 

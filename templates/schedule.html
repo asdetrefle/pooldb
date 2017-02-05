@@ -13,12 +13,12 @@
     #add_new_frame {padding: 4pt}
     </style>
 
-<p> This week's matches</p>
+<p>Matches for {{ week }}</p>
 
 {% for k, v in matches.items %}
 {% if v %}
 <p>
-    <h2>{{ v.0.create_date|date:"l N d, Y" }}</h2>
+    <h2>{{ v.0.match_date|date:"l N d, Y" }}</h2>
 
     <table border="0">    
         <col width="50">
@@ -26,7 +26,7 @@
         <col width="100">
         <col width="300">
         <tr>
-            <td align="center"><h3> ID </h3></td>
+            <td align="center"><h3> # </h3></td>
             <td align="center"><h3> Match </h3></td>
             <td align="center"><h3> Time </h3></td>
             <td align="center"><h3> Venue </h3></td>
@@ -35,7 +35,7 @@
         <tr>
             <td align="center"> {{ forloop.counter }} </td>
             <td align="left"> {{ match.away_player }} vs. {{ match.home_player }} </td>
-            <td align="center"> {{ match.create_date|date:"H:i" }} </td>
+            <td align="center"> {{ match.match_date|date:"H:i" }} </td>
             <td align="center"> {{ match.venue }} </td>
         </tr>
         {% endfor %}

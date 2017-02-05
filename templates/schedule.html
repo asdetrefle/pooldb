@@ -11,9 +11,10 @@
     .away_win {background-color: red; margin: 5pt}
     td {vertical-align: middle}
     #add_new_frame {padding: 4pt}
+    tab {padding-left: 3em}
     </style>
 
-<p>Matches for {{ week }}</p>
+    <p style="margin-left:18em;"> &laquo;&emsp; {{ week }} &emsp;&raquo; </p>
 
 {% for k, v in matches.items %}
 {% if v %}

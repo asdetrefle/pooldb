@@ -152,6 +152,7 @@ class Member(models.Model):
     cancel_date = models.DateTimeField('Date quitted', blank=True, null=True)
 
     points  = models.FloatField(default=1000.)
+    raw_points = models.IntegerField(default=0)
     ranking = models.IntegerField(default=0)
 
     # the following three fields stores adjustment to Member ranking information during a ranking cycle

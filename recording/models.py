@@ -339,3 +339,8 @@ class LeagueFrame(Frame):
     def __str__(self):
         return "{} {} vs. {} Leg {}".format(self.leg.create_date.date(), self.away_player, self.home_player, self.leg.leg_number)
 
+
+
+class Event(models.Model):
+    week = models.ForeignKey(MatchWeek)
+

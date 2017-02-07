@@ -1,5 +1,5 @@
 from django.forms import ModelForm, ValidationError
-from .models import LeagueFrame, Leg, Match, Frame
+from .models import LeagueFrame, LeagueMatch, Match, Frame
 
 class LeagueFrameForm(ModelForm):
     class Meta:

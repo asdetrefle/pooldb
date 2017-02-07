@@ -6,6 +6,7 @@ from django.utils import timezone
 from utils import default_season, calc_elo
 
 from administration.models import Member, Team, League
+from schedule.models import MatchWeek, Season
 # Create your models here.
 
 class AbstractMatch(models.Model):
@@ -39,8 +40,15 @@ class AbstractMatch(models.Model):
     )
 
     venue = models.CharField(max_length=200, blank=True, null=True)
-    create_date = models.DateTimeField('Event date', default=timezone.now)
-    season = models.CharField(max_length=10, default=default_season)
+    match_date = models.DateTimeField('Event date', default=timezone.now)
+    season = models.ForeignKey(Season,
+                               models.CASCADE,
+                               blank=True,
+                               null=True)
+    week = models.ForeignKey(MatchWeek,
+                             models.CASCADE,
+                             blank=True,
+                             null=True)
     number_frames = models.IntegerField(default=0)
     table_size  = models.IntegerField(default=9)
     is_completed = models.BooleanField(default=False)
@@ -206,7 +214,7 @@ class Match(AbstractMatch):
         return
 
     def __str__(self):
-        return "{} {} vs. {} ".format(self.create_date.date(), self.away_player, self.home_player)
+        return "{} {} vs. {} ".format(self.match_date.date(), self.away_player, self.home_player)
 
 
 class Leg(AbstractMatch):
@@ -330,4 +338,9 @@ class LeagueFrame(Frame):
 
     def __str__(self):
         return "{} {} vs. {} Leg {}".format(self.leg.create_date.date(), self.away_player, self.home_player, self.leg.leg_number)
+
+
+
+class Event(models.Model):
+    week = models.ForeignKey(MatchWeek)
 

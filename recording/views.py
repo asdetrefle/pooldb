@@ -13,7 +13,7 @@ def index(request):
 
 
 def listmatch(request):
-    matches = Match.objects.all()
+    matches = Match.objects.all().order_by('match_date')
     return render(request, 'listmatch.html', {'matches': matches})
 
 

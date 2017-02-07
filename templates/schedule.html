@@ -1,9 +1,49 @@
 {% extends "base_site.html" %}
 
-{% block title %} Recording {% endblock %}
+{% block title %} Schedule {% endblock %}
 
 {% block content %}
-<p>#TODO</p
-<p>Add Schedule Here</p>
+    <style>
+    .header     {font-size:1.5em; color:dimgrey; font-weight:normal}
+    .header2    {font-size:1.17em; color:dimgrey; font-weight:normal}
+    .frame_win   {font-weight:bold; color:dodgerblue}
+    .draw {background-color: deepskyblue; margin: 5pt}
+    .away_win {background-color: red; margin: 5pt}
+    td {vertical-align: middle}
+    #add_new_frame {padding: 4pt}
+    tab {padding-left: 3em}
+    </style>
+
+    <p style="margin-left:18em;"> &laquo;&emsp; {{ week }} &emsp;&raquo; </p>
+
+{% for k, v in matches.items %}
+{% if v %}
+<p>
+    <h2>{{ v.0.match_date|date:"l N d, Y" }}</h2>
+
+    <table border="0">    
+        <col width="50">
+        <col width="400">
+        <col width="100">
+        <col width="300">
+        <tr>
+            <td align="center"><h3> # </h3></td>
+            <td align="center"><h3> Match </h3></td>
+            <td align="center"><h3> Time </h3></td>
+            <td align="center"><h3> Venue </h3></td>
+        </tr>
+        {% for match in v %} 
+        <tr>
+            <td align="center"> {{ forloop.counter }} </td>
+            <td align="left"> {{ match.away_player }} vs. {{ match.home_player }} </td>
+            <td align="center"> {{ match.match_date|date:"H:i" }} </td>
+            <td align="center"> {{ match.venue }} </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+    <br>
+</p>
+{% endfor %}
 {% endblock %}
 

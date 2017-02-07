@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Frame, Match, Leg, LeagueFrame
+from .models import Frame, Match, Leg, LeagueFrame, Event
 
 # Register your models here.
 
@@ -25,4 +25,5 @@ admin.site.register(Match)
 admin.site.register(Leg, LegAdmin)
 admin.site.register(LeagueFrame, LeagueFrameAdmin)
 admin.site.register(Frame)
+admin.site.register(Event)
 

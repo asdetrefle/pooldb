@@ -294,7 +294,7 @@ class LeagueMatch(AbstractMatch):
         return
 
     def __str__(self):
-        return "{} {} vs. {} Leg {}".format(self.create_date.date(), self.away, self.home, self.leg_number)
+        return "{} {} vs. {}".format(self.match_date.date(), self.away, self.home)
 
 
 class Frame(models.Model):

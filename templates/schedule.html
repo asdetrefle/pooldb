@@ -14,7 +14,7 @@
     tab {padding-left: 3em}
     </style>
 
-    <p style="margin-left:18em;"> &laquo;&emsp; {{ week }} &emsp;&raquo; </p>
+    <p style="margin-left:18em;"> <a href="{% url 'listweek' week.week_number|add:"-1" %}">&laquo;</a>&emsp; {{ week }} &emsp; <a href="{% url 'listweek' week.week_number|add:1 %}">&raquo;</a> </p>
 
 {% for k, v in matches.items %}
 {% if v %}
@@ -35,7 +35,7 @@
         {% for match in v %} 
         <tr>
             <td align="center"> {{ forloop.counter }} </td>
-            <td align="left"> {{ match.away_player }} vs. {{ match.home_player }} </td>
+            <td align="left"> {{ match.away }} vs. {{ match.home }} </td>
             <td align="center"> {{ match.match_date|date:"H:i" }} </td>
             <td align="center"> {{ match.venue }} </td>
         </tr>

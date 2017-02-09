@@ -1,0 +1,57 @@
+week,date,venue,away,home
+1,2017-02-28,Racks,The Meanions,That's a Beautiful Rack
+1,2017-03-01,Billidart,Holy Strokes,Anything is Fine
+1,2017-03-01,Billidart,Dram Good Shots,The Abangers
+1,2017-03-01,Racks,Beavers Roster,Just the Tip
+2,2017-03-07,Racks,Anything is Fine,Dram Good Shots
+2,2017-03-08,Billidart,That's a Beautiful Rack,Holy Strokes
+2,2017-03-08,Billidart,Just the Tip,The Meanions
+2,2017-03-08,Racks,Beavers Roster,The Abangers
+3,2017-03-14,Racks,Holy Strokes,Just the Tip
+3,2017-03-15,Billidart,The Meanions,Beavers Roster
+3,2017-03-15,Billidart,The Abangers,Anything is Fine
+3,2017-03-15,Racks,Dram Good Shots,That's a Beautiful Rack
+4,2017-03-21,Racks,That's a Beautiful Rack,The Abangers
+4,2017-03-22,Billidart,Just the Tip,Dram Good Shots
+4,2017-03-22,Billidart,Beavers Roster,Holy Strokes
+4,2017-03-22,Racks,Anything is Fine,The Meanions
+5,2017-03-28,Racks,Anything is Fine,Just the Tip
+5,2017-03-29,Billidart,The Meanions,The Abangers
+5,2017-03-29,Billidart,Beavers Roster,That's a Beautiful Rack
+5,2017-03-29,Racks,Holy Strokes,Dram Good Shots
+6,2017-04-04,Racks,Just the Tip,The Abangers
+6,2017-04-05,Billidart,That's a Beautiful Rack,Anything is Fine
+6,2017-04-05,Billidart,Beavers Roster,Dram Good Shots
+6,2017-04-05,Racks,Holy Strokes,The Meanions
+7,2017-04-11,Racks,Just the Tip,That's a Beautiful Rack
+7,2017-04-12,Billidart,The Meanions,Dram Good Shots
+7,2017-04-12,Billidart,Holy Strokes,The Abangers
+7,2017-04-12,Racks,Beavers Roster,Anything is Fine
+8,2017-04-18,Racks,Holy Strokes,That's a Beautiful Rack
+8,2017-04-19,Billidart,Dram Good Shots,Anything is Fine
+8,2017-04-19,Billidart,Just the Tip,Beavers Roster
+8,2017-04-19,Racks,The Abangers,The Meanions
+9,2017-04-25,Racks,Holy Strokes,Beavers Roster
+9,2017-04-26,Billidart,The Meanions,Anything is Fine
+9,2017-04-26,Billidart,The Abangers,That's a Beautiful Rack
+9,2017-04-26,Racks,Dram Good Shots,Just the Tip
+10,2017-05-02,Racks,Anything is Fine,That's a Beautiful Rack
+10,2017-05-03,Billidart,The Abangers,Just the Tip
+10,2017-05-03,Billidart,Dram Good Shots,Holy Strokes
+10,2017-05-03,Racks,Beavers Roster,The Meanions
+11,2017-05-09,Racks,Dram Good Shots,The Meanions
+11,2017-05-10,Billidart,That's a Beautiful Rack,Just the Tip
+11,2017-05-10,Billidart,Anything is Fine,Beavers Roster
+11,2017-05-10,Racks,The Abangers,Holy Strokes
+12,2017-05-16,Racks,That's a Beautiful Rack,Beavers Roster
+12,2017-05-17,Billidart,Just the Tip,Anything is Fine
+12,2017-05-17,Billidart,The Meanions,Holy Strokes
+12,2017-05-17,Racks,The Abangers,Dram Good Shots
+13,2017-05-23,Racks,The Meanions,Just the Tip
+13,2017-05-24,Billidart,The Abangers,Beavers Roster
+13,2017-05-24,Billidart,That's a Beautiful Rack,Dram Good Shots
+13,2017-05-24,Racks,Anything is Fine,Holy Strokes
+14,2017-05-30,Racks,Anything is Fine,The Abangers
+14,2017-05-31,Billidart,That's a Beautiful Rack,The Meanions
+14,2017-05-31,Billidart,Just the Tip,Holy Strokes
+14,2017-05-31,Racks,Dram Good Shots,Beavers Roster

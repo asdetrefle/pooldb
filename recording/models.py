@@ -72,7 +72,7 @@ class AbstractMatch(models.Model):
         abstract = True
 
     @abstractmethod
-    def get_frames(self):
+    def frames(self):
         """to override in child classes"""
         pass
 
@@ -81,7 +81,7 @@ class AbstractMatch(models.Model):
         home_score_ = 0
         away_score_ = 0
 
-        frames = self.get_frames()
+        frames = self.frames()
 
         for f in frames:
             len_ += 1
@@ -130,15 +130,15 @@ class Match(AbstractMatch):
         default='E'
     )
 
-    home_player = models.ForeignKey(
+    home = models.ForeignKey(
         Member,
         models.CASCADE,
-        related_name='%(class)s_home_player',
+        related_name='%(class)s_home',
     )
-    away_player = models.ForeignKey(
+    away = models.ForeignKey(
         Member,
         models.CASCADE,
-        related_name='%(class)s_away_player',
+        related_name='%(class)s_away',
     )
 
     winner = models.ForeignKey(
@@ -149,7 +149,7 @@ class Match(AbstractMatch):
         null=True
     )
 
-    def get_frames(self):
+    def frames(self):
         return self.frame_set.all()
 
     def _upon_completion(self):
@@ -165,45 +165,45 @@ class Match(AbstractMatch):
         print self.is_completed
 
         # adjust matchs information for members.
-        self.home_player.total_matches_played += 1
-        self.home_player.season_matches_played += 1
-        self.away_player.total_matches_played += 1
-        self.away_player.season_matches_played += 1
+        self.home.total_matches_played += 1
+        self.home.season_matches_played += 1
+        self.away.total_matches_played += 1
+        self.away.season_matches_played += 1
 
         if self.home_score > self.away_score:
-            self.winner = self.home_player
-            self.home_player.total_matches_won += 1
-            self.home_player.season_matches_won += 1
+            self.winner = self.home
+            self.home.total_matches_won += 1
+            self.home.season_matches_won += 1
         elif self.home_score < self.away_score:
-            self.winner = self.away_player
-            self.away_player.total_matches_won += 1
-            self.away_player.season_matches_won += 1
+            self.winner = self.away
+            self.away.total_matches_won += 1
+            self.away.season_matches_won += 1
         else:
             self.winner = none
 
         # add clearance info to players
-        for f in self.get_frames():
+        for f in self.frames():
             if f.is_clearance:
-                if f.cleared_by==self.home_player:
-                    self.home_player.total_clearance += 1
-                    self.home_player.season_clearance += 1;
+                if f.cleared_by==self.home:
+                    self.home.total_clearance += 1
+                    self.home.season_clearance += 1;
                 else:
-                    self.away_player.total_clearance += 1
-                    self.away_player.season_clearance += 1
+                    self.away.total_clearance += 1
+                    self.away.season_clearance += 1
 
         # adjust points for members using ELO Ranking systems
         home_score_ = self.home_score
         away_score_ = self.away_score
 
-        self.home_player._point_adj += calc_elo(float(home_score_) / (home_score_ + away_score_),
-                                                self.away_player.points,
-                                                self.home_player.points)
-        self.away_player._point_adj += calc_elo(float(away_score_) / (home_score_ + away_score_),
-                                                self.home_player.points,
-                                                self.away_player.points)
-        self.home_player.save()
-        self.away_player.save()
-        print " tata", self.home_player._point_adj
+        self.home._point_adj += calc_elo(float(home_score_) / (home_score_ + away_score_),
+                                                self.away.points,
+                                                self.home.points)
+        self.away._point_adj += calc_elo(float(away_score_) / (home_score_ + away_score_),
+                                                self.home.points,
+                                                self.away.points)
+        self.home.save()
+        self.away.save()
+        print " tata", self.home._point_adj
         self.is_submitted = True
         self.save()
         return
@@ -214,25 +214,27 @@ class Match(AbstractMatch):
         return
 
     def __str__(self):
-        return "{} {} vs. {} ".format(self.match_date.date(), self.away_player, self.home_player)
+        return "{} {} vs. {} ".format(self.match_date.date(), self.away, self.home)
 
 
-class Leg(AbstractMatch):
-    home_team = models.ForeignKey(
+class LeagueMatch(AbstractMatch):
+    home = models.ForeignKey(
         Team,
         models.CASCADE,
-        related_name='home_team'
+        related_name='home'
     )
-    away_team = models.ForeignKey(
+    away = models.ForeignKey(
         Team,
         models.CASCADE,
-        related_name='away_team'
+        related_name='away'
     )
 
-    leg_number = models.IntegerField('Leg Number', default=0)
-    # Handicap is always for home_team
-    # If handicap is positive, then it is added to home_team when computing final scores
-    # If handicap is negative, then its opposite value is added to away_team
+    home_points_raw = models.IntegerField(default=0)
+    away_points_raw = models.IntegerField(default=0)
+    legs = models.IntegerField('Number of legs', default=6)
+    # Handicap is always for home
+    # If handicap is positive, then it is added to home when computing final scores
+    # If handicap is negative, then its opposite value is added to away
     handicap = models.IntegerField(default=0)
 
     winner = models.ForeignKey(
@@ -243,7 +245,13 @@ class Leg(AbstractMatch):
         null=True
     )
 
-    def get_frames(self):
+    def update_handicap():
+        pass
+
+    def get_leg(self, l):
+        return self.leagueframe_set.filter(leg=l)
+
+    def frames(self):
         return self.leagueframe_set.all()
 
     def _update_handicap(self):
@@ -269,9 +277,9 @@ class Leg(AbstractMatch):
             return
 
         if self.home_score > self.away_score:
-            self.winner = self.home_team
+            self.winner = self.home
         elif self.home_score < self.away_score:
-            self.winner = self.away_team
+            self.winner = self.away
         else:
             self.winner = None
 
@@ -286,7 +294,7 @@ class Leg(AbstractMatch):
         return
 
     def __str__(self):
-        return "{} {} vs. {} Leg {}".format(self.create_date.date(), self.away_team, self.home_team, self.leg_number)
+        return "{} {} vs. {}".format(self.match_date.date(), self.away, self.home)
 
 
 class Frame(models.Model):
@@ -320,27 +328,19 @@ class Frame(models.Model):
 
 class LeagueFrame(Frame):
 
-    home_player = models.ForeignKey(
+    home = models.ForeignKey(
         Member,
         models.CASCADE,
-        related_name='%(class)s_home_player',
+        related_name='%(class)s_home',
     )
-    away_player = models.ForeignKey(
+    away = models.ForeignKey(
         Member,
         models.CASCADE,
-        related_name='%(class)s_away_player',
+        related_name='%(class)s_away',
     )
 
-    leg = models.ForeignKey(
-        Leg,
-        models.CASCADE
-    )
+    leg = models.IntegerField("leg number")
 
     def __str__(self):
-        return "{} {} vs. {} Leg {}".format(self.leg.create_date.date(), self.away_player, self.home_player, self.leg.leg_number)
-
-
-
-class Event(models.Model):
-    week = models.ForeignKey(MatchWeek)
+        return "{} {} vs. {} Leg {}".format(self.leg.create_date.date(), self.away, self.home, self.leg.leg_number)
 

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Frame, Match, Leg, LeagueFrame, Event
+from .models import Frame, Match, LeagueMatch, LeagueFrame
 
 # Register your models here.
 
@@ -12,18 +12,17 @@ class LeagueFrameAdmin(admin.ModelAdmin):
     ]
 
 
-class LegAdmin(admin.ModelAdmin):
+class LeagueMatchAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Information', {'fields': ['leg_number', 'number_frames', 'handicap', 'venue']}),
-        ('Teams',       {'fields': ['home_team', 'away_team']}),
+        ('Teams',       {'fields': ['home', 'away']}),
         ('Scores',      {'fields': ['home_score', 'away_score', 'winner']}),
         ('Defaults',    {'fields': ['create_date', 'pool_type', 'score_type', 'table_size']}),
     ]
 
 
 admin.site.register(Match)
-admin.site.register(Leg, LegAdmin)
-admin.site.register(LeagueFrame, LeagueFrameAdmin)
+admin.site.register(LeagueMatch) #, LeagueMatchAdmin)
+admin.site.register(LeagueFrame) # , LeagueFrameAdmin)
 admin.site.register(Frame)
-admin.site.register(Event)
 

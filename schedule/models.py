@@ -13,9 +13,9 @@ class Season(models.Model):
 
 class MatchWeek(models.Model):
     week_number = models.IntegerField()
-    season = models.OneToOneField(Season)
-    start_date = models.DateField()
-    end_date = models.DateField()
+    season = models.ForeignKey(Season)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
 
     def __str__(self):
         return "Week {} {}-{}".format(self.week_number,

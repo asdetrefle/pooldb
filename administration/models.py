@@ -80,34 +80,6 @@ class League(models.Model):
         return self.name
 
 
-class Team(Group):
-    ranking = models.IntegerField(default=0)
-
-    total_legs_played   = models.IntegerField(default=0)
-    total_legs_won      = models.IntegerField(default=0)
-    season_legs_played  = models.IntegerField(default=0)
-    season_legs_won     = models.IntegerField(default=0)
-
-    league = models.ForeignKey(
-        League,
-        models.CASCADE
-    )
-
-    def _update_legs(self):
-        # TODO
-        return
-
-    def _update_ranking(self):
-        # TODO
-        return
-
-    def update_all(self):
-        self._update_size()
-        self._update_legs()
-        self._update_ranking()
-        return
-
-
 class Player(models.Model):
     SEX_CHOICES = (
         ('F', 'Female'),
@@ -132,7 +104,45 @@ class Player(models.Model):
         return
 
     def __str__(self):
-        return self.username
+        return self.name
+
+
+class Team(Group):
+    ranking = models.IntegerField(default=0)
+
+    total_legs_played   = models.IntegerField(default=0)
+    total_legs_won      = models.IntegerField(default=0)
+    season_legs_played  = models.IntegerField(default=0)
+    season_legs_won     = models.IntegerField(default=0)
+
+    league = models.ForeignKey(
+        League,
+        models.CASCADE
+    )
+
+    capitain = models.ForeignKey(
+        Player,
+        models.SET_NULL,
+        blank=True,
+        null=True
+    )
+
+    def _update_legs(self):
+        # TODO
+        return
+
+    def _update_ranking(self):
+        # TODO
+        return
+
+    def update_all(self):
+        self._update_size()
+        self._update_legs()
+        self._update_ranking()
+        return
+
+
+
 
 
 class Member(models.Model):
@@ -154,6 +164,7 @@ class Member(models.Model):
     points  = models.FloatField(default=1000.)
     raw_points = models.IntegerField(default=0)
     ranking = models.IntegerField(default=0)
+    _handicap = models.IntegerField(default=0)
 
     # the following three fields stores adjustment to Member ranking information during a ranking cycle
     # Members' ranking could change every week or every day.
@@ -178,6 +189,10 @@ class Member(models.Model):
         self._point_adj = 0
         self.save()
         return
+
+    def _update_handicap(self):
+        # TODO
+        pass
 
     def update_all(self):
         self._update_points()

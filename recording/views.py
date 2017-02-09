@@ -1,12 +1,26 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from .models import Match, Leg, Frame, LeagueFrame
-from .forms import LeagueFrameForm
+from .models import Match, LeagueMatch, Frame, LeagueFrame
+#from .forms import LeagueFrameForm
 from administration.models import Member, Team, League
 from django.contrib import messages
+import re, ast
 
 # Create your views here.
 
+def load_players(raw_file):
+    f = open(raw_file, 'r')
+    res = []
+
+    for l in f:
+        replacer = re.compile("(\w+)")
+        to_eval = replacer.sub(r'"\1"', l.strip())
+        res.append(ast.literal_eval(to_eval))
+
+    away = res[0]
+    home = res[1]
+
+    return away, home
 
 def index(request):
     return render(request, 'recording.html')
@@ -18,7 +32,7 @@ def listmatch(request):
 
 
 def listleg(request):
-    legs = Leg.objects.all()
+    legs = LeagueMatch.objects.all()
     return render(request, 'listleg.html', {'legs': legs})
 
 
@@ -50,7 +64,7 @@ def match_view(request, match_id):
 def leg_view(request, leg_id):
     # TODO: now view_match and add_frame are using the same frame; maybe separate them for clarity
     # TODO: use django form and add validation
-    leg = get_object_or_404(Leg, pk=leg_id)
+    leg = get_object_or_404(LeagueMatch, pk=leg_id)
     # leg.update_all()
     if request.method == 'POST':
         break_player = get_object_or_404(Member, pk=int(request.POST['break_player']))
@@ -84,7 +98,7 @@ def leg_view(request, leg_id):
 
 
 def leg_close(request, leg_id):
-    leg = get_object_or_404(Leg, pk=leg_id)
+    leg = get_object_or_404(LeagueMatch, pk=leg_id)
     if leg.is_completed:
         raise Http404
     else:

@@ -3,6 +3,7 @@ from abc import abstractmethod
 
 from django.db import models
 from django.utils import timezone
+from django.forms import ModelForm
 from utils import default_season, calc_elo
 
 from administration.models import Member, Team, League
@@ -298,10 +299,17 @@ class LeagueMatch(AbstractMatch):
 
 
 class Frame(models.Model):
+    match = models.ForeignKey(
+        Match,
+        models.CASCADE,
+        blank=True,
+        null=True,
+    )
+
     break_player = models.ForeignKey(
         Member,
         models.CASCADE,
-        related_name = '%(class)s_break_player'
+        related_name = '%(class)s_break_player',
     )
     frame_number = models.IntegerField(default=0)
     home_score = models.IntegerField(default=0)
@@ -312,18 +320,12 @@ class Frame(models.Model):
         models.CASCADE,
         blank=True,
         null=True,
-        related_name = '%(class)s_cleared_by'
-    )
-
-    match = models.ForeignKey(
-        Match,
-        models.CASCADE,
-        blank=True,
-        null=True,
+        related_name = '%(class)s_cleared_by',
     )
 
     def __str__(self):
         return "{} - Frame {}".format(self.match, self.frame_number)
+
 
 
 class LeagueFrame(Frame):

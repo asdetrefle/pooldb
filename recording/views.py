@@ -1,9 +1,10 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from .models import Match, LeagueMatch, Frame, LeagueFrame
-#from .forms import LeagueFrameForm
+from .forms import FrameForm
 from administration.models import Member, Team, League
 from django.contrib import messages
+from django.db.models import Q
 import re, ast
 
 # Create your views here.
@@ -52,7 +53,7 @@ def initilize(request, match_id, type_):
     return render(request, 'initialize.html')
 
 
-def match_view(request, match_id, type_):
+def match_view_old(request, match_id, type_):
     print 'tata', match_id, type_
     # TODO: now view_match and add_frame are using the same frame; maybe separate them for clarity
     # TODO: use django form and add validation
@@ -123,6 +124,28 @@ def match_view(request, match_id, type_):
     else:
         raise Http404
 
+def match_view(request, match_id):
+    # TODO: now view_match and add_frame are using the same frame; maybe separate them for clarity
+    match = get_object_or_404(Match, pk=match_id)
+    # match.update_all()
+    if request.method == 'POST':
+        form = FrameForm(request.POST, match=match)
+        if form.is_valid():
+            frame = form.save(commit=False)
+            nb = match.number_frames + 1
+            frame.match = match
+            frame.frame_number = nb
+            if form.cleaned_data['cleared_by'] is None:
+                frame.is_clearance = False
+            else:
+                frame.is_clearance = True
+            frame.save()
+            match.update_all()
+            form = FrameForm(match=match)
+    else:
+        form = FrameForm(match=match)
+    frames = match.frame_set.all()
+    return render(request, 'match.html', {'frames': frames, 'match': match, 'form': form})
 
 
 def leg_view(request, leg_id):

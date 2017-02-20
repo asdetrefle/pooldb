@@ -25,13 +25,13 @@
     <col width="120">
   <tr>
     <td align="right"><h2><span class="header"> Away : </span></h2></td>
-    <td><h2><span class="header"> {{match.away_player}} </span></h2></td>
+    <td><h2><span class="header"> {{match.away}} </span></h2></td>
     <td align="right"><h2> {% if match.away_score > match.home_score and match.is_completed %} ✔ {% endif %} </h2></td>
     <td align="center"><h2><span class="{% if match.away_score > match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.away_score}} </span></h2></td>
   </tr>
   <tr>
     <td align="right"><h2><span class="header"> Home : </span></h2></td>
-    <td><h2><span class="header"> {{match.home_player}} </span></h2></td>
+    <td><h2><span class="header"> {{match.home}} </span></h2></td>
     <td align="right"><h2> {% if match.away_score < match.home_score and match.is_completed %} ✔ {% endif %} </h2></td>
     <td align="center"><h2><span class="{% if match.away_score < match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.home_score}}</span></h2></td>
   </tr>
@@ -48,8 +48,8 @@
     <tr>
         <td align="center"><h3> Frame </h3></td>
         <td align="center"><h3> Break By </h3></td>
-        <td align="center"><h3> {{ match.away_player.player}} </h3></td>
-        <td align="center"><h3> {{ match.home_player.player}} </h3></td>
+        <td align="center"><h3> {{ match.away.player}} </h3></td>
+        <td align="center"><h3> {{ match.home.player}} </h3></td>
         <td align="center"><h3> Clear By </h3></td>
         <td></td>
     </tr>
@@ -68,17 +68,10 @@
     <tr> 
         <form method="post">
         <td align="center"> {{ frames.count|add:"1" }} </td>
-        <td align="center"><select name="break_player" >
-                <option value="{{ match.away_player.pk }}">{{ match.away_player.player }}</option>
-                <option value="{{ match.home_player.pk }}">{{ match.home_player.player }}</option>
-            </select></td>
-        <td align="center"><input type="text" name="away_score" size="4"></td>
-        <td align="center"><input type="text" name="home_score" size="4"></td>
-        <td align="center"><select name="clear_player">
-                <option value="" selected=""> - </option>
-                <option value="{{ match.away_player.pk }}">{{ match.away_player.player }}</option>
-                <option value="{{ match.home_player.pk }}">{{ match.home_player.player }}</option>
-            </select></td>
+        <td align="center">{{ form.break_player }}</td>
+        <td align="center">{{ form.away_score }}</td>
+        <td align="center">{{ form.home_score }}</td>
+        <td align="center">{{ form.cleared_by }}</td>
         <td><input type="submit" value="Add" id="add_new_frame"></td>
     </tr>
     {% endif %}
@@ -87,9 +80,13 @@
 <p></p>
 {% if match.is_completed %}
 {% else %}      
-<h3>(TODO: now it's a hand-made form without validation; add validation to it or use forms created by Django) </h3>
+<h3>(TODO: format error message) </h3>
         {% csrf_token %}
     </form>
+    {{ form.errors }}
+    {{ form.non_field_errors }}
+
+
 {% endif %}
 {% endblock %}
 

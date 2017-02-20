@@ -41,10 +41,6 @@ class AbstractMatch(models.Model):
 
     venue = models.CharField(max_length=200, blank=True, null=True)
     match_date = models.DateTimeField('Event date', default=timezone.now)
-    season = models.ForeignKey(Season,
-                               models.CASCADE,
-                               blank=True,
-                               null=True)
     week = models.ForeignKey(MatchWeek,
                              models.CASCADE,
                              blank=True,
@@ -53,6 +49,7 @@ class AbstractMatch(models.Model):
     table_size  = models.IntegerField(default=9)
     is_completed = models.BooleanField(default=False)
     is_submitted = models.BooleanField(default=False)
+    is_initialized = models.BooleanField(default=False)
 
     pool_type  = models.CharField(
         max_length=10,
@@ -73,6 +70,11 @@ class AbstractMatch(models.Model):
 
     @abstractmethod
     def frames(self):
+        """to override in child classes"""
+        pass
+
+    @abstractmethod
+    def initialize(self, *args, **kwargs):
         """to override in child classes"""
         pass
 
@@ -148,6 +150,10 @@ class Match(AbstractMatch):
         blank=True,
         null=True
     )
+
+
+    def initialize(self):
+        pass
 
     def frames(self):
         return self.frame_set.all()
@@ -244,6 +250,13 @@ class LeagueMatch(AbstractMatch):
         blank=True,
         null=True
     )
+
+    def initialize(self, away_players, home_players, method=None):
+        rounds = self.legs / 2
+        if method is None:
+            for offset in range(rounds):
+                pass
+        return
 
     def update_handicap():
         pass
@@ -343,4 +356,5 @@ class LeagueFrame(Frame):
 
     def __str__(self):
         return "{} {} vs. {} Leg {}".format(self.leg.create_date.date(), self.away, self.home, self.leg.leg_number)
+
 

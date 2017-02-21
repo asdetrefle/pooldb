@@ -1,4 +1,5 @@
 {% extends "base_site.html" %}
+{% load match_extras %}
 
 {% block title %} Matches {% endblock %}
 
@@ -18,7 +19,7 @@
     <tr>
         <td align="center"> {{ forloop.counter }} </td>
         <td align="center"> {{ match.match_date.date|date:"Y-m-d" }} </td>
-        <td align="left"> <a href="{% url 'match_view' match.pk %}"> {{ match.away }} vs. {{ match.home }}</a> </td>
+        <td align="left"> <a href="{% url 'match_view' type_ match.pk %}"> {{ match.away }} vs. {{ match.home }}</a> </td>
     </tr>
     {% endfor %}
 </table>

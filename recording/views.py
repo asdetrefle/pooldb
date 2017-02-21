@@ -193,3 +193,8 @@ def leg_close(request, leg_id):
         leg.save()
         messages.success(request, 'Successfully closed the leg.')
         return HttpResponseRedirect('/recording/leg/{}/'.format(leg_id))
+
+
+# TODO: view to drag players in a league match; move it into the match initialization page
+def drag_players(request):
+    return render(request, 'drag.html')

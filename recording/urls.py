@@ -9,4 +9,5 @@ urlpatterns = [
     url(r'^match/type=(?P<type_>\w+)_id=(?P<match_id>\d+)/$', views.match_view, name='match_view'),
     url(r'^leg/(?P<leg_id>\d+)/$', views.leg_view, name='leg_view'),
     url(r'^leg/(?P<leg_id>\d+)/close/$', views.leg_close, name='leg_close'),
+    url(r'^drag/$', views.drag_players, name='drag_players'),
 ]

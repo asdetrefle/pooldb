@@ -1,0 +1,57 @@
+week,date,venue,away,home
+1,2017-02-28,Racks,Anything is Fine,Pink Platypuses
+1,2017-03-01,Billidart,That's a Beautiful Rack,Holy Strokes
+1,2017-03-01,Billidart,The Abangers,Dram Good Shots
+1,2017-03-01,Racks,Just the Tip,The Minions
+2,2017-03-07,Racks,Holy Strokes,The Abangers
+2,2017-03-08,Billidart,Pink Platypuses,That's a Beautiful Rack
+2,2017-03-08,Billidart,The Minions,Anything is Fine
+2,2017-03-08,Racks,Just the Tip,Dram Good Shots
+3,2017-03-14,Racks,That's a Beautiful Rack,The Minions
+3,2017-03-15,Billidart,Anything is Fine,Just the Tip
+3,2017-03-15,Billidart,Dram Good Shots,Holy Strokes
+3,2017-03-15,Racks,The Abangers,Pink Platypuses
+4,2017-03-21,Racks,Pink Platypuses,Dram Good Shots
+4,2017-03-22,Billidart,The Minions,The Abangers
+4,2017-03-22,Billidart,Just the Tip,That's a Beautiful Rack
+4,2017-03-22,Racks,Holy Strokes,Anything is Fine
+5,2017-03-28,Racks,Holy Strokes,The Minions
+5,2017-03-29,Billidart,Anything is Fine,Dram Good Shots
+5,2017-03-29,Billidart,Just the Tip,Pink Platypuses
+5,2017-03-29,Racks,That's a Beautiful Rack,The Abangers
+6,2017-04-04,Racks,The Minions,Dram Good Shots
+6,2017-04-05,Billidart,Pink Platypuses,Holy Strokes
+6,2017-04-05,Billidart,Just the Tip,The Abangers
+6,2017-04-05,Racks,That's a Beautiful Rack,Anything is Fine
+7,2017-04-11,Racks,The Minions,Pink Platypuses
+7,2017-04-12,Billidart,Anything is Fine,The Abangers
+7,2017-04-12,Billidart,That's a Beautiful Rack,Dram Good Shots
+7,2017-04-12,Racks,Just the Tip,Holy Strokes
+8,2017-04-18,Racks,That's a Beautiful Rack,Pink Platypuses
+8,2017-04-19,Billidart,The Abangers,Holy Strokes
+8,2017-04-19,Billidart,The Minions,Just the Tip
+8,2017-04-19,Racks,Dram Good Shots,Anything is Fine
+9,2017-04-25,Racks,That's a Beautiful Rack,Just the Tip
+9,2017-04-26,Billidart,Anything is Fine,Holy Strokes
+9,2017-04-26,Billidart,Dram Good Shots,Pink Platypuses
+9,2017-04-26,Racks,The Abangers,The Minions
+10,2017-05-02,Racks,Holy Strokes,Pink Platypuses
+10,2017-05-03,Billidart,Dram Good Shots,The Minions
+10,2017-05-03,Billidart,The Abangers,That's a Beautiful Rack
+10,2017-05-03,Racks,Just the Tip,Anything is Fine
+11,2017-05-09,Racks,The Abangers,Anything is Fine
+11,2017-05-10,Billidart,Pink Platypuses,The Minions
+11,2017-05-10,Billidart,Holy Strokes,Just the Tip
+11,2017-05-10,Racks,Dram Good Shots,That's a Beautiful Rack
+12,2017-05-16,Racks,Pink Platypuses,Just the Tip
+12,2017-05-17,Billidart,The Minions,Holy Strokes
+12,2017-05-17,Billidart,Anything is Fine,That's a Beautiful Rack
+12,2017-05-17,Racks,Dram Good Shots,The Abangers
+13,2017-05-23,Racks,Anything is Fine,The Minions
+13,2017-05-24,Billidart,Dram Good Shots,Just the Tip
+13,2017-05-24,Billidart,Pink Platypuses,The Abangers
+13,2017-05-24,Racks,Holy Strokes,That's a Beautiful Rack
+14,2017-05-30,Racks,Holy Strokes,Dram Good Shots
+14,2017-05-31,Billidart,Pink Platypuses,Anything is Fine
+14,2017-05-31,Billidart,The Minions,That's a Beautiful Rack
+14,2017-05-31,Racks,The Abangers,Just the Tip

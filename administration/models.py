@@ -12,7 +12,8 @@ import scipy.stats as ss
 class Group(models.Model):
     name = models.CharField(max_length=200)
     size = models.IntegerField(default=0)
-    create_date   = models.DateTimeField('date joined', default=timezone.now)
+    create_date = models.DateTimeField('date joined', default=timezone.now)
+    close_date  = models.DateTimeField('date ended', blank=True, null=True)
 
     def _update_size(self):
         self.size = len(self.member_set.all())
@@ -109,8 +110,9 @@ class Player(models.Model):
 
 class Team(Group):
     ranking = models.IntegerField(default=0)
+    team_number = models.IntegerField(default=0)
 
-    total_legs_played   = models.IntegerField(default=0)
+    total_legs_played   = models.IntegerField(default=-1)
     total_legs_won      = models.IntegerField(default=0)
     season_legs_played  = models.IntegerField(default=0)
     season_legs_won     = models.IntegerField(default=0)
@@ -140,9 +142,6 @@ class Team(Group):
         self._update_legs()
         self._update_ranking()
         return
-
-
-
 
 
 class Member(models.Model):

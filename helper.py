@@ -44,8 +44,8 @@ def create_leaguematch():
 
         tues = True
         for k,v in match.items():
-            t1 = Team.objects.get(pk=int(k))
-            t2 = Team.objects.get(pk=int(v[0]))
+            t1 = Team.objects.get(team_number=int(k))
+            t2 = Team.objects.get(team_number=int(v[0]))
             w = MatchWeek.objects.get(week_number=i+1)
             if tues and v[1] == 'R':
                 mdate = w.start_date + timedelta(days=2, hours=20)
@@ -53,13 +53,12 @@ def create_leaguematch():
             else:
                 mdate = w.start_date + timedelta(days=3, hours=20)
 
-            historical = LeagueMatch.objects.filter(Q(season=s),
-                                                    Q(away=t1),
+            historical = LeagueMatch.objects.filter(Q(away=t1),
                                                     Q(home=t2))
             if not historical:
-                nm = LeagueMatch(venue=VENUE[v[1]], season=s, week=w, match_date=mdate, away=t1, home=t2)
+                nm = LeagueMatch(venue=VENUE[v[1]], week=w, match_date=mdate, away=t1, home=t2)
             else:
-                nm = LeagueMatch(venue=VENUE[v[1]], season=s, week=w, match_date=mdate, away=t2, home=t1)
+                nm = LeagueMatch(venue=VENUE[v[1]], week=w, match_date=mdate, away=t2, home=t1)
             print w, mdate, nm
             nm.save()
 
@@ -75,11 +74,16 @@ def set_week():
     return
 
 
+def add_members():
+    f = open('members.csv', 'r')
+    # TODO
+    return
+
 
 def main():
-    #create_leaguematch()
+    create_leaguematch()
     #shift_matchweek(2,14)
-    set_week()
+    #set_week()
 
 
 if __name__=='__main__':

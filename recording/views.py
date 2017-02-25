@@ -1,10 +1,10 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from .models import Match, LeagueMatch, Frame, LeagueFrame
 from .forms import FrameForm
 from administration.models import Member, Team, League
 from django.contrib import messages
-from django.db.models import Q
+# from django.db.models import Q
 import re, ast
 
 # Create your views here.
@@ -37,20 +37,29 @@ def listleg(request):
     return render(request, 'listmatch.html', {'matches': matches, 'type_': 'LeagueMatch'})
 
 
-def initilize(request, match_id, type_):
+def initialize(request, match_id, type_):
     # currently only provide initialize method for LeagueMatch
-    if request.method =='POST':
-        if type_ == 'LeagueMatch':
-            home_players = []  # get list of id from web
-            away_players = []  # get list of id from web
-            match = get_object_or_404(LeagueMatch, pk=match_id)
+    # TODO: use django model form; add validation; how to represent properly the lists of players via POST?
+    if type_ == 'LeagueMatch':
+        match = get_object_or_404(LeagueMatch, pk=match_id)
+        home_players = match.home.member_set.all()
+        away_players = match.away.member_set.all()
+        # TODO: 1 player for test puepose; change to 5 when the DB of teams is complete
+        nb_selected_players = 1  # 5
+        if request.method == 'POST':
+            selected_home_players = []
+            selected_away_players = []
+            match.initialize(away_players, home_players)
+            return redirect('match_view', type_=type_, match_id=match_id)
         else:
-            raise TypeError
+            return render(request, 'initialize_match.html', {'match': match,
+                                                             'home_players': home_players,
+                                                             'away_players': away_players,
+                                                             'nb_selected_players': nb_selected_players,
+                                                             'inds': list(range(nb_selected_players))})
+    else:
+        raise Http404
 
-        match.initialize(away_players, home_players)
-        return match_view(request, match_id, type_=type_)
-
-    return render(request, 'initialize.html')
 
 
 def match_view_old(request, match_id, type_):
@@ -124,7 +133,13 @@ def match_view_old(request, match_id, type_):
     else:
         raise Http404
 
-def match_view(request, match_id):
+
+def match_view(request, type_, match_id):
+    # TODO: fix this dirty fix
+    if type_ == 'LeagueMatch':
+        match = get_object_or_404(LeagueMatch, pk=match_id)
+        if not match.is_initialized:
+            return redirect('match_initialize', type_=type_, match_id=match_id)
     # TODO: now view_match and add_frame are using the same frame; maybe separate them for clarity
     match = get_object_or_404(Match, pk=match_id)
     # match.update_all()
@@ -192,6 +207,7 @@ def leg_close(request, leg_id):
         leg.is_completed = True
         leg.save()
         messages.success(request, 'Successfully closed the leg.')
+        # TODO: maybe use redirect
         return HttpResponseRedirect('/recording/leg/{}/'.format(leg_id))
 
 

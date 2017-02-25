@@ -1,0 +1,97 @@
+{% extends "base_site.html" %}
+
+{% block title %} Drag {% endblock %}
+
+{% block extrahead %}
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    
+    <script>
+
+    function after_sorting_players() {
+        // var nb_players = 8;
+        var nb_playing_players = {{ nb_selected_players }};
+        var home_players = $("#home_players li");
+        var away_players = $("#away_players li");
+        var update_class = function (index) {
+            if (index < nb_playing_players) {
+                return "playing";
+            } else {
+                return "resting";
+            }
+        };
+        for (var i = 0; i < nb_playing_players; i++) {
+            if (home_players[i]) {
+                $("input[name=home" + i + "]").val(home_players[i].value);
+            }
+            if (away_players[i]) {
+                $("input[name=away" + i + "]").val(away_players[i].value);
+            }
+        }
+
+        var info = "home ids: ";
+        for (var i = 0; i < nb_playing_players; i++) {
+            info += $("input[name=home" + i + "]")[0].value + " ";
+        }
+        info += " away ids: ";
+        for (var i = 0; i < nb_playing_players; i++) {
+            info += $("input[name=away" + i + "]")[0].value + " ";
+        }
+        $("#info").html(info);
+
+        home_players.removeClass("playing resting").addClass(update_class);
+        away_players.removeClass("playing resting").addClass(update_class);
+    }
+
+
+    $(document).ready(function () {
+        var player_lists = $(".players");
+        player_lists.sortable({
+{#            change: function( event, ui ) {after_sorting_players()},#}
+            stop: function( event, ui ) {after_sorting_players()},
+{#            update: function( event, ui ) {console.log("update")},#}
+        });
+        player_lists.disableSelection();
+        after_sorting_players();
+    })
+    </script>
+
+    <style>
+    .players li.playing {background: #74ce86
+    }
+    .players li.resting {background: #de8e8a
+    }
+    .players { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+    .players li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1.4em; height: 18px; width: 200px}
+    </style>
+{% endblock %}
+
+{% block content %}
+
+<p>Home Players</p>
+<ul id="home_players" class="players">
+    {% for p in home_players %}
+        <li value="{{ p.id }}">{{ p.player }}</li>
+    {% endfor %}
+</ul>
+
+<p>Away Players</p>
+<ul id="away_players" class="players">
+    {% for p in away_players %}
+        <li value="{{ p.id }}">{{ p.player }}</li>
+    {% endfor %}
+</ul>
+    <p id="info"></p>
+    <p>TODO: change number of selected players to 5 in view initialize() once the team DB is complete</p>
+    <form method="post">
+    {% for ind in inds %}
+        <input type="hidden" name="home{{ ind }}" value="">
+        <input type="hidden" name="away{{ ind }}" value="">
+    {% endfor %}
+    <input type="submit" value="Initialize Match">
+    {% csrf_token %}
+    </form>
+
+{% endblock %}
+

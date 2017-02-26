@@ -252,11 +252,39 @@ class LeagueMatch(AbstractMatch):
         null=True
     )
 
-    def initialize(self, away_players, home_players, method=None):
+    @staticmethod
+    def default_matching(num_players, round):
+        order = range(num_players)
+        return order[round-1:] + order[:round-1]
+
+    def initialize(self, away_players, home_players, matching=default_matching):
         rounds = self.legs / 2
-        if method is None:
-            for offset in range(rounds):
-                pass
+        num_players = len(home_players)
+
+        for r in range(rounds):
+            l = matching(num_players, r)
+            for i, p in enumerate(l):
+                players = [Members.objects.get(pk=away_players[p]),
+                           Members.objects.get(pk=home_players[i])]
+                nm = Match(venue=self.venue,
+                           match_date=self.match_date,
+                           table_size=self.table_size,
+                           pool_type =self.pool_type,
+                           score_type=self.score_type,
+                           race_to=2,
+                           match_type='E',
+                           away_player=players[0],
+                           home_player=players[1])
+                nm.save()
+                for j in range(2):
+                    nlf = self.leagueframe_set.create(match=nm,
+                                                      break_player=players[(j+1)%2],
+                                                      frame_number=j+1,
+                                                      away_player=away_player,
+                                                      home_player=home_player,
+                                                      leg=2*r+j+1)
+                    nlf.save()
+
         return
 
     def update_handicap():

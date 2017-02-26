@@ -1,6 +1,6 @@
 {% extends "base_site.html" %}
 
-{% block title %} Drag {% endblock %}
+{% block title %} Initialize Match {% endblock %}
 
 {% block extrahead %}
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
@@ -68,22 +68,34 @@
 {% endblock %}
 
 {% block content %}
+<p> Drag to choose the players who play and rank them in desired orders. </p>
+<table border="0">    
+    <col width="400">
+    <col width="400">
+    <tr>
+        <td align="center"><h2> {{ match.away }} </h2></td>
+        <td align="center"><h2> {{ match.home }} </h2></td>
+    </tr>
+    <tr>
+        <td align="center">
+            <ul id="away_players" class="players">
+            {% for p in away_players %}
+                <li value="{{ p.id }}">{{ p.player }}</li>
+            {% endfor %}
+            </ul>
+        </td>
+        <td align="center">
+            <ul id="home_players" class="players">
+            {% for p in home_players %}
+                <li value="{{ p.id }}">{{ p.player }}</li>
+            {% endfor %}
+            </ul>
+        </td>
+    </tr>
+</table>
 
-<p>Home Players</p>
-<ul id="home_players" class="players">
-    {% for p in home_players %}
-        <li value="{{ p.id }}">{{ p.player }}</li>
-    {% endfor %}
-</ul>
-
-<p>Away Players</p>
-<ul id="away_players" class="players">
-    {% for p in away_players %}
-        <li value="{{ p.id }}">{{ p.player }}</li>
-    {% endfor %}
-</ul>
-    <p id="info"></p>
-    <p>TODO: change number of selected players to 5 in view initialize() once the team DB is complete</p>
+<div style="height:10px"></div>
+<p>
     <form method="post">
     {% for ind in inds %}
         <input type="hidden" name="home{{ ind }}" value="">
@@ -92,6 +104,9 @@
     <input type="submit" value="Initialize Match">
     {% csrf_token %}
     </form>
+    </p>
+    <p id="info"></p>
+    <p>TODO: change number of selected players to 5 in view initialize() once the team DB is complete</p>
 
 {% endblock %}
 

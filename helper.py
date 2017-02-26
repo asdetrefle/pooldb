@@ -2,9 +2,10 @@
 
 from schedule.models import MatchWeek, Season
 from recording.models import LeagueMatch
-from administration.models import Team
+from administration.models import Team, Player, Member
 from datetime import timedelta
 from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
 
 
 VENUE = {'R': 'Racks', 'B': 'Billidart'}
@@ -76,14 +77,40 @@ def set_week():
 
 def add_members():
     f = open('members.csv', 'r')
-    # TODO
+    for l in f:
+        [name, team] = l.strip().split(',')
+        name_list = name.split()
+        if len(name_list)>1:
+            username = name_list[0].lower()+name_list[1][0].lower()
+        else:
+            pass
+        t = Team.objects.get(team_number=int(team))
+        print t
+
+        try:
+            p = Player.objects.get(username=username)
+            print p
+        except ObjectDoesNotExist:
+            p = Player.objects.create(username=username,
+                                      name=name,
+                                      sex='M')
+            p.save()
+
+        print username
+        try:
+            m = Member.objects.get(Q(player=p), Q(group=t))
+        except ObjectDoesNotExist:
+            m = Member.objects.create(player=p, group=t)
+            m.save()
+
     return
 
 
 def main():
-    create_leaguematch()
+    #create_leaguematch()
     #shift_matchweek(2,14)
     #set_week()
+    add_members()
 
 
 if __name__=='__main__':

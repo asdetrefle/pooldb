@@ -44,8 +44,7 @@ def initialize(request, match_id, type_):
         match = get_object_or_404(LeagueMatch, pk=match_id)
         home_players = match.home.member_set.all()
         away_players = match.away.member_set.all()
-        # TODO: 1 player for test puepose; change to 5 when the DB of teams is complete
-        nb_selected_players = 1  # 5
+        nb_selected_players = 5
         if request.method == 'POST':
             selected_home_players = []
             selected_away_players = []

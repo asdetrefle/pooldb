@@ -252,20 +252,21 @@ class LeagueMatch(AbstractMatch):
         null=True
     )
 
-    @staticmethod
-    def default_matching(num_players, round):
-        order = range(num_players)
-        return order[round-1:] + order[:round-1]
 
-    def initialize(self, away_players, home_players, matching=default_matching):
+    def initialize(self, away_players, home_players, matching=None):
         rounds = self.legs / 2
         num_players = len(home_players)
+
+        if matching is None:
+            def matching(num_players, round):
+                order = range(num_players)
+                return order[round-1:] + order[:round-1]
 
         for r in range(rounds):
             l = matching(num_players, r)
             for i, p in enumerate(l):
-                players = [Members.objects.get(pk=away_players[p]),
-                           Members.objects.get(pk=home_players[i])]
+                players = [Member.objects.get(pk=away_players[p]),
+                           Member.objects.get(pk=home_players[i])]
                 nm = Match(venue=self.venue,
                            match_date=self.match_date,
                            table_size=self.table_size,
@@ -275,7 +276,7 @@ class LeagueMatch(AbstractMatch):
                            match_type='E',
                            away_player=players[0],
                            home_player=players[1])
-                nm.save()
+                #nm.save()
                 for j in range(2):
                     nlf = self.leagueframe_set.create(match=nm,
                                                       break_player=players[(j+1)%2],
@@ -283,7 +284,7 @@ class LeagueMatch(AbstractMatch):
                                                       away_player=away_player,
                                                       home_player=home_player,
                                                       leg=2*r+j+1)
-                    nlf.save()
+                    #nlf.save()
 
         return
 

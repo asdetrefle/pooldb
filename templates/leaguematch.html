@@ -1,7 +1,7 @@
 {% extends "base_site.html" %}
 {% load mathfilters %}
 
-{% block title %} Edit leg {% endblock %}
+{% block title %} Edit leaguematch {% endblock %}
 
 {% block content %}
     {% load static %}
@@ -9,7 +9,7 @@
     <script>
     $(document).ready(function () {
         // show handicap
-        var handicap = {{ leg.handicap }};
+        var handicap = {{ leaguematch.handicap }};
         var handicap_display = "(" + Math.abs(handicap).toString() + ")";
         if (handicap > 0) {
             $("#home_handicap").html(handicap_display);
@@ -22,7 +22,7 @@
         var away_player_select = $("select[name=away_player]");
         var break_player_select = $("select[name=break_player]");
         var clear_player_select = $("select[name=clear_player]");
-        var leg_id = {{ leg.pk }};
+        var leaguematch_id = {{ leaguematch.pk }};
 
         function update_list() {
             var home_selected = home_player_select.find("option:selected");
@@ -38,7 +38,7 @@
             break_player_select.append(home_selected.clone());
             break_player_select.append(away_selected.clone());
             if (old_break_selected_val == undefined || isNaN(old_break_selected_val)) { // at initializaion, select the player according to parity of frame number
-                if (leg_id % 2 == 1) { // default home
+                if (leaguematch_id % 2 == 1) { // default home
                     break_player_select.val(home_selected_val);
                 } else { // default away
                     break_player_select.val(away_selected_val);
@@ -94,7 +94,7 @@
     #add_new_frame {padding: 4pt}
     </style>
 
-    <h3>Date of leg: {{leg.create_date}} {% if leg.is_completed %} leg Completed. {% else %} leg in Progress. <a class="button" href="{% url 'leg_close' leg_id=leg.pk %}">Close the leg</a>{% endif %}</h3>
+    <h3>Date of leaguematch: {{leaguematch.create_date}} {% if leaguematch.is_completed %} leaguematch Completed. {% else %} leaguematch in Progress. <a class="button" href="{% url 'leaguematch_close' leaguematch_id=leaguematch.pk %}">Close the leaguematch</a>{% endif %}</h3>
 
 <table border="0">
     <col width="80">
@@ -104,16 +104,16 @@
     <col width="50">
   <tr>
     <td align="right"><h2><span class="header"> Away : </span></h2></td>
-    <td><h2><span class="header"> {{leg.away_team}} </span></h2></td>
-    <td align="right"><h2> {% if leg.away_score > leg.home_score and leg.is_completed %} ✔ {% endif %} </h2></td>
-    <td align="right"><h2><span class="{% if leg.away_score > leg.home_score %}header_win{% else %}header_loss{% endif %}"> {{leg.away_score}} </span></h2></td>
+    <td><h2><span class="header"> {{leaguematch.away_team}} </span></h2></td>
+    <td align="right"><h2> {% if leaguematch.away_score > leaguematch.home_score and leaguematch.is_completed %} ✔ {% endif %} </h2></td>
+    <td align="right"><h2><span class="{% if leaguematch.away_score > leaguematch.home_score %}header_win{% else %}header_loss{% endif %}"> {{leaguematch.away_score}} </span></h2></td>
     <td align="left"><h2><span class="handicap" id="away_handicap"></span></h2></td>
   </tr>
   <tr>
     <td align="right"><h2><span class="header"> Home : </span></h2></td>
-    <td><h2><span class="header"> {{leg.home_team}} </span></h2></td>
-    <td align="right"><h2> {% if leg.away_score < leg.home_score and leg.is_completed %} ✔ {% endif %} </h2></td>
-    <td align="right"><h2><span class="{% if leg.away_score < leg.home_score %}header_win{% else %}header_loss{% endif %}"> {{leg.home_score}}</span></h2></td>
+    <td><h2><span class="header"> {{leaguematch.home_team}} </span></h2></td>
+    <td align="right"><h2> {% if leaguematch.away_score < leaguematch.home_score and leaguematch.is_completed %} ✔ {% endif %} </h2></td>
+    <td align="right"><h2><span class="{% if leaguematch.away_score < leaguematch.home_score %}header_win{% else %}header_loss{% endif %}"> {{leaguematch.home_score}}</span></h2></td>
     <td align="left"><h2><span class="handicap" id="home_handicap"></span></h2></td>
   </tr>
 </table>
@@ -148,7 +148,7 @@
         <td align="center"></td>
     </tr>
     {% endfor %}
-    {% if leg.is_completed %}
+    {% if leaguematch.is_completed %}
     {% else %}
     <tr> 
         <form method="post">
@@ -174,7 +174,7 @@
 </table>
 
 <p></p>
-{% if leg.is_completed %}
+{% if leaguematch.is_completed %}
 {% else %}      
 <h3> (TODO: now it's a hand-made form without validation; add validation to it or use forms created by Django) </h3>
         {% csrf_token %}

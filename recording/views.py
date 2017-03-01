@@ -49,7 +49,7 @@ def initialize(request, match_id, type_):
             selected_home_players = []
             selected_away_players = []
             match.initialize(away_players, home_players)
-            return redirect('match_view', type_=type_, match_id=match_id)
+            return redirect('match_view', type_=type_, match_id=match_id, allow_edit='True')
         else:
             return render(request, 'initialize_match.html', {'match': match,
                                                              'home_players': home_players,
@@ -133,7 +133,7 @@ def match_view_old(request, match_id, type_):
         raise Http404
 
 
-def match_view(request, type_, match_id):
+def match_view(request, type_, match_id, allow_edit=False):
     # TODO: fix this dirty fix
     if type_ == 'LeagueMatch':
         match = get_object_or_404(LeagueMatch, pk=match_id)

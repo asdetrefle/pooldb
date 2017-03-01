@@ -274,8 +274,8 @@ class LeagueMatch(AbstractMatch):
                            score_type=self.score_type,
                            race_to=2,
                            match_type='E',
-                           away_player=players[0],
-                           home_player=players[1])
+                           away=players[0],
+                           home=players[1])
                 #nm.save()
                 for j in range(2):
                     nlf = self.leagueframe_set.create(match=nm,

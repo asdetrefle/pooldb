@@ -48,7 +48,10 @@ def initialize(request, match_id, type_):
         if request.method == 'POST':
             selected_home_players = []
             selected_away_players = []
-            match.initialize(away_players, home_players)
+            for i in range(nb_selected_players):
+                selected_home_players.append(int(request.POST['home{}'.format(i)]))
+                selected_away_players.append(int(request.POST['away{}'.format(i)]))
+            match.initialize(selected_away_players, selected_home_players)
             return redirect('match_view', type_=type_, match_id=match_id, allow_edit='True')
         else:
             return render(request, 'initialize_match.html', {'match': match,

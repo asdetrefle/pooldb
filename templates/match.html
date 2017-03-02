@@ -1,5 +1,4 @@
 {% extends "base_site.html" %}
-{% load get_class_name %}
 
 {% block title %} Edit Match {% endblock %}
 
@@ -16,7 +15,7 @@
     #add_new_frame {padding: 4pt}
     </style>
 
-    <h3>Date of Match: {{match.match_date}} {% if match.is_completed %} Match Completed. {% else %} Match in Progress. {% endif %}</h3> 
+    <h3>Match Date: {{match.match_date}} {% if match.is_completed %} Match Completed. {% elif match.race_to <= frames.count %} Match under review. {% else %} Match in Progress. {% endif %}</h3> 
 
 <table border="0"> 
     <col width="80">
@@ -63,7 +62,7 @@
         <td></td>
     </tr>
     {% endfor %}
-    {% if match.is_completed %}
+    {% if match.race_to <= frames.count %}
     {% else %}
     <tr> 
         <form method="post">

@@ -39,9 +39,14 @@ def listleg(request):
 
 def initialize(request, match_id, type_):
     # currently only provide initialize method for LeagueMatch
+    # initialize method is also useful for Match in case of a tournament.
+    # We know all matchs ahead but will only know players before the Match
     # TODO: use django model form; add validation; how to represent properly the lists of players via POST?
     if type_ == 'LeagueMatch':
         match = get_object_or_404(LeagueMatch, pk=match_id)
+        if match.is_initialized:
+            return redirect('match_view', type_=type_, match_id=match_id, allow_edit='False')
+
         home_players = match.home.member_set.all()
         away_players = match.away.member_set.all()
         nb_selected_players = 5
@@ -145,6 +150,7 @@ def match_view(request, type_, match_id, allow_edit=False):
     # TODO: now view_match and add_frame are using the same frame; maybe separate them for clarity
     match = get_object_or_404(Match, pk=match_id)
     # match.update_all()
+    print match
     if request.method == 'POST':
         form = FrameForm(request.POST, match=match)
         if form.is_valid():
@@ -162,6 +168,7 @@ def match_view(request, type_, match_id, allow_edit=False):
     else:
         form = FrameForm(match=match)
     frames = match.frame_set.all()
+    print len(frames)
     return render(request, 'match.html', {'frames': frames, 'match': match, 'form': form})
 
 

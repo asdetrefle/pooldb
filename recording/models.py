@@ -105,6 +105,11 @@ class AbstractMatch(models.Model):
         return
 
     @abstractmethod
+    def completes(self):
+        """to override in child classes"""
+        pass
+
+    @abstractmethod
     def _upon_completion(self):
         """to override in child classes"""
         pass
@@ -159,10 +164,12 @@ class Match(AbstractMatch):
     def frames(self):
         return self.frame_set.all()
 
-    def _upon_completion(self):
-        if self.home_score>=self.race_to or self.away_score>=self.race_to:
-            self.is_completed = True
+    def completes(self):
+        self.is_completed = True
+        self._upon_completion()
+        return
 
+    def _upon_completion(self):
         if not self.is_completed:
             return
 
@@ -310,6 +317,11 @@ class LeagueMatch(AbstractMatch):
             self.away_score += -self.handicap
 
         self.save()
+        return
+
+    def completes(self):
+        self.is_completed = True
+        self._upon_completion()
         return
 
     def _upon_completion(self):

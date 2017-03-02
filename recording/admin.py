@@ -17,7 +17,7 @@ class LeagueMatchAdmin(admin.ModelAdmin):
         ('Information', {'fields': ['leg_number', 'number_frames', 'handicap', 'venue']}),
         ('Teams',       {'fields': ['home', 'away']}),
         ('Scores',      {'fields': ['home_score', 'away_score', 'winner']}),
-        ('Defaults',    {'fields': ['create_date', 'pool_type', 'score_type', 'table_size']}),
+        ('Defaults',    {'fields': ['match_date', 'pool_type', 'score_type', 'table_size']}),
     ]
 
 

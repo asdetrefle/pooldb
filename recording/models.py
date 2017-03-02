@@ -258,12 +258,13 @@ class LeagueMatch(AbstractMatch):
         num_players = len(home_players)
 
         if matching is None:
-            def matching(num_players, round):
+            def matching(num_players, round_):
                 order = range(num_players)
-                return order[round-1:] + order[:round-1]
+                return order[round_-1:] + order[:round_-1]
 
-        for r in range(rounds):
+        for r in range(1, rounds+1):
             l = matching(num_players, r)
+            print l
             for i, p in enumerate(l):
                 players = [Member.objects.get(pk=away_players[p]),
                            Member.objects.get(pk=home_players[i])]
@@ -276,16 +277,18 @@ class LeagueMatch(AbstractMatch):
                            match_type='E',
                            away=players[0],
                            home=players[1])
-                #nm.save()
+                nm.save()
                 for j in range(2):
                     nlf = self.leagueframe_set.create(match=nm,
                                                       break_player=players[(j+1)%2],
                                                       frame_number=j+1,
-                                                      away_player=away_player,
-                                                      home_player=home_player,
-                                                      leg=2*r+j+1)
-                    #nlf.save()
+                                                      away_player=players[0],
+                                                      home_player=players[1],
+                                                      leg=2*r+j-1)
+                    nlf.save()
 
+        self.is_initialized = True
+        self.save()
         return
 
     def update_handicap():
@@ -372,20 +375,24 @@ class Frame(models.Model):
 
 class LeagueFrame(Frame):
 
-    home = models.ForeignKey(
+    home_player = models.ForeignKey(
         Member,
         models.CASCADE,
         related_name='%(class)s_home',
     )
-    away = models.ForeignKey(
+    away_player = models.ForeignKey(
         Member,
         models.CASCADE,
         related_name='%(class)s_away',
     )
 
+    league_match = models.ForeignKey(
+        LeagueMatch,
+        models.CASCADE,
+    )
     leg = models.IntegerField("leg number")
 
     def __str__(self):
-        return "{} {} vs. {} Leg {}".format(self.leg.create_date.date(), self.away, self.home, self.leg.leg_number)
+        return "{} {} vs. {} Leg {}".format(self.league_match.match_date.date(), self.away_player, self.home_player, self.leg)
 
 

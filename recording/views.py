@@ -149,14 +149,17 @@ def match_view(request, type_, match_id, allow_edit='False'):
         match = get_object_or_404(LeagueMatch, pk=match_id)
         if not match.is_initialized:
             return redirect('match_initialize', type_=type_, match_id=match_id)
-        frames = match.leagueframe_set.all().order_by('leg_number', 'frame_number')
-        print len(frames), allow_edit
+        # show match
         if not allow_edit:
-            print 0
+            frames = match.leagueframe_set.all().order_by('leg_number', 'frame_number')
+            print len(frames), allow_edit
             return render(request, 'leaguematch_view.html', {'frames': frames, 'match': match})
-    # TODO: now view_match and add_frame are using the same frame; maybe separate them for clarity
-    # match = get_object_or_404(Match, pk=match_id)
-    # match.update_all()
+        else:
+            if request.method=='POST':
+                # Implement your edit method here
+                pass
+            frames = match.leagueframe_set.all().order_by('leg_number', 'frame_number')
+            return render(request, 'leaguematch_edit.html', {'frames': frames, 'match': match})
     elif type_ == 'Match':
         match = get_object_or_404(Match, pk=match_id)
         if request.method == 'POST':

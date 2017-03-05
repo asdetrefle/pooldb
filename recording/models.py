@@ -316,7 +316,7 @@ class LeagueMatch(AbstractMatch):
                                                       frame_number=j+1,
                                                       away_player=players[0],
                                                       home_player=players[1],
-                                                      leg=2*r+j-1)
+                                                      leg_number=2*r+j-1)
                     nlf.save()
 
         self.is_initialized = True

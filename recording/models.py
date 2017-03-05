@@ -394,8 +394,8 @@ class Frame(models.Model):
         related_name = '%(class)s_break_player',
     )
     frame_number = models.IntegerField(default=0)
-    home_score = models.IntegerField(default=0)
-    away_score = models.IntegerField(default=0)
+    home_score = models.IntegerField(blank=True, null=True)
+    away_score = models.IntegerField(blank=True, null=True)
     is_clearance = models.BooleanField(default=False)
     cleared_by = models.ForeignKey(
         Member,

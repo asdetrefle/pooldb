@@ -76,32 +76,48 @@ def set_week():
 
 
 def add_members():
-    f = open('members.csv', 'r')
+    f = open('s03_pl.csv', 'r')
+    count = 0
+    all_user = set()
     for l in f:
-        [name, team] = l.strip().split(',')
-        name_list = name.split()
-        if len(name_list)>1:
-            username = name_list[0].lower()+name_list[1][0].lower()
-        else:
-            pass
-        t = Team.objects.get(team_number=int(team))
-        print t
+        member = l.strip().split(',')
+        team, prenom, nom, gender = member[0], member[1], member[2], member[3]
+        name = prenom + ' ' + nom
+        if prenom[-3:]=='(c)':
+            prenom = prenom[:-3]
+        username = prenom.lower()+nom[0].lower()
+        t = Team.objects.get(name=team)
+        all_user.add(username)
 
         try:
             p = Player.objects.get(username=username)
-            print p
+            count += 1
+            print username, p, name
+            continue
         except ObjectDoesNotExist:
+            print "----- NEW: ", username, name
             p = Player.objects.create(username=username,
                                       name=name,
-                                      sex='M')
+                                      sex=gender)
             p.save()
+            pass
 
-        print username
+
+        #print t, username, count
+
         try:
             m = Member.objects.get(Q(player=p), Q(group=t))
         except ObjectDoesNotExist:
             m = Member.objects.create(player=p, group=t)
             m.save()
+
+    print "---"
+
+    all_members = Member.objects.all()
+    print len(all_user)
+    print len(all_members)
+
+    print [ m.player.username for m in all_members if m.player.username not in all_user]
 
     return
 

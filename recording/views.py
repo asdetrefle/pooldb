@@ -117,6 +117,7 @@ def match_view_old(request, match_id, type_):
         return render(request, 'leaguematch.html', {'leg': leg, 'frames': frames, 'away_team_members': away_team_members,
                                             'home_team_members': home_team_members})
     elif type_ == 'Match':
+        print 'toto'
         match = get_object_or_404(Match, pk=match_id)
         # match.update_all()
         if request.method == 'POST':
@@ -141,35 +142,43 @@ def match_view_old(request, match_id, type_):
         raise Http404
 
 
-def match_view(request, type_, match_id, allow_edit=False):
+def match_view(request, type_, match_id, allow_edit='False'):
     # TODO: fix this dirty fix
+    allow_edit = ast.literal_eval(allow_edit)
     if type_ == 'LeagueMatch':
         match = get_object_or_404(LeagueMatch, pk=match_id)
         if not match.is_initialized:
             return redirect('match_initialize', type_=type_, match_id=match_id)
+        frames = match.leagueframe_set.all().order_by('leg_number', 'frame_number')
+        print len(frames), allow_edit
+        if not allow_edit:
+            print 0
+            return render(request, 'leaguematch_view.html', {'frames': frames, 'match': match})
     # TODO: now view_match and add_frame are using the same frame; maybe separate them for clarity
-    match = get_object_or_404(Match, pk=match_id)
+    # match = get_object_or_404(Match, pk=match_id)
     # match.update_all()
-    print match
-    if request.method == 'POST':
-        form = FrameForm(request.POST, match=match)
-        if form.is_valid():
-            frame = form.save(commit=False)
-            nb = match.number_frames + 1
-            frame.match = match
-            frame.frame_number = nb
-            if form.cleaned_data['cleared_by'] is None:
-                frame.is_clearance = False
-            else:
-                frame.is_clearance = True
-            frame.save()
-            match.update_all()
+    elif type_ == 'Match':
+        match = get_object_or_404(Match, pk=match_id)
+        if request.method == 'POST':
+            form = FrameForm(request.POST, match=match)
+            if form.is_valid():
+                frame = form.save(commit=False)
+                nb = match.number_frames + 1
+                frame.match = match
+                frame.frame_number = nb
+                if form.cleaned_data['cleared_by'] is None:
+                    frame.is_clearance = False
+                else:
+                    frame.is_clearance = True
+                frame.save()
+                match.update_all()
+                form = FrameForm(match=match)
+        else:
             form = FrameForm(match=match)
+        frames = match.frame_set.all()
+        return render(request, 'match.html', {'frames': frames, 'match': match, 'form': form})
     else:
-        form = FrameForm(match=match)
-    frames = match.frame_set.all()
-    print len(frames)
-    return render(request, 'match.html', {'frames': frames, 'match': match, 'form': form})
+        raise Http404
 
 
 def leg_view(request, leg_id):

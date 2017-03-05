@@ -245,6 +245,8 @@ class LeagueMatch(AbstractMatch):
 
     home_points_raw = models.IntegerField(default=0)
     away_points_raw = models.IntegerField(default=0)
+    _home_ordered_players = models.CharField(max_length=200, blank=True, null=True)
+    _away_ordered_players = models.CharField(max_length=200, blank=True, null=True)
     legs = models.IntegerField('Number of legs', default=6)
     # Handicap is always for home
     # If handicap is positive, then it is added to home when computing final scores
@@ -259,8 +261,31 @@ class LeagueMatch(AbstractMatch):
         null=True
     )
 
+    def _get_ordered_players(self):
+        res = {}
+
+        if self._home_ordered_players is not None:
+            home_pk = self._home_ordered_players.split('_')
+            home_pk = [int(x) for x in home_pk]
+            res['home'] = home_pk
+
+        if self._away_ordered_players is not None:
+            away_pk = self._away_ordered_players.split('_')
+            away_pk = [int(x) for x in away_pk]
+            res['away'] = away_pk
+
+        return res
+
+    def _create_ordered_players(self, away_players, home_players):
+        self._home_ordered_players = '_'.join([str(x) for x in home_players])
+        self._away_ordered_players = '_'.join([str(x) for x in away_players])
+        self.save()
+        return
+
 
     def initialize(self, away_players, home_players, matching=None):
+        self._create_ordered_players(away_players, home_players)
+
         rounds = self.legs / 2
         num_players = len(home_players)
 
@@ -402,9 +427,9 @@ class LeagueFrame(Frame):
         LeagueMatch,
         models.CASCADE,
     )
-    leg = models.IntegerField("leg number")
+    leg_number = models.IntegerField("leg number")
 
     def __str__(self):
-        return "{} {} vs. {} Leg {}".format(self.league_match.match_date.date(), self.away_player, self.home_player, self.leg)
+        return "{} {} vs. {} Leg {}".format(self.league_match.match_date.date(), self.away_player, self.home_player, self.leg_number)
 
 

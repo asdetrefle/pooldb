@@ -167,6 +167,11 @@ class Match(AbstractMatch):
         return self.frame_set.all()
 
     def completes(self):
+        if self.home_score > self.away_score:
+            self.winner = self.home
+        elif self.home_score < self.away_score:
+            self.winner = self.away
+
         self.is_completed = True
         self.save()
         return
@@ -383,6 +388,16 @@ class LeagueMatch(AbstractMatch):
         return
 
     def completes(self):
+        if self.home_score > self.away_score:
+            self.winner = self.home
+        elif self.home_score < self.away_score:
+            self.winner = self.away
+        else:
+            if self.home_points_raw > self.away_points_raw:
+                self.winner = self.home
+            elif self.home_points_raw < self.away_points_raw:
+                self.winner = self.away
+
         self.is_completed = True
         self.save()
         return

@@ -25,13 +25,13 @@
   <tr>
     <td align="right"><h2><span class="header"> Away : </span></h2></td>
     <td><h2><span class="header"> {{match.away}} </span></h2></td>
-    <td align="right"><h2> {% if match.away_score > match.home_score and match.is_completed %} ✔ {% endif %} </h2></td>
+    <td align="right"><h2> {% if match.winner == match.away %} ✔ {% endif %} </h2></td>
     <td align="center"><h2><span class="{% if match.away_score > match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.away_score}} </span></h2></td>
   </tr>
   <tr>
     <td align="right"><h2><span class="header"> Home : </span></h2></td>
     <td><h2><span class="header"> {{match.home}} </span></h2></td>
-    <td align="right"><h2> {% if match.away_score < match.home_score and match.is_completed %} ✔ {% endif %} </h2></td>
+    <td align="right"><h2> {% if match.winner == match.home %} ✔ {% endif %} </h2></td>
     <td align="center"><h2><span class="{% if match.away_score < match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.home_score}}</span></h2></td>
   </tr>
 </table>

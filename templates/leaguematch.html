@@ -1,0 +1,106 @@
+{% extends "base_site.html" %}
+{% load match_extras %}
+
+{% block title %} Edit Match {% endblock %}
+
+{% block content %}
+
+    <style>
+    .header     {font-size:1.17em; color:dimgrey; font-weight:normal}
+    .header_loss    {font-size:1.5em; color:dimgrey; font-weight:normal}
+    .raw_pts    {font-size:1.0em; color:midnightblue; font-weight:normal}
+    .header_win {font-size:1.5em; color:dodgerblue; font-weight:bold}
+    .frame_win   {font-weight:bold; color:dodgerblue}
+    .draw {background-color: deepskyblue; margin: 5pt}
+    .away_win {background-color: red; margin: 5pt}
+    td {vertical-align: middle}
+    #add_new_frame {padding: 4pt}
+    </style>
+
+    <h3>Match Date: {{match.match_date}} {% if match.is_completed %} Match Completed. {% elif match.race_to <= frames.count %} Match under review. {% else %} Match in Progress. {% endif %}</h3> 
+
+<table border="0"> 
+    <col width="80">
+    <col width="400">
+    <col width="50">
+    <col width="120">
+    <col width="60">
+  <tr>
+    <td align="right"><h2><span class="header"> Away : </span></h2></td>
+    <td><h2><span class="header"> {{match.away}} </span></h2></td>
+    <td align="right"><h2> {% if match.away_score > match.home_score and match.is_completed %} ✔ {% endif %} </h2></td>
+    <td align="center"><h2><span class="{% if match.away_score > match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.away_score}} </span></h2></td>
+    <td align="center"><h2><span class="raw_pts"> ({{match.away_points_raw}}) </span></h2></td>
+  </tr>
+  <tr>
+    <td align="right"><h2><span class="header"> Home : </span></h2></td>
+    <td><h2><span class="header"> {{match.home}} </span></h2></td>
+    <td align="right"><h2> {% if match.away_score < match.home_score and match.is_completed %} ✔ {% endif %} </h2></td>
+    <td align="center"><h2><span class="{% if match.away_score < match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.home_score}}</span></h2></td>
+    <td align="center"><h2><span class="raw_pts"> ({{match.home_points_raw}}) </span></h2></td>
+  </tr>
+</table>
+
+<p></p>
+
+<table border="0">    
+    <col width="20">
+    <col width="140">
+    <col width="60">
+    <col width="10">
+    <col width="60">
+    <col width="140">    
+    <col width="140">    
+    <col width="20">
+    <col width="140">
+    <col width="60">
+    <col width="10">
+    <col width="60">
+    <col width="140">
+    <col width="140">
+    <tr>
+        <td align="center"><h3> Leg </h3></td>
+        <td colspan='2' align="center"><h3> Away </h3></td>
+        <td align="center"> </td>
+        <td colspan='2' align="center"><h3> Home </h3></td>
+        <td align="center"><h3> Clear By </h3></td>        
+        <td align="center"><h3> Leg </h3></td>
+        <td colspan='2' align="center"><h3> Away </h3></td>
+        <td align="center"> </td>
+        <td colspan='2' align="center"><h3> Home </h3></td>
+        <td align="center"><h3> Clear By </h3></td>
+    </tr>
+    {% for round in frames %}
+        {% for frame in round %}
+            <tr>
+            {% for f in frame %}
+                <td align="center"> {{f.leg_number}} </td>
+                <td align="center"> {{f.away_player.player}} </td>
+                <td align="right"> {% if f.away_score == None %} - {% elif f.away_score > f.home_score %} <span class="frame_win"> {{ f.away_score }} </span> {% else %} {{ f.away_score }}{% endif %} </td>
+                <td align="center"> : </td>
+                <td align="left"> {% if f.home_score == None %} - {% elif f.away_score < f.home_score %} <span class="frame_win"> {{ f.home_score }} </span> {% else %} {{ f.home_score }}{% endif %} </td>
+                <td align="center"> {{f.home_player.player}} </td>
+                <td align="center"> {%if f.is_clearance %} {{f.cleared_by.player}}{% else %} - {% endif %} </td>
+            {% endfor %}
+            </tr>
+        {% endfor %}
+        <tr>
+            <td></td>
+            <td align="right"> <h3>Total:</h3> </td>
+            <td align="right"> <h3>{{summary|get_item:forloop.counter0|get_item:0|get_item:0}}</h3> </td>
+            <td>:</td>
+            <td align="left"> <h3>{{summary|get_item:forloop.counter0|get_item:1|get_item:0}} </h3></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td align="right"> <h3>Total:</h3> </td>
+            <td align="right"> <h3>{{summary|get_item:forloop.counter0|get_item:0|get_item:1}}</h3> </td>
+            <td>:</td>
+            <td align="left"> <h3>{{summary|get_item:forloop.counter0|get_item:1|get_item:1}} </h3></td>
+            <td></td>
+        </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
+

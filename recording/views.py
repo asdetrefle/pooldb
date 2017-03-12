@@ -142,24 +142,29 @@ def match_view_old(request, match_id, type_):
         raise Http404
 
 
-def match_view(request, type_, match_id, allow_edit='False'):
+def match_view(request, type_, match_id):
     # TODO: fix this dirty fix
-    allow_edit = ast.literal_eval(allow_edit)
     if type_ == 'LeagueMatch':
         match = get_object_or_404(LeagueMatch, pk=match_id)
         if not match.is_initialized:
             return redirect('match_initialize', type_=type_, match_id=match_id)
         # show match
-        if not allow_edit:
-            frames = match.leagueframe_set.all().order_by('leg_number', 'frame_number')
-            print len(frames), allow_edit
-            return render(request, 'leaguematch_view.html', {'frames': frames, 'match': match})
-        else:
-            if request.method=='POST':
-                # Implement your edit method here
-                pass
-            frames = match.leagueframe_set.all().order_by('leg_number', 'frame_number')
-            return render(request, 'leaguematch_edit.html', {'frames': frames, 'match': match})
+        if request.method=='POST':
+            # Implement your edit method here
+            pass
+
+        def group_by_n(to_group, n=2):
+            res = []
+            rounds = int(match.legs / 2)
+            for i in range(rounds):
+                to_zip = tuple(to_group[n*i+j] for j in range(n))
+                res.append(zip(*to_zip))
+            return res
+        frames = group_by_n(match.to_view().values())
+        print match.sum_legs()
+        summary = group_by_n(match.sum_legs())
+        print frames, summary
+        return render(request, 'leaguematch.html', {'frames': frames, 'match': match, 'summary': summary})
     elif type_ == 'Match':
         match = get_object_or_404(Match, pk=match_id)
         if request.method == 'POST':

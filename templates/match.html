@@ -19,7 +19,7 @@
 
 <table border="0"> 
     <col width="80">
-    <col width="350">
+    <col width="400">
     <col width="50">
     <col width="120">
   <tr>
@@ -41,8 +41,8 @@
 <table border="0">    
     <col width="40">
     <col width="150">
-    <col width="100">
-    <col width="100">
+    <col width="120">
+    <col width="120">
     <col width="150">
     <tr>
         <td align="center"><h3> Frame </h3></td>
@@ -56,13 +56,13 @@
     <tr>
         <td align="center"> {{frame.frame_number}} </td>
         <td align="center"> {{frame.break_player.player}} </td>
-        <td align="center"> {% if frame.away_score > frame.home_score %} <span class="frame_win"> {{ frame.away_score }} </span> {% else %} {{ frame.away_score }}{% endif %} </td>
-        <td align="center"> {% if frame.away_score < frame.home_score %} <span class="frame_win"> {{ frame.home_score }} </span> {% else %} {{ frame.home_score }}{% endif %} </td>
+        <td align="center"> {% if frame.away_score == None %} - {% elif frame.away_score > frame.home_score %} <span class="frame_win"> {{ frame.away_score }} </span> {% else %} {{ frame.away_score }}{% endif %} </td>
+        <td align="center"> {% if frame.home_score == None %} - {% elif frame.away_score < frame.home_score %} <span class="frame_win"> {{ frame.home_score }} </span> {% else %} {{ frame.home_score }}{% endif %} </td>
         <td align="center"> {%if frame.is_clearance %} {{frame.cleared_by.player}}{% else %} - {% endif %} </td>
         <td></td>
     </tr>
     {% endfor %}
-    {% if match.race_to <= frames.count %}
+    {% if match.is_completed %}
     {% else %}
     <tr> 
         <form method="post">

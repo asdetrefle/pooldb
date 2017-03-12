@@ -9,3 +9,12 @@ def get_class_name(obj):
     print type(obj)
     print str(obj.__class__.__name__)
     return str(obj.__class__.__name__)
+
+
+@register.filter
+def get_item(l, i):
+    try:
+        return l[i]
+    except:
+        return None
+

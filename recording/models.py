@@ -8,6 +8,7 @@ from utils import default_season, calc_elo
 
 from administration.models import Member, Team, League
 from schedule.models import MatchWeek, Season
+from collections import OrderedDict
 # Create your models here.
 
 class AbstractMatch(models.Model):
@@ -42,6 +43,7 @@ class AbstractMatch(models.Model):
 
     venue = models.CharField(max_length=200, blank=True, null=True)
     match_date = models.DateTimeField('Event date', default=timezone.now)
+    #do we need week for single match as well? in discussion
     week = models.ForeignKey(MatchWeek,
                              models.CASCADE,
                              blank=True,
@@ -110,7 +112,7 @@ class AbstractMatch(models.Model):
         pass
 
     @abstractmethod
-    def _upon_completion(self):
+    def submits(self):
         """to override in child classes"""
         pass
 
@@ -166,17 +168,15 @@ class Match(AbstractMatch):
 
     def completes(self):
         self.is_completed = True
-        self._upon_completion()
+        self.save()
         return
 
-    def _upon_completion(self):
+    def submits(self):
         if not self.is_completed:
             return
 
         if self.is_submitted:
             return
-
-        print self.is_completed
 
         # adjust matchs information for members.
         self.home.total_matches_played += 1
@@ -332,6 +332,44 @@ class LeagueMatch(AbstractMatch):
     def frames(self):
         return self.leagueframe_set.all()
 
+    def to_view(self):
+        frames = self.frames()
+        res = {}
+
+        for f in frames:
+            res.setdefault(f.leg_number, []).append(f)
+
+        return OrderedDict(sorted(res.items()))
+
+    def sum_legs(self):
+        frames = self.frames()
+        res = [[0,0] for i in range(self.legs)]
+        for f in frames:
+            res[f.leg_number - 1][0] += f.away_score
+            res[f.leg_number - 1][1] += f.home_score
+
+        return res
+
+    def _update_progress(self):
+        super(LeagueMatch, self)._update_progress()
+        self.home_points_raw = self.home_score
+        self.away_points_raw = self.away_score
+
+        legs_sum = self.sum_legs()
+        home_win_leg = 0
+        away_win_leg = 0
+        for [a, h] in legs_sum:
+            if a>h:
+                away_win_leg += 1
+            elif h>a:
+                home_win_leg += 1
+
+        self.home_score = home_win_leg
+        self.away_score = away_win_leg
+        self._update_handicap()
+        self.save()
+        return
+
     def _update_handicap(self):
         """
         This method needs to be called everytime after _update_progress
@@ -346,10 +384,10 @@ class LeagueMatch(AbstractMatch):
 
     def completes(self):
         self.is_completed = True
-        self._upon_completion()
+        self.save()
         return
 
-    def _upon_completion(self):
+    def submits(self):
         # TODO this one does not work yet
         # We need to create a way for Leg to be completed
         # Currently it nevers finishes.

@@ -189,17 +189,15 @@ class Match(AbstractMatch):
         self.away.total_matches_played += 1
         self.away.season_matches_played += 1
 
-        if self.home_score > self.away_score:
-            self.winner = self.home
+        if self.winner == self.home:
             self.home.total_matches_won += 1
             self.home.season_matches_won += 1
-        elif self.home_score < self.away_score:
-            self.winner = self.away
+        elif self.winner == self.away:
             self.away.total_matches_won += 1
             self.away.season_matches_won += 1
-        else:
-            self.winner = none
 
+        print self.home, self.home.total_matches_played
+        print self.away, self.away.total_matches_played
         # add clearance info to players
         for f in self.frames():
             if f.is_clearance:
@@ -214,6 +212,8 @@ class Match(AbstractMatch):
         home_score_ = self.home_score
         away_score_ = self.away_score
 
+        self.home.raw_points += mi.home_score
+        self.away.raw_points += mi.away_score
         self.home._point_adj += calc_elo(float(home_score_) / (home_score_ + away_score_),
                                                 self.away.points,
                                                 self.home.points)
@@ -328,7 +328,7 @@ class LeagueMatch(AbstractMatch):
         self.save()
         return
 
-    def update_handicap():
+    def set_handicap():
         pass
 
     def get_leg(self, l):

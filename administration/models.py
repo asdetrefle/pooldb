@@ -43,7 +43,7 @@ class League(models.Model):
         pk_set = []
         point_set = []
         for t in ts:
-            for m in t.member_set.all():
+            for m in t.member_set.filter(season_matches_played__gt=0):
                 m._update_points()
                 pk_set.append(m.pk)
                 # scipy rankdata only ranks from smallest to highest so here needs the minus sign.

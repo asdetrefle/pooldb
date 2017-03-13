@@ -25,13 +25,13 @@
   <tr>
     <td align="right"><h2><span class="header"> Away : </span></h2></td>
     <td><h2><span class="header"> {{match.away}} </span></h2></td>
-    <td align="right"><h2> {% if match.winner == match.away %} ✔ {% endif %} </h2></td>
+    <td align="right"><h2> {% if match.away_score > match.home_score and match.is_completed %} ✔ {% endif %} </h2></td>
     <td align="center"><h2><span class="{% if match.away_score > match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.away_score}} </span></h2></td>
   </tr>
   <tr>
     <td align="right"><h2><span class="header"> Home : </span></h2></td>
     <td><h2><span class="header"> {{match.home}} </span></h2></td>
-    <td align="right"><h2> {% if match.winner == match.home %} ✔ {% endif %} </h2></td>
+    <td align="right"><h2> {% if match.away_score < match.home_score and match.is_completed %} ✔ {% endif %} </h2></td>
     <td align="center"><h2><span class="{% if match.away_score < match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.home_score}}</span></h2></td>
   </tr>
 </table>
@@ -39,53 +39,36 @@
 <p></p>
 
 <table border="0">    
-    <col width="40">
-    <col width="150">
-    <col width="120">
-    <col width="120">
-    <col width="150">
+    <col width="20">
+    <col width="140">
+    <col width="60">
+    <col width="10">
+    <col width="60">
+    <col width="140">
+    <col width="140">
     <tr>
-        <td align="center"><h3> Frame </h3></td>
-        <td align="center"><h3> Break By </h3></td>
-        <td align="center"><h3> {{ match.away.player}} </h3></td>
-        <td align="center"><h3> {{ match.home.player}} </h3></td>
+        <td align="center"><h3> Leg </h3></td>
+        <td align="center"><h3> Away </h3></td>
+        <td align="right"><h3> Away </h3></td>
+        <td align="center"> </td>
+        <td align="left"><h3> Home </h3></td>
+        <td align="center"><h3> Home </h3></td>
         <td align="center"><h3> Clear By </h3></td>
         <td></td>
     </tr>
     {% for frame in frames %}
     <tr>
-        <td align="center"> {{frame.frame_number}} </td>
-        <td align="center"> {{frame.break_player.player}} </td>
-        <td align="center"> {% if frame.away_score == None %} - {% elif frame.away_score > frame.home_score %} <span class="frame_win"> {{ frame.away_score }} </span> {% else %} {{ frame.away_score }}{% endif %} </td>
-        <td align="center"> {% if frame.home_score == None %} - {% elif frame.away_score < frame.home_score %} <span class="frame_win"> {{ frame.home_score }} </span> {% else %} {{ frame.home_score }}{% endif %} </td>
+        <td align="center"> {{frame.leg_number}} </td>
+        <td align="center"> {{frame.away_player.player}} </td>
+        <td align="right"> {% if frame.away_score == None %} - {% elif frame.away_score > frame.home_score %} <span class="frame_win"> {{ frame.away_score }} </span> {% else %} {{ frame.away_score }}{% endif %} </td>
+        <td align="center"> : </td>
+        <td align="left"> {% if frame.home_score == None %} - {% elif frame.away_score < frame.home_score %} <span class="frame_win"> {{ frame.home_score }} </span> {% else %} {{ frame.home_score }}{% endif %} </td>
+        <td align="center"> {{frame.home_player.player}} </td>
         <td align="center"> {%if frame.is_clearance %} {{frame.cleared_by.player}}{% else %} - {% endif %} </td>
         <td></td>
     </tr>
     {% endfor %}
-    {% if match.is_completed %}
-    {% else %}
-    <tr> 
-        <form method="post">
-        <td align="center"> {{ frames.count|add:"1" }} </td>
-        <td align="center">{{ form.break_player }}</td>
-        <td align="center">{{ form.away_score }}</td>
-        <td align="center">{{ form.home_score }}</td>
-        <td align="center">{{ form.cleared_by }}</td>
-        <td><input type="submit" value="Add" id="add_new_frame"></td>
-    </tr>
-    {% endif %}
 </table>
 
-<p></p>
-{% if match.is_completed %}
-{% else %}      
-<h3>(TODO: format error message) </h3>
-        {% csrf_token %}
-    </form>
-    {{ form.errors }}
-    {{ form.non_field_errors }}
-
-
-{% endif %}
 {% endblock %}
 

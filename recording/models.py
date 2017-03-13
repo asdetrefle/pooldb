@@ -8,6 +8,7 @@ from utils import default_season, calc_elo
 
 from administration.models import Member, Team, League
 from schedule.models import MatchWeek, Season
+from collections import OrderedDict
 # Create your models here.
 
 class AbstractMatch(models.Model):
@@ -42,6 +43,7 @@ class AbstractMatch(models.Model):
 
     venue = models.CharField(max_length=200, blank=True, null=True)
     match_date = models.DateTimeField('Event date', default=timezone.now)
+    #do we need week for single match as well? in discussion
     week = models.ForeignKey(MatchWeek,
                              models.CASCADE,
                              blank=True,
@@ -105,7 +107,12 @@ class AbstractMatch(models.Model):
         return
 
     @abstractmethod
-    def _upon_completion(self):
+    def completes(self):
+        """to override in child classes"""
+        pass
+
+    @abstractmethod
+    def submits(self):
         """to override in child classes"""
         pass
 
@@ -159,17 +166,22 @@ class Match(AbstractMatch):
     def frames(self):
         return self.frame_set.all()
 
-    def _upon_completion(self):
-        if self.home_score>=self.race_to or self.away_score>=self.race_to:
-            self.is_completed = True
+    def completes(self):
+        if self.home_score > self.away_score:
+            self.winner = self.home
+        elif self.home_score < self.away_score:
+            self.winner = self.away
 
+        self.is_completed = True
+        self.save()
+        return
+
+    def submits(self):
         if not self.is_completed:
             return
 
         if self.is_submitted:
             return
-
-        print self.is_completed
 
         # adjust matchs information for members.
         self.home.total_matches_played += 1
@@ -177,17 +189,15 @@ class Match(AbstractMatch):
         self.away.total_matches_played += 1
         self.away.season_matches_played += 1
 
-        if self.home_score > self.away_score:
-            self.winner = self.home
+        if self.winner == self.home:
             self.home.total_matches_won += 1
             self.home.season_matches_won += 1
-        elif self.home_score < self.away_score:
-            self.winner = self.away
+        elif self.winner == self.away:
             self.away.total_matches_won += 1
             self.away.season_matches_won += 1
-        else:
-            self.winner = none
 
+        print self.home, self.home.total_matches_played
+        print self.away, self.away.total_matches_played
         # add clearance info to players
         for f in self.frames():
             if f.is_clearance:
@@ -202,6 +212,8 @@ class Match(AbstractMatch):
         home_score_ = self.home_score
         away_score_ = self.away_score
 
+        self.home.raw_points += mi.home_score
+        self.away.raw_points += mi.away_score
         self.home._point_adj += calc_elo(float(home_score_) / (home_score_ + away_score_),
                                                 self.away.points,
                                                 self.home.points)
@@ -238,6 +250,8 @@ class LeagueMatch(AbstractMatch):
 
     home_points_raw = models.IntegerField(default=0)
     away_points_raw = models.IntegerField(default=0)
+    _home_ordered_players = models.CharField(max_length=200, blank=True, null=True)
+    _away_ordered_players = models.CharField(max_length=200, blank=True, null=True)
     legs = models.IntegerField('Number of legs', default=6)
     # Handicap is always for home
     # If handicap is positive, then it is added to home when computing final scores
@@ -252,14 +266,69 @@ class LeagueMatch(AbstractMatch):
         null=True
     )
 
-    def initialize(self, away_players, home_players, method=None):
-        rounds = self.legs / 2
-        if method is None:
-            for offset in range(rounds):
-                pass
+    def _get_ordered_players(self):
+        res = {}
+
+        if self._home_ordered_players is not None:
+            home_pk = self._home_ordered_players.split('_')
+            home_pk = [int(x) for x in home_pk]
+            res['home'] = home_pk
+
+        if self._away_ordered_players is not None:
+            away_pk = self._away_ordered_players.split('_')
+            away_pk = [int(x) for x in away_pk]
+            res['away'] = away_pk
+
+        return res
+
+    def _create_ordered_players(self, away_players, home_players):
+        self._home_ordered_players = '_'.join([str(x) for x in home_players])
+        self._away_ordered_players = '_'.join([str(x) for x in away_players])
+        self.save()
         return
 
-    def update_handicap():
+
+    def initialize(self, away_players, home_players, matching=None):
+        self._create_ordered_players(away_players, home_players)
+
+        rounds = self.legs / 2
+        num_players = len(home_players)
+
+        if matching is None:
+            def matching(num_players, round_):
+                order = range(num_players)
+                return order[round_-1:] + order[:round_-1]
+
+        for r in range(1, rounds+1):
+            l = matching(num_players, r)
+            print l
+            for i, p in enumerate(l):
+                players = [Member.objects.get(pk=away_players[p]),
+                           Member.objects.get(pk=home_players[i])]
+                nm = Match(venue=self.venue,
+                           match_date=self.match_date,
+                           table_size=self.table_size,
+                           pool_type =self.pool_type,
+                           score_type=self.score_type,
+                           race_to=2,
+                           match_type='E',
+                           away=players[0],
+                           home=players[1])
+                nm.save()
+                for j in range(2):
+                    nlf = self.leagueframe_set.create(match=nm,
+                                                      break_player=players[(j+1)%2],
+                                                      frame_number=j+1,
+                                                      away_player=players[0],
+                                                      home_player=players[1],
+                                                      leg_number=2*r+j-1)
+                    nlf.save()
+
+        self.is_initialized = True
+        self.save()
+        return
+
+    def set_handicap():
         pass
 
     def get_leg(self, l):
@@ -267,6 +336,44 @@ class LeagueMatch(AbstractMatch):
 
     def frames(self):
         return self.leagueframe_set.all()
+
+    def to_view(self):
+        frames = self.frames()
+        res = {}
+
+        for f in frames:
+            res.setdefault(f.leg_number, []).append(f)
+
+        return OrderedDict(sorted(res.items()))
+
+    def sum_legs(self):
+        frames = self.frames()
+        res = [[0,0] for i in range(self.legs)]
+        for f in frames:
+            res[f.leg_number - 1][0] += f.away_score
+            res[f.leg_number - 1][1] += f.home_score
+
+        return res
+
+    def _update_progress(self):
+        super(LeagueMatch, self)._update_progress()
+        self.home_points_raw = self.home_score
+        self.away_points_raw = self.away_score
+
+        legs_sum = self.sum_legs()
+        home_win_leg = 0
+        away_win_leg = 0
+        for [a, h] in legs_sum:
+            if a>h:
+                away_win_leg += 1
+            elif h>a:
+                home_win_leg += 1
+
+        self.home_score = home_win_leg
+        self.away_score = away_win_leg
+        self._update_handicap()
+        self.save()
+        return
 
     def _update_handicap(self):
         """
@@ -280,7 +387,22 @@ class LeagueMatch(AbstractMatch):
         self.save()
         return
 
-    def _upon_completion(self):
+    def completes(self):
+        if self.home_score > self.away_score:
+            self.winner = self.home
+        elif self.home_score < self.away_score:
+            self.winner = self.away
+        else:
+            if self.home_points_raw > self.away_points_raw:
+                self.winner = self.home
+            elif self.home_points_raw < self.away_points_raw:
+                self.winner = self.away
+
+        self.is_completed = True
+        self.save()
+        return
+
+    def submits(self):
         # TODO this one does not work yet
         # We need to create a way for Leg to be completed
         # Currently it nevers finishes.
@@ -325,8 +447,8 @@ class Frame(models.Model):
         related_name = '%(class)s_break_player',
     )
     frame_number = models.IntegerField(default=0)
-    home_score = models.IntegerField(default=0)
-    away_score = models.IntegerField(default=0)
+    home_score = models.IntegerField(blank=True, null=True)
+    away_score = models.IntegerField(blank=True, null=True)
     is_clearance = models.BooleanField(default=False)
     cleared_by = models.ForeignKey(
         Member,
@@ -343,20 +465,24 @@ class Frame(models.Model):
 
 class LeagueFrame(Frame):
 
-    home = models.ForeignKey(
+    home_player = models.ForeignKey(
         Member,
         models.CASCADE,
         related_name='%(class)s_home',
     )
-    away = models.ForeignKey(
+    away_player = models.ForeignKey(
         Member,
         models.CASCADE,
         related_name='%(class)s_away',
     )
 
-    leg = models.IntegerField("leg number")
+    league_match = models.ForeignKey(
+        LeagueMatch,
+        models.CASCADE,
+    )
+    leg_number = models.IntegerField("leg number")
 
     def __str__(self):
-        return "{} {} vs. {} Leg {}".format(self.leg.create_date.date(), self.away, self.home, self.leg.leg_number)
+        return "{} {} vs. {} Leg {}".format(self.league_match.match_date.date(), self.away_player, self.home_player, self.leg_number)
 
 

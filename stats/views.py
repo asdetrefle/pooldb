@@ -7,7 +7,7 @@ def index(request):
     return render(request, 'stats.html')
 
 
-def ranking_league(request, league_name='HKPL', rankby='points'):
+def ranking_league(request, league_name='Poke n Hope HK 8-Ball', rankby='points'):
     # TODO: now view_match and add_frame are using the same frame; maybe separate them for clarity
     # TODO: use django form and add validation
     lg = League.objects.get(name=league_name)

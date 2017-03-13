@@ -39,18 +39,25 @@ def listleg(request):
 
 def initialize(request, match_id, type_):
     # currently only provide initialize method for LeagueMatch
+    # initialize method is also useful for Match in case of a tournament.
+    # We know all matchs ahead but will only know players before the Match
     # TODO: use django model form; add validation; how to represent properly the lists of players via POST?
     if type_ == 'LeagueMatch':
         match = get_object_or_404(LeagueMatch, pk=match_id)
+        if match.is_initialized:
+            return redirect('match_view', type_=type_, match_id=match_id, allow_edit='False')
+
         home_players = match.home.member_set.all()
         away_players = match.away.member_set.all()
-        # TODO: 1 player for test puepose; change to 5 when the DB of teams is complete
-        nb_selected_players = 1  # 5
+        nb_selected_players = 5
         if request.method == 'POST':
             selected_home_players = []
             selected_away_players = []
-            match.initialize(away_players, home_players)
-            return redirect('match_view', type_=type_, match_id=match_id)
+            for i in range(nb_selected_players):
+                selected_home_players.append(int(request.POST['home{}'.format(i)]))
+                selected_away_players.append(int(request.POST['away{}'.format(i)]))
+            match.initialize(selected_away_players, selected_home_players)
+            return redirect('match_view', type_=type_, match_id=match_id, allow_edit='True')
         else:
             return render(request, 'initialize_match.html', {'match': match,
                                                              'home_players': home_players,
@@ -110,6 +117,7 @@ def match_view_old(request, match_id, type_):
         return render(request, 'leaguematch.html', {'leg': leg, 'frames': frames, 'away_team_members': away_team_members,
                                             'home_team_members': home_team_members})
     elif type_ == 'Match':
+        print 'toto'
         match = get_object_or_404(Match, pk=match_id)
         # match.update_all()
         if request.method == 'POST':
@@ -140,27 +148,45 @@ def match_view(request, type_, match_id):
         match = get_object_or_404(LeagueMatch, pk=match_id)
         if not match.is_initialized:
             return redirect('match_initialize', type_=type_, match_id=match_id)
-    # TODO: now view_match and add_frame are using the same frame; maybe separate them for clarity
-    match = get_object_or_404(Match, pk=match_id)
-    # match.update_all()
-    if request.method == 'POST':
-        form = FrameForm(request.POST, match=match)
-        if form.is_valid():
-            frame = form.save(commit=False)
-            nb = match.number_frames + 1
-            frame.match = match
-            frame.frame_number = nb
-            if form.cleaned_data['cleared_by'] is None:
-                frame.is_clearance = False
-            else:
-                frame.is_clearance = True
-            frame.save()
-            match.update_all()
+        # show match
+        if request.method=='POST':
+            # Implement your edit method here
+            pass
+
+        def group_by_n(to_group, n=2):
+            res = []
+            rounds = int(match.legs / 2)
+            for i in range(rounds):
+                to_zip = tuple(to_group[n*i+j] for j in range(n))
+                res.append(zip(*to_zip))
+            return res
+        frames = group_by_n(match.to_view().values())
+        print match.sum_legs()
+        summary = group_by_n(match.sum_legs())
+        print frames, summary
+        return render(request, 'leaguematch.html', {'frames': frames, 'match': match, 'summary': summary})
+    elif type_ == 'Match':
+        match = get_object_or_404(Match, pk=match_id)
+        if request.method == 'POST':
+            form = FrameForm(request.POST, match=match)
+            if form.is_valid():
+                frame = form.save(commit=False)
+                nb = match.number_frames + 1
+                frame.match = match
+                frame.frame_number = nb
+                if form.cleaned_data['cleared_by'] is None:
+                    frame.is_clearance = False
+                else:
+                    frame.is_clearance = True
+                frame.save()
+                match.update_all()
+                form = FrameForm(match=match)
+        else:
             form = FrameForm(match=match)
+        frames = match.frame_set.all()
+        return render(request, 'match.html', {'frames': frames, 'match': match, 'form': form})
     else:
-        form = FrameForm(match=match)
-    frames = match.frame_set.all()
-    return render(request, 'match.html', {'frames': frames, 'match': match, 'form': form})
+        raise Http404
 
 
 def leg_view(request, leg_id):

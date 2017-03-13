@@ -1,184 +1,106 @@
 {% extends "base_site.html" %}
-{% load mathfilters %}
+{% load match_extras %}
 
-{% block title %} Edit leg {% endblock %}
+{% block title %} Edit Match {% endblock %}
 
 {% block content %}
-    {% load static %}
-    <script src="{% static "js/jquery-3.1.1.min.js" %}"></script>
-    <script>
-    $(document).ready(function () {
-        // show handicap
-        var handicap = {{ leg.handicap }};
-        var handicap_display = "(" + Math.abs(handicap).toString() + ")";
-        if (handicap > 0) {
-            $("#home_handicap").html(handicap_display);
-        } else if (handicap < 0) {
-            $("#away_handicap").html(handicap_display);
-        }
 
-        // automatic break player select
-        var home_player_select = $("select[name=home_player]");
-        var away_player_select = $("select[name=away_player]");
-        var break_player_select = $("select[name=break_player]");
-        var clear_player_select = $("select[name=clear_player]");
-        var leg_id = {{ leg.pk }};
-
-        function update_list() {
-            var home_selected = home_player_select.find("option:selected");
-            var home_selected_val = parseInt(home_selected.val());
-            var away_selected = away_player_select.find("option:selected");
-            var away_selected_val = parseInt(away_selected.val());
-
-            var old_break_selected_val = parseInt(break_player_select.find("option:selected").val());
-            var old_clear_selected_val = parseInt(clear_player_select.find("option:selected").val());
-            var not_clearance = $('<option>').val(-1).html("-");
-
-            break_player_select.empty();
-            break_player_select.append(home_selected.clone());
-            break_player_select.append(away_selected.clone());
-            if (old_break_selected_val == undefined || isNaN(old_break_selected_val)) { // at initializaion, select the player according to parity of frame number
-                if (leg_id % 2 == 1) { // default home
-                    break_player_select.val(home_selected_val);
-                } else { // default away
-                    break_player_select.val(away_selected_val);
-                }
-            } else { // keep the break player with the currently selected home/away team
-                //if (old_break_selected_val == home_selected.val() || old_break_selected_val == away_selected.val()) {
-                //    break_player_select.val(old_break_selected_val);
-                //}
-                var old_break_is_home = false;
-                var home_options = home_player_select.find("option");
-                var i;
-                for (i = 0; i < home_options.length; i++) {
-                    if (parseInt(home_options[i].value) == old_break_selected_val) {
-                        old_break_is_home = true;
-                        break;
-                    }
-                }
-                if (old_break_is_home) {
-                    break_player_select.val(home_selected_val);
-                } else {
-                    break_player_select.val(away_selected_val);
-                }
-            }
-
-            clear_player_select.empty();
-            clear_player_select.append(not_clearance);
-            clear_player_select.append(home_selected.clone());
-            clear_player_select.append(away_selected.clone());
-            // keep the value unchanged if it's still valid
-            if (old_clear_selected_val != undefined) {
-                if (old_clear_selected_val == home_selected.val() ||
-                    old_clear_selected_val == away_selected.val() ||
-                    old_clear_selected_val < 0) {
-                    clear_player_select.val(old_clear_selected_val);
-                }
-            }
-
-        }
-        update_list();
-        $(home_player_select).change(update_list);
-        $(away_player_select).change(update_list);
-    });
-    </script>
     <style>
     .header     {font-size:1.17em; color:dimgrey; font-weight:normal}
     .header_loss    {font-size:1.5em; color:dimgrey; font-weight:normal}
+    .raw_pts    {font-size:1.0em; color:midnightblue; font-weight:normal}
     .header_win {font-size:1.5em; color:dodgerblue; font-weight:bold}
     .frame_win   {font-weight:bold; color:dodgerblue}
-    .handicap   {font-size:0.8em; color:green}
     .draw {background-color: deepskyblue; margin: 5pt}
     .away_win {background-color: red; margin: 5pt}
     td {vertical-align: middle}
     #add_new_frame {padding: 4pt}
     </style>
 
-    <h3>Date of leg: {{leg.create_date}} {% if leg.is_completed %} leg Completed. {% else %} leg in Progress. <a class="button" href="{% url 'leg_close' leg_id=leg.pk %}">Close the leg</a>{% endif %}</h3>
+    <h3>Match Date: {{match.match_date}} {% if match.is_completed %} Match Completed. {% elif match.race_to <= frames.count %} Match under review. {% else %} Match in Progress. {% endif %}</h3> 
 
-<table border="0">
+<table border="0"> 
     <col width="80">
-    <col width="350">
+    <col width="400">
     <col width="50">
-    <col width="70">
-    <col width="50">
+    <col width="120">
+    <col width="60">
   <tr>
     <td align="right"><h2><span class="header"> Away : </span></h2></td>
-    <td><h2><span class="header"> {{leg.away_team}} </span></h2></td>
-    <td align="right"><h2> {% if leg.away_score > leg.home_score and leg.is_completed %} ✔ {% endif %} </h2></td>
-    <td align="right"><h2><span class="{% if leg.away_score > leg.home_score %}header_win{% else %}header_loss{% endif %}"> {{leg.away_score}} </span></h2></td>
-    <td align="left"><h2><span class="handicap" id="away_handicap"></span></h2></td>
+    <td><h2><span class="header"> {{match.away}} </span></h2></td>
+    <td align="right"><h2> {% if match.winner == match.away %} ✔ {% endif %} </h2></td>
+    <td align="center"><h2><span class="{% if match.away_score > match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.away_score}} </span></h2></td>
+    <td align="center"><h2><span class="raw_pts"> ({{match.away_points_raw}}) </span></h2></td>
   </tr>
   <tr>
     <td align="right"><h2><span class="header"> Home : </span></h2></td>
-    <td><h2><span class="header"> {{leg.home_team}} </span></h2></td>
-    <td align="right"><h2> {% if leg.away_score < leg.home_score and leg.is_completed %} ✔ {% endif %} </h2></td>
-    <td align="right"><h2><span class="{% if leg.away_score < leg.home_score %}header_win{% else %}header_loss{% endif %}"> {{leg.home_score}}</span></h2></td>
-    <td align="left"><h2><span class="handicap" id="home_handicap"></span></h2></td>
+    <td><h2><span class="header"> {{match.home}} </span></h2></td>
+    <td align="right"><h2> {% if match.winner == match.home %} ✔ {% endif %} </h2></td>
+    <td align="center"><h2><span class="{% if match.away_score < match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.home_score}}</span></h2></td>
+    <td align="center"><h2><span class="raw_pts"> ({{match.home_points_raw}}) </span></h2></td>
   </tr>
 </table>
 
 <p></p>
 
 <table border="0">    
-    <col width="40">
-    <col width="150">
-    <col width="100">
-    <col width="100">
-    <col width="150">
+    <col width="20">
+    <col width="140">
+    <col width="60">
+    <col width="10">
+    <col width="60">
+    <col width="140">    
+    <col width="140">    
+    <col width="20">
+    <col width="140">
+    <col width="60">
+    <col width="10">
+    <col width="60">
+    <col width="140">
+    <col width="140">
     <tr>
-        <td align="center"><h3> Frame </h3></td>
-        <td align="center"><h3> Away Player </h3></td>
-        <td align="center"><h3> Away Score </h3></td>
-        <td align="center"><h3> Home Score </h3></td>
-        <td align="center"><h3> Home Player </h3></td>
-        <td align="center"><h3> Break By </h3></td>
+        <td align="center"><h3> Leg </h3></td>
+        <td colspan='2' align="center"><h3> Away </h3></td>
+        <td align="center"> </td>
+        <td colspan='2' align="center"><h3> Home </h3></td>
+        <td align="center"><h3> Clear By </h3></td>        
+        <td align="center"><h3> Leg </h3></td>
+        <td colspan='2' align="center"><h3> Away </h3></td>
+        <td align="center"> </td>
+        <td colspan='2' align="center"><h3> Home </h3></td>
         <td align="center"><h3> Clear By </h3></td>
-        <td align="center"></td>
     </tr>
-    {% for frame in frames %}
-    <tr>
-        <td align="center"> {{frame.frame_number}} </td>
-        <td align="center"> {{frame.away_player.player}} </td>
-        <td align="center"> {% if frame.away_score > frame.home_score %} <span class="frame_win"> {{ frame.away_score }} </span> {% else %} {{ frame.away_score }}{% endif %} </td>
-        <td align="center"> {% if frame.away_score < frame.home_score %} <span class="frame_win"> {{ frame.home_score }} </span> {% else %} {{ frame.home_score }}{% endif %} </td>
-        <td align="center"> {{frame.home_player.player}} </td>
-        <td align="center"> {{frame.break_player.player}} </td>
-        <td align="center"> {%if frame.is_clearance %} {{frame.cleared_by.player}} {% else %} - {% endif %} </td>
-        <td align="center"></td>
-    </tr>
+    {% for round in frames %}
+        {% for frame in round %}
+            <tr>
+            {% for f in frame %}
+                <td align="center"> {{f.leg_number}} </td>
+                <td align="center"> {{f.away_player.player}} </td>
+                <td align="right"> {% if f.away_score == None %} - {% elif f.away_score > f.home_score %} <span class="frame_win"> {{ f.away_score }} </span> {% else %} {{ f.away_score }}{% endif %} </td>
+                <td align="center"> : </td>
+                <td align="left"> {% if f.home_score == None %} - {% elif f.away_score < f.home_score %} <span class="frame_win"> {{ f.home_score }} </span> {% else %} {{ f.home_score }}{% endif %} </td>
+                <td align="center"> {{f.home_player.player}} </td>
+                <td align="center"> {%if f.is_clearance %} {{f.cleared_by.player}}{% else %} - {% endif %} </td>
+            {% endfor %}
+            </tr>
+        {% endfor %}
+        <tr>
+            <td></td>
+            <td align="right"> <h3>Total:</h3> </td>
+            <td align="right"> <h3>{{summary|get_item:forloop.counter0|get_item:0|get_item:0}}</h3> </td>
+            <td>:</td>
+            <td align="left"> <h3>{{summary|get_item:forloop.counter0|get_item:1|get_item:0}} </h3></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td align="right"> <h3>Total:</h3> </td>
+            <td align="right"> <h3>{{summary|get_item:forloop.counter0|get_item:0|get_item:1}}</h3> </td>
+            <td>:</td>
+            <td align="left"> <h3>{{summary|get_item:forloop.counter0|get_item:1|get_item:1}} </h3></td>
+            <td></td>
+        </tr>
     {% endfor %}
-    {% if leg.is_completed %}
-    {% else %}
-    <tr> 
-        <form method="post">
-        <td align="center"> {{ frames.count|add:"1" }} </td>
-        <td align="center"><select name="away_player" >
-                {% for p in away_team_members %}
-                <option value="{{ p.pk }}">{{ p.player }}</option>
-                {% endfor %}
-            </select></td>
-        <td align="center"><input type="text" name="away_score" size="4"></td>
-        <td align="center"><input type="text" name="home_score" size="4"></td>
-        <td align="center"><select name="home_player">
-                {% for p in home_team_members %}
-                <option value="{{ p.pk }}">{{ p.player }}</option>
-                {% endfor %}
-            </select></td>
-{#        TODO: these two lists will change width when the options change; use css to have a fixed size #}
-        <td><select name="break_player"></select></td>
-        <td><select name="clear_player"></select></td>
-        <td><input type="submit" value="Add" id="add_new_frame"></td>
-    </tr>
-    {% endif %}
 </table>
 
-<p></p>
-{% if leg.is_completed %}
-{% else %}      
-<h3> (TODO: now it's a hand-made form without validation; add validation to it or use forms created by Django) </h3>
-        {% csrf_token %}
-    </form>
-{% endif %}
 {% endblock %}
 

@@ -8,8 +8,10 @@
 
  <table border="0">    
     <col width="50">
-    <col width="100">
+    <col width="140">
     <col width="200">
+    <col width="128">
+    <col width="128">
     <col width="128">
     <col width="128">
     <col width="128">
@@ -19,6 +21,8 @@
         <td align="center"><h3> Name </h3></td>
         <td align="center"><h3> Team </h3></td>
         <td align="center"><h3> Ranking Points </h3></td>
+        <td align="center"><h3> Total Points </h3></td>
+        <td align="center"><h3> Average </h3></td>
         <td align="center"><h3> Match Playered </h3></td>
         <td align="center"><h3> Match Won </h3></td>
         <td align="center"><h3> Clearance </h3></td>
@@ -29,6 +33,8 @@
         <td align="center"> {{ m.player }} </td>
         <td align="center"> {{ m.group }} </td>
         <td align="center"> {{ m.points|floatformat:"0" }} </td>
+        <td align="center"> {{ m.raw_points|floatformat:"0" }} </td>
+        <td align="center"> {{ m.handicap|floatformat:1 }} </td>
         <td align="center"> {{ m.season_matches_played }} </td>
         <td align="center"> {{ m.season_matches_won }} </td>
         <td align="center"> {{ m.season_clearance }} </td>

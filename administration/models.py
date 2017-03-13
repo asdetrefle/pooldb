@@ -43,7 +43,7 @@ class League(models.Model):
         pk_set = []
         point_set = []
         for t in ts:
-            for m in t.member_set.all():
+            for m in t.member_set.filter(season_matches_played__gt=0):
                 m._update_points()
                 pk_set.append(m.pk)
                 # scipy rankdata only ranks from smallest to highest so here needs the minus sign.
@@ -71,7 +71,7 @@ class League(models.Model):
         members = []
 
         for t in ts:
-            for m in t.member_set.all():
+            for m in t.member_set.filter(season_matches_played__gt=0):
                 members.append(m)
 
         members.sort(key=lambda m: m.ranking)
@@ -163,7 +163,7 @@ class Member(models.Model):
     points  = models.FloatField(default=1000.)
     raw_points = models.IntegerField(default=0)
     ranking = models.IntegerField(default=0)
-    _handicap = models.IntegerField(default=0)
+    handicap = models.FloatField(default=0)
 
     # the following three fields stores adjustment to Member ranking information during a ranking cycle
     # Members' ranking could change every week or every day.
@@ -190,8 +190,12 @@ class Member(models.Model):
         return
 
     def _update_handicap(self):
-        # TODO
-        pass
+        if self.season_matches_played==0:
+            return
+
+        self.handicap = float(self.raw_points) / (self.season_matches_played * 2.)
+        self.save()
+        return
 
     def update_all(self):
         self._update_points()

@@ -161,10 +161,16 @@ def match_view(request, type_, match_id):
                 res.append(zip(*to_zip))
             return res
         frames = group_by_n(match.to_view().values())
-        print match.sum_legs()
-        summary = group_by_n(match.sum_legs())
-        print frames, summary
-        return render(request, 'leaguematch.html', {'frames': frames, 'match': match, 'summary': summary})
+        # TODO: use a var to indicate whether all scores are not None (e.g. is_completed or is_submitted?)
+        try:
+            # print match.sum_legs()
+            summary = group_by_n(match.sum_legs())
+            # print frames, summary
+            first_time = False
+        except TypeError:
+            summary = [[('-', '-'), ('-', '-')]] * 3
+            first_time = True
+        return render(request, 'leaguematch.html', {'frames': frames, 'match': match, 'summary': summary, 'first_time': first_time})
     elif type_ == 'Match':
         match = get_object_or_404(Match, pk=match_id)
         if request.method == 'POST':

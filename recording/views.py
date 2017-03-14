@@ -45,7 +45,7 @@ def initialize(request, match_id, type_):
     if type_ == 'LeagueMatch':
         match = get_object_or_404(LeagueMatch, pk=match_id)
         if match.is_initialized:
-            return redirect('match_view', type_=type_, match_id=match_id, allow_edit='False')
+            return redirect('match_view', type_=type_, match_id=match_id)
 
         home_players = match.home.member_set.all()
         away_players = match.away.member_set.all()
@@ -57,7 +57,7 @@ def initialize(request, match_id, type_):
                 selected_home_players.append(int(request.POST['home{}'.format(i)]))
                 selected_away_players.append(int(request.POST['away{}'.format(i)]))
             match.initialize(selected_away_players, selected_home_players)
-            return redirect('match_view', type_=type_, match_id=match_id, allow_edit='True')
+            return redirect('match_view', type_=type_, match_id=match_id)
         else:
             return render(request, 'initialize_match.html', {'match': match,
                                                              'home_players': home_players,
@@ -237,6 +237,29 @@ def leg_close(request, leg_id):
         return HttpResponseRedirect('/recording/leg/{}/'.format(leg_id))
 
 
-# TODO: view to drag players in a league match; move it into the match initialization page
-def drag_players(request):
-    return render(request, 'drag.html')
+def edit(request, type_, match_id):
+    # TODO: more proper way to edit; add validation; maybe use form/formset again
+    pattern = re.compile(r'(\d+) (home|away)')
+    if request.method == 'POST':
+        match = get_object_or_404(LeagueMatch, id=match_id)
+        for key, value in request.POST.iteritems():
+            key_match = pattern.match(key)
+            if key_match:
+                frame_id, home_away = key_match.groups()
+                frame_id = int(frame_id)
+                score = int(value)
+                frame = get_object_or_404(LeagueFrame, id=frame_id)
+                if home_away == 'home':
+                    frame.home_score = score
+                    frame.save()
+                elif home_away == 'away':
+                    frame.away_score = score
+                    frame.save()
+                else:
+                    raise Http404
+            else:
+                pass
+        match._update_progress()
+        return redirect('match_view', type_=type_, match_id=match_id)
+    else:
+        raise Http404

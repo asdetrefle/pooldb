@@ -3,9 +3,8 @@
 
 {% block title %} Edit Match {% endblock %}
 
-{% block content %}
-
-    <style>
+{% block extrahead %}
+<style>
     .header     {font-size:1.17em; color:dimgrey; font-weight:normal}
     .header_loss    {font-size:1.5em; color:dimgrey; font-weight:normal}
     .raw_pts    {font-size:1.0em; color:midnightblue; font-weight:normal}
@@ -15,9 +14,44 @@
     .away_win {background-color: red; margin: 5pt}
     td {vertical-align: middle}
     #add_new_frame {padding: 4pt}
-    </style>
+    .edit_score {width: 20px; height: 8px}
+    #submit_edit {display: none}
+</style>
 
-    <h3>Match Date: {{match.match_date}} {% if match.is_completed %} Match Completed. {% elif match.race_to <= frames.count %} Match under review. {% else %} Match in Progress. {% endif %}</h3> 
+{% load static %}
+<script src="{% static "js/jquery-3.1.1.min.js" %}"></script>
+<script>
+    $(document).ready(function () {
+        $(".frame_score").click(function () {
+            $("#submit_edit").show();
+            var value = $( this ).html().trim();
+            var score_location = $(this).attr("value");
+            var home_away = score_location.split(" ")[1];
+            var other_span;
+            if (home_away == "away") {
+                other_span = $(this).closest("td").next().next().find("span");
+            } else {
+                other_span = $(this).closest("td").prev().prev().find("span");
+            }
+            var other_value = other_span.html().trim();
+            var other_score_location = other_span.attr("value");
+
+            var input = $("<input>").attr({type: "text", value: value, name: score_location}).addClass("edit_score");
+            $( this ).replaceWith(input);
+
+            var other_input = $("<input>").attr({type: "text", value: other_value, name: other_score_location}).addClass("edit_score");
+            other_span.replaceWith(other_input);
+        });
+    });
+</script>
+
+
+{% endblock %}
+
+{% block content %}
+
+
+    <h3>Match Date: {{match.match_date}} {% if match.is_completed %} Match Completed. {% elif match.race_to <= frames.count %} Match under review. {% else %} Match in Progress. {% endif %}</h3>
 
 <table border="0"> 
     <col width="80">
@@ -43,6 +77,9 @@
 
 <p></p>
 
+<form enctype="application/json" action="{% url 'match_edit' 'LeagueMatch' match.id %}" method="post">
+{% csrf_token %}
+<input type="submit" value="Submit Changes" id="submit_edit"/>
 <table border="0">    
     <col width="20">
     <col width="140">
@@ -76,9 +113,9 @@
             {% for f in frame %}
                 <td align="center"> {{f.leg_number}} </td>
                 <td align="center"> {{f.away_player.player}} </td>
-                <td align="right"> {% if f.away_score == None %} - {% elif f.away_score > f.home_score %} <span class="frame_win"> {{ f.away_score }} </span> {% else %} {{ f.away_score }}{% endif %} </td>
+                <td align="right"> {% if f.away_score == None %} - {% else %} <span class="{% if f.away_score > f.home_score %}frame_win{% endif %} frame_score" value="{{ f.id }} away"> {{ f.away_score }} </span> {% endif %} </td>
                 <td align="center"> : </td>
-                <td align="left"> {% if f.home_score == None %} - {% elif f.away_score < f.home_score %} <span class="frame_win"> {{ f.home_score }} </span> {% else %} {{ f.home_score }}{% endif %} </td>
+                <td align="left"> {% if f.home_score == None %} - {% else %} <span class="{% if f.away_score < f.home_score %}frame_win{% endif %} frame_score" value="{{ f.id }} home"> {{ f.home_score }} </span> {% endif %} </td>
                 <td align="center"> {{f.home_player.player}} </td>
                 <td align="center"> {%if f.is_clearance %} {{f.cleared_by.player}}{% else %} - {% endif %} </td>
             {% endfor %}
@@ -101,6 +138,6 @@
         </tr>
     {% endfor %}
 </table>
-
+</form>
 {% endblock %}
 

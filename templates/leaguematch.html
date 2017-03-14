@@ -122,19 +122,21 @@
             </tr>
         {% endfor %}
         <tr>
+            {% with s0=summary|get_item:forloop.counter0|get_item:0|get_item:0 s1=summary|get_item:forloop.counter0|get_item:1|get_item:0 s2=summary|get_item:forloop.counter0|get_item:0|get_item:1 s3=summary|get_item:forloop.counter0|get_item:1|get_item:1 %}
             <td></td>
             <td align="right"> <h3>Total:</h3> </td>
-            <td align="right"> <h3>{{summary|get_item:forloop.counter0|get_item:0|get_item:0}}</h3> </td>
+            <td align="right"> <h3>{{s0}}</h3> </td>
             <td>:</td>
-            <td align="left"> <h3>{{summary|get_item:forloop.counter0|get_item:1|get_item:0}} </h3></td>
+            <td align="left"> <h3>{{s1}} </h3></td>
             <td></td>
             <td></td>
             <td></td>
             <td align="right"> <h3>Total:</h3> </td>
-            <td align="right"> <h3>{{summary|get_item:forloop.counter0|get_item:0|get_item:1}}</h3> </td>
+            <td align="right"> <h3>{{s2}}</h3> </td>
             <td>:</td>
-            <td align="left"> <h3>{{summary|get_item:forloop.counter0|get_item:1|get_item:1}} </h3></td>
+            <td align="left"> <h3>{{s3}} </h3></td>
             <td></td>
+            {% endwith %}
         </tr>
     {% endfor %}
 </table>

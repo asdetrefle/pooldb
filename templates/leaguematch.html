@@ -15,7 +15,7 @@
     td {vertical-align: middle}
     #add_new_frame {padding: 4pt}
     .edit_score {width: 20px; height: 8px}
-    #submit_edit {display: none}
+    #submit_edit {display: {% if first_time %}inline-block{% else %}none{% endif %}
 </style>
 
 {% load static %}
@@ -113,9 +113,9 @@
             {% for f in frame %}
                 <td align="center"> {{f.leg_number}} </td>
                 <td align="center"> {{f.away_player.player}} </td>
-                <td align="right"> {% if f.away_score == None %} - {% else %} <span class="{% if f.away_score > f.home_score %}frame_win{% endif %} frame_score" value="{{ f.id }} away"> {{ f.away_score }} </span> {% endif %} </td>
+                <td align="right"> {% if f.away_score == None %} <input type="text" name="{{ f.id }} away" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score > f.home_score %}frame_win{% endif %} frame_score" value="{{ f.id }} away"> {{ f.away_score }} </span> {% endif %} </td>
                 <td align="center"> : </td>
-                <td align="left"> {% if f.home_score == None %} - {% else %} <span class="{% if f.away_score < f.home_score %}frame_win{% endif %} frame_score" value="{{ f.id }} home"> {{ f.home_score }} </span> {% endif %} </td>
+                <td align="left"> {% if f.home_score == None %} <input type="text" name="{{ f.id }} home" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score < f.home_score %}frame_win{% endif %} frame_score" value="{{ f.id }} home"> {{ f.home_score }} </span> {% endif %} </td>
                 <td align="center"> {{f.home_player.player}} </td>
                 <td align="center"> {%if f.is_clearance %} {{f.cleared_by.player}}{% else %} - {% endif %} </td>
             {% endfor %}

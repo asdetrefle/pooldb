@@ -388,6 +388,11 @@ class LeagueMatch(AbstractMatch):
         return
 
     def completes(self):
+        if self.home_points_raw > self.away_points_raw:
+            self.home_score += 1
+        elif self.home_points_raw < self.away_points_raw:
+            self.away_score += 1
+
         if self.home_score > self.away_score:
             self.winner = self.home
         elif self.home_score < self.away_score:

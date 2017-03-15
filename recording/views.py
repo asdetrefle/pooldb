@@ -27,9 +27,12 @@ def index(request):
     return render(request, 'recording.html')
 
 
-def listmatch(request):
-    matches = Match.objects.all().order_by('match_date')
-    return render(request, 'listmatch.html', {'matches': matches, 'type_': 'Match'})
+def listmatch(request, type_):
+    if type_=='Match':
+        matches = Match.objects.all().order_by('match_date')
+    elif type_=='LeagueMatch':
+        matches = LeagueMatch.objects.all().order_by('match_date')
+    return render(request, 'listmatch.html', {'matches': matches, 'type_': type_})
 
 
 def listleg(request):

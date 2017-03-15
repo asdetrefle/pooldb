@@ -124,9 +124,9 @@ def add_members():
 
 def main():
     #create_leaguematch()
-    #shift_matchweek(2,14)
+    shift_matchweek(3,14)
     #set_week()
-    add_members()
+    #add_members()
 
 
 if __name__=='__main__':

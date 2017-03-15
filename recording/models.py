@@ -348,7 +348,11 @@ class LeagueMatch(AbstractMatch):
 
     def sum_legs(self):
         frames = self.frames()
-        res = [[0,0] for i in range(self.legs)]
+        if self.handicap>=0:
+            res = [[0,self.handicap] for i in range(self.legs)]
+        else:
+            res = [[-self.handicap,0] for i in range(self.legs)]
+
         for f in frames:
             res[f.leg_number - 1][0] += f.away_score
             res[f.leg_number - 1][1] += f.home_score
@@ -371,7 +375,7 @@ class LeagueMatch(AbstractMatch):
 
         self.home_score = home_win_leg
         self.away_score = away_win_leg
-        self._update_handicap()
+        #self._update_handicap()
         self.save()
         return
 

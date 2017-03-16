@@ -9,7 +9,18 @@
     .header_loss    {font-size:1.5em; color:dimgrey; font-weight:normal}
     .raw_pts    {font-size:1.0em; color:midnightblue; font-weight:normal}
     .header_win {font-size:1.5em; color:dodgerblue; font-weight:bold}
-    .frame_win   {font-weight:bold; color:dodgerblue}
+    .leg_win {display: block;
+        font-size: 1.17em;
+        margin-top: 1em;
+        margin-bottom: 1em;
+        margin-left: 0;
+        margin-right: 0;
+        font-weight: bold;
+        color:dodgerblue;
+    }
+    .home_handicap {font-size:0.85em; color:green}
+    .away_handicap {font-size:0.85em; color:green}
+    .frame_win   {font-weight:bold; color:dodgerblue;}
     .draw {background-color: deepskyblue; margin: 5pt}
     .away_win {background-color: red; margin: 5pt}
     td {vertical-align: middle}
@@ -22,6 +33,17 @@
 <script src="{% static "js/jquery-3.1.1.min.js" %}"></script>
 <script>
     $(document).ready(function () {
+        // show handicap
+        var handicap = {{ match.handicap }};
+        var handicap_display = " (" + Math.abs(handicap).toString() + ")";
+        if (handicap > 0) {
+            $(".home_handicap").html(handicap_display);
+        } else if (handicap < 0) {
+            $(".away_handicap").html(handicap_display);
+        }
+
+        $(".clearance").html('<img src={% static "star.png" %} width="16" align="middle">')
+
         $(".frame_score").click(function () {
             $("#submit_edit").show();
             var value = $( this ).html().trim();
@@ -43,6 +65,12 @@
             other_span.replaceWith(other_input);
         });
     });
+
+    $(document).keyup(function(e) {
+        if (e.keyCode == 27) { 
+            location.reload()
+        }
+    });  
 </script>
 
 
@@ -51,7 +79,7 @@
 {% block content %}
 
 
-    <h3>Match Date: {{match.match_date}} {% if match.is_completed %} Match Completed. {% elif match.race_to <= frames.count %} Match under review. {% else %} Match in Progress. {% endif %}</h3>
+<h3> Match Date: {{match.match_date}} {% if match.is_completed %} Match Completed. {% elif match.race_to <= frames.count %} Match under review. {% else %} Match in Progress. {% endif %}</h3>
 
 <table border="0"> 
     <col width="80">
@@ -62,7 +90,7 @@
   <tr>
     <td align="right"><h2><span class="header"> Away : </span></h2></td>
     <td><h2><span class="header"> {{match.away}} </span></h2></td>
-    <td align="right"><h2> {% if match.winner == match.away %} ✔ {% endif %} </h2></td>
+    <td align="right"><h2>  {% if match.winner == match.away %} ✔ {% endif %} </h2></td>
     <td align="center"><h2><span class="{% if match.away_score > match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.away_score}} </span></h2></td>
     <td align="center"><h2><span class="raw_pts"> ({{match.away_points_raw}}) </span></h2></td>
   </tr>
@@ -83,41 +111,41 @@
 <table border="0">    
     <col width="20">
     <col width="140">
-    <col width="60">
+    <col width="80">
     <col width="10">
-    <col width="60">
+    <col width="80">
     <col width="140">    
-    <col width="140">    
+    <col width="40">
     <col width="20">
     <col width="140">
-    <col width="60">
+    <col width="80">
     <col width="10">
-    <col width="60">
-    <col width="140">
+    <col width="80">
     <col width="140">
     <tr>
         <td align="center"><h3> Leg </h3></td>
         <td colspan='2' align="center"><h3> Away </h3></td>
         <td align="center"> </td>
         <td colspan='2' align="center"><h3> Home </h3></td>
-        <td align="center"><h3> Clear By </h3></td>        
+        <td align="center"> </td>
         <td align="center"><h3> Leg </h3></td>
         <td colspan='2' align="center"><h3> Away </h3></td>
         <td align="center"> </td>
         <td colspan='2' align="center"><h3> Home </h3></td>
-        <td align="center"><h3> Clear By </h3></td>
     </tr>
     {% for round in frames %}
         {% for frame in round %}
             <tr>
             {% for f in frame %}
+                {% if forloop.counter > 1 %}
+                    <td align="center"> </td>
+                {% endif %}
                 <td align="center"> {{f.leg_number}} </td>
                 <td align="center"> {{f.away_player.player}} </td>
-                <td align="right"> {% if f.away_score == None %} <input type="text" name="{{ f.id }} away" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score > f.home_score %}frame_win{% endif %} frame_score" value="{{ f.id }} away"> {{ f.away_score }} </span> {% endif %} </td>
+                <td align="right"> {% if f.cleared_by == f.away_player %} <span class="clearance"></span> {% endif %} {% if f.away_score == None %} <input type="text" name="{{ f.id }} away" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score > f.home_score %}frame_win{% endif %} frame_score" value="{{ f.id }} away"> {{ f.away_score }} </span>{% endif %} </td>
                 <td align="center"> : </td>
-                <td align="left"> {% if f.home_score == None %} <input type="text" name="{{ f.id }} home" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score < f.home_score %}frame_win{% endif %} frame_score" value="{{ f.id }} home"> {{ f.home_score }} </span> {% endif %} </td>
+                <td align="left"> {% if f.home_score == None %} <input type="text" name="{{ f.id }} home" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score < f.home_score %}frame_win{% endif %} frame_score" value="{{ f.id }} home"> {{ f.home_score }} </span> {% endif %}  {% if f.cleared_by == f.home_player %} <span class="clearance"></span> {% endif %} </td>
                 <td align="center"> {{f.home_player.player}} </td>
-                <td align="center"> {%if f.is_clearance %} {{f.cleared_by.player}}{% else %} - {% endif %} </td>
             {% endfor %}
             </tr>
         {% endfor %}
@@ -125,16 +153,16 @@
             {% with s0=summary|get_item:forloop.counter0|get_item:0|get_item:0 s1=summary|get_item:forloop.counter0|get_item:1|get_item:0 s2=summary|get_item:forloop.counter0|get_item:0|get_item:1 s3=summary|get_item:forloop.counter0|get_item:1|get_item:1 %}
             <td></td>
             <td align="right"> <h3>Total:</h3> </td>
-            <td align="right"> <h3>{{s0}}</h3> </td>
-            <td>:</td>
-            <td align="left"> <h3>{{s1}} </h3></td>
+            <td align="right"> {% if s0 > s1 %} <h3 style="color:dodgerblue;display:inline-block;"> {% else %} <h3 style="display:inline-block;"> {% endif %} {{s0}} </h3><span class="away_handicap"></span></td>
+                <td><h3>:</h3></td>
+            <td align="left"> {% if s1 > s0 %} <h3 style="color:dodgerblue;display:inline-block;"> {% else %} <h3 style="display:inline-block;"> {% endif %} {{s1}} </h3><span class="home_handicap"></span></td>
             <td></td>
             <td></td>
             <td></td>
             <td align="right"> <h3>Total:</h3> </td>
-            <td align="right"> <h3>{{s2}}</h3> </td>
-            <td>:</td>
-            <td align="left"> <h3>{{s3}} </h3></td>
+            <td align="right"> {% if s2 > s3 %} <h3 style="color:dodgerblue;display:inline-block;"> {% else %} <h3 style="display:inline-block;"> {% endif %} {{s2}} </h3><span class="away_handicap"></span></td>
+                <td><h3>:</h3></td>
+            <td align="left"> {% if s3 > s2 %} <h3 style="color:dodgerblue;display:inline-block;"> {% else %} <h3 style="display:inline-block;"> {% endif %} {{s3}} </h3><span class="home_handicap"></span></td>
             <td></td>
             {% endwith %}
         </tr>

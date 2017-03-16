@@ -42,7 +42,6 @@
             $(".away_handicap").html(handicap_display);
         }
 
-        $(".clearance").html('<img src={% static "star.png" %} width="16" align="middle">')
 
         $(".frame_score").click(function () {
             $("#submit_edit").show();
@@ -142,9 +141,9 @@
                 {% endif %}
                 <td align="center"> {{f.leg_number}} </td>
                 <td align="center"> {{f.away_player.player}} </td>
-                <td align="right"> {% if f.cleared_by == f.away_player %} <span class="clearance"></span> {% endif %} {% if f.away_score == None %} <input type="text" name="{{ f.id }} away" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score > f.home_score %}frame_win{% endif %} frame_score" value="{{ f.id }} away"> {{ f.away_score }} </span>{% endif %} </td>
+                <td align="right"> {% if f.cleared_by == f.away_player %} <img src={% static "star.png" %} width="16" align="middle"> {% endif %} {% if f.away_score == None %} <input type="text" name="{{ f.id }} away" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score > f.home_score %}frame_win{% endif %} frame_score" value="{{ f.id }} away"> {{ f.away_score }} </span>{% endif %} </td>
                 <td align="center"> : </td>
-                <td align="left"> {% if f.home_score == None %} <input type="text" name="{{ f.id }} home" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score < f.home_score %}frame_win{% endif %} frame_score" value="{{ f.id }} home"> {{ f.home_score }} </span> {% endif %}  {% if f.cleared_by == f.home_player %} <span class="clearance"></span> {% endif %} </td>
+                <td align="left"> {% if f.home_score == None %} <input type="text" name="{{ f.id }} home" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score < f.home_score %}frame_win{% endif %} frame_score" value="{{ f.id }} home"> {{ f.home_score }} </span> {% endif %}  {% if f.cleared_by == f.home_player %} <img src={% static "star.png" %} width="16" align="middle"> {% endif %} </td>
                 <td align="center"> {{f.home_player.player}} </td>
             {% endfor %}
             </tr>

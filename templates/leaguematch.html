@@ -55,33 +55,31 @@
             $(".away_handicap").html(handicap_display);
         }
 
-
         $(".frame_score").click(function () {
             $("#submit_edit").show();
             var value = $( this ).html().trim();
-            var score_location = $(this).attr("value");
-            var home_away = score_location.split(" ")[1];
-            var other_span;
-            if (home_away == "away") {
-                other_span = $(this).closest("td").next().next().find("span");
-            } else {
-                other_span = $(this).closest("td").prev().prev().find("span");
-            }
-            var other_value = other_span.html().trim();
-            var other_score_location = other_span.attr("value");
-
+            var score_location = $(this).attr("value").split(" ");
+            var home_away = score_location[1];
+            var frame_id = score_location[0];
             var input = $("<input>").attr({type: "text", value: value, name: score_location}).addClass("edit_score");
             $( this ).replaceWith(input);
 
-            var other_input = $("<input>").attr({type: "text", value: other_value, name: other_score_location}).addClass("edit_score");
-            other_span.replaceWith(other_input);
+            // replace other span to input
+            var other_home_away = (home_away == "home") ? "away" : "home";
+            var other_location = frame_id + " " + other_home_away;
+            var other_span = $("span[value='" + other_location +"']");
+            if (other_span.length > 0 ) {
+                var other_value = other_span.html().trim();
+                var other_score_location = other_span.attr("value");
+                var other_input = $("<input>").attr({type: "text", value: other_value, name: other_score_location}).addClass("edit_score");
+                other_span.replaceWith(other_input);
+            }
         });
 
         $(".clear_mark").click(function() {
             $("#submit_edit").show();
             var this_mark = $(this);
-            var clear_location = this_mark.attr("id");
-            clear_location = clear_location.split("_");
+            var clear_location = this_mark.attr("id").split("_");
             var frame_id = clear_location[0];
             var home_away = clear_location[2];
             var input_name = frame_id + " " + "clear";

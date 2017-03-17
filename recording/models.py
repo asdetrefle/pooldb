@@ -91,8 +91,11 @@ class AbstractMatch(models.Model):
         for f in frames:
             len_ += 1
             if self.score_type == 'P':
-                home_score_ += f.home_score
-                away_score_ += f.away_score
+                try:
+                    home_score_ += f.home_score
+                    away_score_ += f.away_score
+                except TypeError:
+                    pass
             else:
                 if f.home_score > f.away_score:
                     home_score_ += 1
@@ -354,8 +357,11 @@ class LeagueMatch(AbstractMatch):
             res = [[-self.handicap,0] for i in range(self.legs)]
 
         for f in frames:
-            res[f.leg_number - 1][0] += f.away_score
-            res[f.leg_number - 1][1] += f.home_score
+            try:
+                res[f.leg_number - 1][0] += f.away_score
+                res[f.leg_number - 1][1] += f.home_score
+            except TypeError:
+                pass
 
         return res
 

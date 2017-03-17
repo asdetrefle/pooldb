@@ -143,6 +143,9 @@ class Team(Group):
         self._update_ranking()
         return
 
+    def __str__(self):
+        return "{} ({})".format(self.name, self.team_number)
+
 
 class Member(models.Model):
     player = models.ForeignKey(

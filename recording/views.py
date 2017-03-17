@@ -173,7 +173,9 @@ def match_view(request, type_, match_id):
         except TypeError:
             summary = [[('-', '-'), ('-', '-')]] * 3
             has_blank_fields = True
-        return render(request, 'leaguematch.html', {'frames': frames, 'match': match, 'summary': summary, 'has_blank_fields': has_blank_fields})
+
+        print "toto", not match.is_completed
+        return render(request, 'leaguematch.html', {'frames': frames, 'match': match, 'summary': summary, 'has_blank_fields': not match.is_completed})
     elif type_ == 'Match':
         match = get_object_or_404(Match, pk=match_id)
         if request.method == 'POST':
@@ -288,8 +290,8 @@ def edit(request, type_, match_id):
                     raise Http404
             else:
                 pass
-        if not has_blank_fields:
-            match._update_progress()
+        #if not has_blank_fields:
+        match._update_progress()
         return redirect('match_view', type_=type_, match_id=match_id)
     else:
         raise Http404

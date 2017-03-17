@@ -169,11 +169,11 @@ def match_view(request, type_, match_id):
             # print match.sum_legs()
             summary = group_by_n(match.sum_legs())
             # print frames, summary
-            first_time = False
+            has_blank_fields = False
         except TypeError:
             summary = [[('-', '-'), ('-', '-')]] * 3
-            first_time = True
-        return render(request, 'leaguematch.html', {'frames': frames, 'match': match, 'summary': summary, 'first_time': first_time})
+            has_blank_fields = True
+        return render(request, 'leaguematch.html', {'frames': frames, 'match': match, 'summary': summary, 'has_blank_fields': has_blank_fields})
     elif type_ == 'Match':
         match = get_object_or_404(Match, pk=match_id)
         if request.method == 'POST':
@@ -247,24 +247,30 @@ def leg_close(request, leg_id):
 
 
 def edit(request, type_, match_id):
-    # TODO: more proper way to edit; add validation; maybe use form/formset again; it may be slow to update DB for each input
+    # TODO: more proper way to edit; add validation; maybe use form/formset again
+    # TODO:it may be slow to update DB for each input; instead, we should update all the fields of a frame and then do frame.save()
+    # TODO: after each edit, the league match view is loaded again: this makes it inconvenient to go back to match list
     pattern = re.compile(r'(\d+) (home|away|clear)')
     if request.method == 'POST':
         match = get_object_or_404(LeagueMatch, id=match_id)
+        has_blank_fields = False
         for key, value in request.POST.iteritems():
             key_match = pattern.match(key)
             if key_match:
                 frame_id, field = key_match.groups()
                 frame_id = int(frame_id)
                 frame = get_object_or_404(LeagueFrame, id=frame_id)
-                if field == 'home':
-                    score = int(value)
-                    frame.home_score = score
-                    frame.save()
-                elif field == 'away':
-                    score = int(value)
-                    frame.away_score = score
-                    frame.save()
+                if field in ('home', 'away'):
+                    if value:
+                        score = int(value)
+                        if field == 'home':
+                            frame.home_score = score
+                        else:
+                            frame.away_score = score
+                        frame.save()
+                    else:
+                        has_blank_fields = True
+                        continue
                 elif field == 'clear':
                     home_away = value
                     print home_away
@@ -283,7 +289,8 @@ def edit(request, type_, match_id):
                     raise Http404
             else:
                 pass
-        match._update_progress()
+        if not has_blank_fields:
+            match._update_progress()
         return redirect('match_view', type_=type_, match_id=match_id)
     else:
         raise Http404

@@ -27,7 +27,7 @@
     td {vertical-align: middle}
     #add_new_frame {padding: 4pt}
     .edit_score {width: 20px; height: 8px}
-    #submit_edit {display: {% if first_time %}inline-block{% else %}none{% endif %}}
+    #submit_edit {display: {% if has_blank_fields %}inline-block{% else %}none{% endif %}}
     .clear_mark {
         content: url({% static "star.png" %});
         width: 16px;

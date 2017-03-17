@@ -247,23 +247,38 @@ def leg_close(request, leg_id):
 
 
 def edit(request, type_, match_id):
-    # TODO: more proper way to edit; add validation; maybe use form/formset again
-    pattern = re.compile(r'(\d+) (home|away)')
+    # TODO: more proper way to edit; add validation; maybe use form/formset again; it may be slow to update DB for each input
+    pattern = re.compile(r'(\d+) (home|away|clear)')
     if request.method == 'POST':
         match = get_object_or_404(LeagueMatch, id=match_id)
         for key, value in request.POST.iteritems():
             key_match = pattern.match(key)
             if key_match:
-                frame_id, home_away = key_match.groups()
+                frame_id, field = key_match.groups()
                 frame_id = int(frame_id)
-                score = int(value)
                 frame = get_object_or_404(LeagueFrame, id=frame_id)
-                if home_away == 'home':
+                if field == 'home':
+                    score = int(value)
                     frame.home_score = score
                     frame.save()
-                elif home_away == 'away':
+                elif field == 'away':
+                    score = int(value)
                     frame.away_score = score
                     frame.save()
+                elif field == 'clear':
+                    home_away = value
+                    print home_away
+                    if home_away == 'home':
+                        frame.cleared_by = frame.home_player
+                        frame.save()
+                    elif home_away == 'away':
+                        frame.cleared_by = frame.away_player
+                        frame.save()
+                    elif home_away == 'none':
+                        frame.cleared_by = None
+                        frame.save()
+                    else:
+                        raise Http404
                 else:
                     raise Http404
             else:

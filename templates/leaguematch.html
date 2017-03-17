@@ -4,6 +4,7 @@
 {% block title %} Edit Match {% endblock %}
 
 {% block extrahead %}
+{% load static %}
 <style>
     .header     {font-size:1.17em; color:dimgrey; font-weight:normal}
     .header_loss    {font-size:1.5em; color:dimgrey; font-weight:normal}
@@ -26,10 +27,22 @@
     td {vertical-align: middle}
     #add_new_frame {padding: 4pt}
     .edit_score {width: 20px; height: 8px}
-    #submit_edit {display: {% if first_time %}inline-block{% else %}none{% endif %}
+    #submit_edit {display: {% if first_time %}inline-block{% else %}none{% endif %}}
+    .clear_mark {
+        content: url({% static "star.png" %});
+        width: 16px;
+        height: 16px;
+        -webkit-transition: all 0.5s ease;
+        -moz-transition: all 0.5s ease;
+        -o-transition: all 0.5s ease;
+        transition: all 0.5s ease;
+    }
+    .unselected {
+        -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+        filter: grayscale(100%);
+    }
 </style>
 
-{% load static %}
 <script src="{% static "js/jquery-3.1.1.min.js" %}"></script>
 <script>
     $(document).ready(function () {
@@ -62,6 +75,35 @@
 
             var other_input = $("<input>").attr({type: "text", value: other_value, name: other_score_location}).addClass("edit_score");
             other_span.replaceWith(other_input);
+        });
+
+        $(".clear_mark").click(function() {
+            $("#submit_edit").show();
+            var this_mark = $(this);
+            var clear_location = this_mark.attr("id");
+            clear_location = clear_location.split("_");
+            var frame_id = clear_location[0];
+            var home_away = clear_location[2];
+            var input_name = frame_id + " " + "clear";
+            var input = $("input[name='" + input_name + "']");
+            // console.log(input);
+            if (input.length == 0) {
+                input = $("<input>").attr({type: "hidden", name: input_name, value: "none"});
+                $("#edit_form").append(input);
+            }
+            var other_home_away = (home_away == "home") ? "away" : "home";
+            var other_location = frame_id + "_clear_" + other_home_away;
+            var other_mark = $("#" + other_location);
+            var this_on = !this_mark.hasClass("unselected");
+            // var other_on = !other_mark.hasClass("unselected");
+            if (this_on) {
+                input.val("none");
+                this_mark.addClass("unselected");
+            } else {
+                input.val(home_away);
+                this_mark.removeClass("unselected");
+                other_mark.addClass("unselected");
+            }
         });
     });
 
@@ -104,7 +146,7 @@
 
 <p></p>
 
-<form enctype="application/json" action="{% url 'match_edit' 'LeagueMatch' match.id %}" method="post">
+<form action="{% url 'match_edit' 'LeagueMatch' match.id %}" method="post" id="edit_form">
 {% csrf_token %}
 <input type="submit" value="Submit Changes" id="submit_edit"/>
 <table border="0">    
@@ -141,9 +183,9 @@
                 {% endif %}
                 <td align="center"> {{f.leg_number}} </td>
                 <td align="center"> {{f.away_player.player}} </td>
-                <td align="right"> {% if f.cleared_by == f.away_player %} <img src={% static "star.png" %} width="16" align="middle"> {% endif %} {% if f.away_score == None %} <input type="text" name="{{ f.id }} away" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score > f.home_score %}frame_win{% endif %} frame_score" value="{{ f.id }} away"> {{ f.away_score }} </span>{% endif %} </td>
+                <td align="right">  <img class="clear_mark {% if f.cleared_by != f.away_player %}unselected{% endif %}" id="{{ f.id }}_clear_away"/> {% if f.away_score == None %} <input type="text" name="{{ f.id }} away" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score > f.home_score %}frame_win{% endif %} frame_score" value="{{ f.id }} away"> {{ f.away_score }} </span>{% endif %} </td>
                 <td align="center"> : </td>
-                <td align="left"> {% if f.home_score == None %} <input type="text" name="{{ f.id }} home" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score < f.home_score %}frame_win{% endif %} frame_score" value="{{ f.id }} home"> {{ f.home_score }} </span> {% endif %}  {% if f.cleared_by == f.home_player %} <img src={% static "star.png" %} width="16" align="middle"> {% endif %} </td>
+                <td align="left"> {% if f.home_score == None %} <input type="text" name="{{ f.id }} home" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score < f.home_score %}frame_win{% endif %} frame_score" value="{{ f.id }} home"> {{ f.home_score }} </span> {% endif %}  <img class="clear_mark {% if f.cleared_by != f.home_player %}unselected{% endif %}" id="{{ f.id }}_clear_home"/> </td>
                 <td align="center"> {{f.home_player.player}} </td>
             {% endfor %}
             </tr>

@@ -273,7 +273,6 @@ def edit(request, type_, match_id):
                         continue
                 elif field == 'clear':
                     home_away = value
-                    print home_away
                     if home_away == 'home':
                         frame.cleared_by = frame.home_player
                         frame.save()

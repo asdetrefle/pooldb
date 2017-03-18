@@ -81,6 +81,7 @@
                 other_span.replaceWith(other_input);
             }
 
+            /*
             $(".clear_mark").click(function() {
                 $("#submit_edit").show();
                 var this_mark = $(this);
@@ -107,18 +108,16 @@
                     this_mark.removeClass("unselected");
                     other_mark.addClass("unselected").show();
                 }
-            });
+            });*/
         });
         
         $(".clear_mark").click(function() {
             var this_mark = $(this);
             var clear_location = this_mark.attr("id").split("_");
             var frame_id = clear_location[0];
-            var home_score = $("span[value='" + frame_id + " home']") 
-            //var other_location = frame_id + " home";
-            //var other_span = $("span[value='" + other_location +"']");
-            console.log(home_score.length)
-            if (home_score.length == 0) {
+            var home_away = clear_location[2];
+            var home_score = $("#" + frame_id + "_" + home_away + "_score") 
+            if (!home_score.hasClass("frame_score")) {
                 $("#submit_edit").show();
                 var home_away = clear_location[2];
                 var input_name = frame_id + " " + "clear";
@@ -131,9 +130,7 @@
                 var other_home_away = (home_away == "home") ? "away" : "home";
                 var other_location = frame_id + "_clear_" + other_home_away;
                 var other_mark = $("#" + other_location);
-                var this_on = this_mark.hasClass("unselected");
-                console.log(this_on)
-                // var other_on = !other_mark.hasClass("unselected");
+                var this_on = !this_mark.hasClass("unselected");
                 if (this_on) {
                     input.val("none");
                     this_mark.addClass("unselected").show();
@@ -229,10 +226,10 @@
                 <td align="center"> {{f.leg_number}} </td>
                 <td align="center"> {{f.away_player.player}} </td>
                 <td align="right"> <img class="clear_mark {% if f.cleared_by != f.away_player %}unselected{% endif %}" id="{{ f.id }}_clear_away" style="{% if f.away_score == None or f.away_score == None %}display:inline-block{% endif %}"/></td>
-                <td align="right">  {% if f.away_score == None %} <input type="text" name="{{ f.id }} away" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score > f.home_score %}frame_win{% endif %} frame_score" value="{{ f.id }} away"> {{ f.away_score }} </span>{% endif %} </td>
+                <td align="right">  {% if f.away_score == None %} <input type="text" name="{{ f.id }} away" id="{{ f.id }}_away_score" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score > f.home_score %}frame_win{% endif %} frame_score" id="{{ f.id }}_away_score" value="{{ f.id }} away"> {{ f.away_score }} </span>{% endif %} </td>
                 <td align="center"> : </td>
-                <td align="left"> {% if f.home_score == None %} <input type="text" name="{{ f.id }} home" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score < f.home_score %}frame_win{% endif %} frame_score" value="{{ f.id }} home"> {{ f.home_score }} </span> {% endif %}   </td>
-                <td align="left"> <img class="clear_mark {% if f.cleared_by != f.home_player %}unselected{% endif %}" id="{{ f.id }}_clear_home"/></td>
+                <td align="left"> {% if f.home_score == None %} <input type="text" name="{{ f.id }} home" id="{{ f.id }}_home_score" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score < f.home_score %}frame_win{% endif %} frame_score" id="{{ f.id }}_home_score" value="{{ f.id }} home"> {{ f.home_score }} </span> {% endif %}   </td>
+                <td align="left"> <img class="clear_mark {% if f.cleared_by != f.home_player %}unselected{% endif %}" id="{{ f.id }}_clear_home" style="{% if f.away_score == None or f.away_score == None %}display:inline-block{% endif %}"/></td>
                 <td align="center"> {{f.home_player.player}} </td>
             {% endfor %}
             </tr>

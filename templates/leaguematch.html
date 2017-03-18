@@ -59,13 +59,14 @@
         $(".frame_score").click(function () {
             $("#submit_edit").show();
             var value = $( this ).html().trim();
-            var score_location = $(this).attr("value").split(" ");
-            var home_away = score_location[1];
-            var frame_id = score_location[0];
+            var score_location = $(this).attr("value");
+            var home_away = score_location.split(" ")[1];
+            var frame_id = score_location.split(" ")[0];
             var home_mark = $("#" + frame_id + "_clear_home");
             var away_mark = $("#" + frame_id + "_clear_away");
             home_mark.show();
             away_mark.show();
+            console.log(frame_id)
 
             var input = $("<input>").attr({type: "text", value: value, name: score_location}).addClass("edit_score");
             $( this ).replaceWith(input);
@@ -73,7 +74,7 @@
             // replace other span to input
             var other_home_away = (home_away == "home") ? "away" : "home";
             var other_location = frame_id + " " + other_home_away;
-            var other_span = $("span[value='" + other_location +"']");
+            var other_span = $("#" + frame_id + "_" + other_home_away + "_score");
             if (other_span.length > 0 ) {
                 var other_value = other_span.html().trim();
                 var other_score_location = other_span.attr("value");
@@ -140,9 +141,7 @@
                     other_mark.addClass("unselected").show();
                 }
             }
-
         });
- 
     });
 
     $(document).keyup(function(e) {
@@ -189,22 +188,22 @@
 <input type="submit" value="Submit Changes" id="submit_edit"/>
 <table border="0">    
     <col width="20">
-    <col width="140">
+    <col width="150">
     <col width="40">
     <col width="40">
     <col width="10">
     <col width="40">
     <col width="40">
-    <col width="140">    
+    <col width="150">    
+    <col width="30">
     <col width="20">
-    <col width="20">
-    <col width="140">    
+    <col width="150">    
     <col width="40">
     <col width="40">
     <col width="10">
     <col width="40">
     <col width="40">
-    <col width="140">
+    <col width="150">
     <tr>
         <td align="center"><h3> Leg </h3></td>
         <td colspan='3' align="center"><h3> Away </h3></td>

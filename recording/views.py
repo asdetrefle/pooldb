@@ -258,10 +258,12 @@ def edit(request, type_, match_id):
         has_blank_fields = False
         for key, value in request.POST.iteritems():
             key_match = pattern.match(key)
+            print key, value
             if key_match:
                 frame_id, field = key_match.groups()
                 frame_id = int(frame_id)
                 frame = get_object_or_404(LeagueFrame, id=frame_id)
+                print key, value, field
                 if field in ('home', 'away'):
                     if value:
                         score = int(value)

@@ -59,9 +59,9 @@
         $(".frame_score").click(function () {
             $("#submit_edit").show();
             var value = $( this ).html().trim();
-            var score_location = $(this).attr("value").split(" ");
-            var home_away = score_location[1];
-            var frame_id = score_location[0];
+            var score_location = $(this).attr("value");
+            var home_away = score_location.split(" ")[1];
+            var frame_id = score_location.split(" ")[0];
             var home_mark = $("#" + frame_id + "_clear_home");
             var away_mark = $("#" + frame_id + "_clear_away");
             home_mark.show();

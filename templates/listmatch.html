@@ -19,7 +19,10 @@
     <tr>
         <td align="center"> {{ forloop.counter }} </td>
         <td align="center"> {{ match.match_date.date|date:"Y-m-d" }} </td>
-        <td align="left"> <a href="{% url 'match_view' type_ match.pk %}"> {{ match.away }} vs. {{ match.home }}</a> </td>
+        <td align="left"> 
+            {% if match.match_date <= eow %} <a href="{% url 'match_view' type_ match.pk %}"> {{ match.away }} vs. {{ match.home }}</a> 
+            {% else %} {{ match.away }} vs. {{ match.home }}  {% endif %}
+        </td>
     </tr>
     {% endfor %}
 </table>

@@ -30,8 +30,29 @@ class FrameForm(ModelForm):
         self.match = kwargs.pop('match', None)
         print(self.match)
         super(FrameForm, self).__init__(*args, **kwargs)
-        break_choices = [(self.match.home.id, str(self.match.home.player)),
-                         (self.match.away.id, str(self.match.away.player))]
+
+        # Who breaks?
+        nb_frames = len(self.match.frame_set.all())
+        if nb_frames==0:
+            break_choices = [(self.match.home.id, str(self.match.home.player)),
+                            (self.match.away.id, str(self.match.away.player))]
+        elif self.match.break_type=='W':
+            last_frame = self.match.frame_set.get(frame_number=nb_frames)
+            if last_frame.home_score >= last_frame.away_score:
+                break_choices = [(self.match.home.id, str(self.match.home.player)),
+                                 (self.match.away.id, str(self.match.away.player))]
+            else:
+                break_choices = [(self.match.away.id, str(self.match.away.player)),
+                                 (self.match.home.id, str(self.match.home.player))]
+        elif self.match.break_type=='A':
+            last_frame = self.match.frame_set.get(frame_number=nb_frames)
+            if last_frame.break_player == self.away:
+                break_choices = [(self.match.home.id, str(self.match.home.player)),
+                                 (self.match.away.id, str(self.match.away.player))]
+            else:
+                break_choices = [(self.match.away.id, str(self.match.away.player)),
+                                 (self.match.home.id, str(self.match.home.player))]
+
         clear_choices = [(u'', '-'),
                          (self.match.home.id, str(self.match.home.player)),
                          (self.match.away.id, str(self.match.away.player))]

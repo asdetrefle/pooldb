@@ -4,8 +4,8 @@ from .models import Match, LeagueMatch, Frame, LeagueFrame
 from .forms import FrameForm
 from administration.models import Member, Team, League
 from django.contrib import messages
-# from django.db.models import Q
 import re, ast
+from utils import end_of_week
 
 # Create your views here.
 
@@ -32,7 +32,9 @@ def listmatch(request, type_):
         matches = Match.objects.all().order_by('match_date')
     elif type_=='LeagueMatch':
         matches = LeagueMatch.objects.all().order_by('match_date')
-    return render(request, 'listmatch.html', {'matches': matches, 'type_': type_})
+    eow = end_of_week()
+    print eow
+    return render(request, 'listmatch.html', {'matches': matches, 'type_': type_, 'eow': eow})
 
 
 def listleg(request):
@@ -258,12 +260,10 @@ def edit(request, type_, match_id):
         has_blank_fields = False
         for key, value in request.POST.iteritems():
             key_match = pattern.match(key)
-            print key, value
             if key_match:
                 frame_id, field = key_match.groups()
                 frame_id = int(frame_id)
                 frame = get_object_or_404(LeagueFrame, id=frame_id)
-                print key, value, field
                 if field in ('home', 'away'):
                     if value:
                         score = int(value)
@@ -279,12 +279,15 @@ def edit(request, type_, match_id):
                     home_away = value
                     if home_away == 'home':
                         frame.cleared_by = frame.home_player
+                        frame.is_clearance = True
                         frame.save()
                     elif home_away == 'away':
                         frame.cleared_by = frame.away_player
+                        frame.is_clearance = True
                         frame.save()
                     elif home_away == 'none':
                         frame.cleared_by = None
+                        frame.is_clearance = False
                         frame.save()
                     else:
                         raise Http404

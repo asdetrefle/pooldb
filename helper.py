@@ -57,9 +57,9 @@ def create_leaguematch():
             historical = LeagueMatch.objects.filter(Q(away=t1),
                                                     Q(home=t2))
             if not historical:
-                nm = LeagueMatch(venue=VENUE[v[1]], week=w, match_date=mdate, away=t1, home=t2, score_type='P')
+                nm = LeagueMatch(venue=VENUE[v[1]], week=w, match_date=mdate, away=t1, home=t2, score_type='P', break_type='A')
             else:
-                nm = LeagueMatch(venue=VENUE[v[1]], week=w, match_date=mdate, away=t2, home=t1, score_type='P')
+                nm = LeagueMatch(venue=VENUE[v[1]], week=w, match_date=mdate, away=t2, home=t1, score_type='P', break_type='A')
             print w, mdate, nm
             nm.save()
 

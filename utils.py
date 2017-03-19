@@ -1,5 +1,7 @@
 from django.utils import timezone
 from dateutil import relativedelta
+from pooldb.settings import TIME_ZONE
+import pytz, datetime
 
 def default_season():
     n = timezone.now()
@@ -18,4 +20,16 @@ def calc_elo(result, opp, sef):
     diff = opp - sef
     esp = 1. / (1. + 10.**(diff / 400.))
     return K * (result - esp)
+
+
+def with_timezone(dt, tzinfo=TIME_ZONE):
+    tz = pytz.timezone(tzinfo)
+    return tz.localize(dt)
+
+
+def end_of_week():
+    today = datetime.datetime.now().date()
+    eow = with_timezone(datetime.datetime.combine(today + datetime.timedelta(days=(7-today.weekday())), datetime.datetime.min.time()))
+    return eow
+
 

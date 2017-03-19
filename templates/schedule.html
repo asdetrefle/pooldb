@@ -2,6 +2,7 @@
 
 {% block title %} Schedule {% endblock %}
 
+{% load static %}
 {% block content %}
     <style>
     .header     {font-size:1.5em; color:dimgrey; font-weight:normal}
@@ -12,9 +13,42 @@
     td {vertical-align: middle}
     #add_new_frame {padding: 4pt}
     tab {padding-left: 3em}
+    div.week_left {
+        width:240px;
+        margin:0px;
+        text-align: right;
+        vertical-align: middle;
+        display:inline-block;
+    }       
+    div.week {
+        width:300px;
+        margin:0px;
+        text-align: center;
+        vertical-align: middle;
+        display:inline-block;
+    }
+    div.week_right {
+        width:240px;
+        margin:0px;
+        text-align: left;
+        vertical-align: middle;
+        display:inline-block;
+    }
     </style>
 
-    <p style="margin-left:18em;"> <a href="{% url 'listweek' week.week_number|add:"-1" %}">&laquo;</a>&emsp; {{ week }} &emsp; <a href="{% url 'listweek' week.week_number|add:1 %}">&raquo;</a> </p>
+<div class="week_left"> 
+    <a href="{% url 'listweek' week.week_number|add:"-1" %}">
+        <img src="{% static "left_arrow.png" %}" width="20"></img>   
+    </a>
+</div>
+<div class="week"> 
+    {{ week }}
+</div>
+<div class="week_right"> 
+    <a href="{% url 'listweek' week.week_number|add:"1" %}">
+        <img src="{% static "right_arrow.png" %}" width="20"></img>   
+    </a>
+</div>
 
 {% for k, v in matches.items %}
 {% if v %}

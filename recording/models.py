@@ -9,6 +9,7 @@ from utils import default_season, calc_elo
 from administration.models import Member, Team, League
 from schedule.models import MatchWeek, Season
 from collections import OrderedDict
+import numpy as np
 # Create your models here.
 
 class AbstractMatch(models.Model):
@@ -17,6 +18,10 @@ class AbstractMatch(models.Model):
     SCORE_SYSTEM_CHOICES = (
         (POINTS, 'Points'),
         (FRAMES, 'Frames'),
+    )
+    BREAK_TYPE_CHOICES = (
+        ('W', 'Winner Break'),
+        ('A', 'Alternative'),
     )
     EIGHT_BALL  = '8-Ball'
     NINE_BALL   = '9-Ball'
@@ -63,6 +68,11 @@ class AbstractMatch(models.Model):
         max_length=1,
         choices=SCORE_SYSTEM_CHOICES,
         default='F'
+    )
+    break_type = models.CharField(
+        max_length=1,
+        choices=BREAK_TYPE_CHOICES,
+        default='W'
     )
 
     home_score = models.IntegerField(default=0)
@@ -170,6 +180,8 @@ class Match(AbstractMatch):
         return self.frame_set.all()
 
     def completes(self):
+        self._update_progress()
+
         if self.home_score > self.away_score:
             self.winner = self.home
         elif self.home_score < self.away_score:
@@ -215,8 +227,8 @@ class Match(AbstractMatch):
         home_score_ = self.home_score
         away_score_ = self.away_score
 
-        self.home.raw_points += mi.home_score
-        self.away.raw_points += mi.away_score
+        self.home.raw_points += home_score_
+        self.away.raw_points += away_score_
         self.home._point_adj += calc_elo(float(home_score_) / (home_score_ + away_score_),
                                                 self.away.points,
                                                 self.home.points)
@@ -232,7 +244,6 @@ class Match(AbstractMatch):
 
     def update_all(self):
         self._update_progress()
-        self._upon_completion()
         return
 
     def __str__(self):
@@ -313,6 +324,7 @@ class LeagueMatch(AbstractMatch):
                            table_size=self.table_size,
                            pool_type =self.pool_type,
                            score_type=self.score_type,
+                           break_type=self.break_type,
                            race_to=2,
                            match_type='E',
                            away=players[0],
@@ -331,8 +343,24 @@ class LeagueMatch(AbstractMatch):
         self.save()
         return
 
-    def set_handicap():
-        pass
+    def set_handicap(self, max_handicap=15):
+        players = self._get_ordered_players()
+        away_handicap = [Member.objects.get(pk=i).handicap for i in players['away']]
+        home_handicap = [Member.objects.get(pk=i).handicap for i in players['home']]
+
+        away_handicap = [x for x in away_handicap if x > 0]
+        home_handicap = [x for x in home_handicap if x > 0]
+
+        away_handicap.sort()
+        home_handicap.sort()
+
+        effective_length = min(len(away_handicap), len(home_handicap))
+        handicap = np.sum(away_handicap[0:effective_length]) - np.sum(home_handicap[0:effective_length])
+
+        handicap = int(round(handicap))
+        self.handicap = np.sign(handicap) * min(max_handicap, abs(handicap))
+        self.save()
+        return
 
     def get_leg(self, l):
         return self.leagueframe_set.filter(leg=l)
@@ -366,11 +394,11 @@ class LeagueMatch(AbstractMatch):
         return res
 
     def _update_progress(self):
-        super(LeagueMatch, self)._update_progress()
-        self.home_points_raw = self.home_score
-        self.away_points_raw = self.away_score
-
         legs_sum = self.sum_legs()
+        #super(LeagueMatch, self)._update_progress()
+        self.away_points_raw = sum([x[0] for x in legs_sum])
+        self.home_points_raw = sum([x[1] for x in legs_sum])
+
         home_win_leg = 0
         away_win_leg = 0
         for [a, h] in legs_sum:
@@ -427,12 +455,30 @@ class LeagueMatch(AbstractMatch):
         if self.is_submitted:
             return
 
-        if self.home_score > self.away_score:
-            self.winner = self.home
-        elif self.home_score < self.away_score:
-            self.winner = self.away
+        self.home.total_matches_played += 1
+        self.home.season_matches_played += 1
+        self.away.total_matches_played += 1
+        self.away.season_matches_played += 1
+
+        self.home.total_legs_played += (self.legs + 1)
+        self.home.season_legs_played += (self.legs + 1)
+        self.away.total_legs_played += (self.legs + 1)
+        self.away.season_legs_played += (self.legs + 1)
+
+        self.home.total_legs_won += self.home_score
+        self.home.season_legs_won += self.home_score
+        self.away.total_legs_won += self.away_score
+        self.away.season_legs_won += self.away_score
+
+        if self.winner == self.home:
+            self.home.total_matches_won += 1
+            self.home.season_matches_won += 1
         else:
-            self.winner = None
+            self.away.total_matches_won += 1
+            self.away.season_matches_won += 1
+
+        self.home.save()
+        self.away.save()
 
         self.is_submitted = True
         self.save()

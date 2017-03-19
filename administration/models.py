@@ -30,6 +30,7 @@ class Group(models.Model):
 class League(models.Model):
     name = models.CharField(max_length=200)
     create_date = models.DateTimeField('date created', default=timezone.now)
+    last_update = models.DateTimeField('last update', default=timezone.now)
     level = models.IntegerField(default=1, blank=True, null=True)
     size = models.IntegerField(default=0)
 
@@ -37,7 +38,7 @@ class League(models.Model):
         self.size = len(self.team_set.all())
         return
 
-    def _update_ranking(self):
+    def rank_players(self):
         ts = self.team_set.all()
 
         pk_set = []
@@ -45,6 +46,7 @@ class League(models.Model):
         for t in ts:
             for m in t.member_set.filter(season_matches_played__gt=0):
                 m._update_points()
+                m._update_handicap()
                 pk_set.append(m.pk)
                 # scipy rankdata only ranks from smallest to highest so here needs the minus sign.
                 point_set.append(-m.points)
@@ -58,14 +60,18 @@ class League(models.Model):
             mb.ranking = order[i]
             mb.save()
 
+        self.last_update = timezone.now
+
         return
 
+    def rank_teams(self):
+        return
 
     def update_all(self):
         self._update_size()
         return
 
-    def get_ranking(self):
+    def get_player_ranking(self):
         ts = self.team_set.all()
 
         members = []
@@ -76,6 +82,12 @@ class League(models.Model):
 
         members.sort(key=lambda m: m.ranking)
         return members
+
+    def get_team_ranking(self):
+        ts = list(self.team_set.all());
+
+        ts.sort(key=lambda m: m.ranking)
+        return ts
 
     def __str__(self):
         return self.name
@@ -112,7 +124,11 @@ class Team(Group):
     ranking = models.IntegerField(default=0)
     team_number = models.IntegerField(default=0)
 
-    total_legs_played   = models.IntegerField(default=-1)
+    total_matches_played= models.IntegerField(default=0)
+    total_matches_won   = models.IntegerField(default=0)
+    season_matches_played= models.IntegerField(default=0)
+    season_matches_won   = models.IntegerField(default=0)
+    total_legs_played   = models.IntegerField(default=0)
     total_legs_won      = models.IntegerField(default=0)
     season_legs_played  = models.IntegerField(default=0)
     season_legs_won     = models.IntegerField(default=0)
@@ -166,7 +182,8 @@ class Member(models.Model):
     points  = models.FloatField(default=1000.)
     raw_points = models.IntegerField(default=0)
     ranking = models.IntegerField(default=0)
-    handicap = models.FloatField(default=0)
+    # -1 is a new player flag. handicap will become >=0 when at least 1 match played
+    handicap = models.FloatField(default=-1)
 
     # the following three fields stores adjustment to Member ranking information during a ranking cycle
     # Members' ranking could change every week or every day.

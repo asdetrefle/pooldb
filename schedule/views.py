@@ -1,17 +1,12 @@
 from django.shortcuts import render
 from django.db.models import Q
 from recording.models import Match, LeagueMatch
-from pooldb.settings import TIME_ZONE
 from collections import OrderedDict
 import datetime, pytz
-from utils import default_season
+from utils import default_season, with_timezone
 from .models import Season, MatchWeek
 
 # Create your views here.
-
-def with_timezone(dt, tzinfo=TIME_ZONE):
-    tz = pytz.timezone(tzinfo)
-    return tz.localize(dt)
 
 def match_to_dict(l):
     d = OrderedDict((('Sunday',     []),

@@ -3,8 +3,8 @@
 {% block title %} Ranking {% endblock %}
 
 {% block content %}
+Last Update: {{ last_update }}
 # TODO Add filters that allows to select all matches by player, date, team
-# TODO: maybe put the last update time here
 
  <table border="0">    
     <col width="50">
@@ -23,7 +23,7 @@
         <td align="center"><h3> Ranking Points </h3></td>
         <td align="center"><h3> Total Points </h3></td>
         <td align="center"><h3> Average </h3></td>
-        <td align="center"><h3> Match Playered </h3></td>
+        <td align="center"><h3> Match Played </h3></td>
         <td align="center"><h3> Match Won </h3></td>
         <td align="center"><h3> Clearance </h3></td>
     </tr>
@@ -34,7 +34,7 @@
         <td align="center"> {{ m.group }} </td>
         <td align="center"> {{ m.points|floatformat:"0" }} </td>
         <td align="center"> {{ m.raw_points|floatformat:"0" }} </td>
-        <td align="center"> {{ m.handicap|floatformat:1 }} </td>
+        <td align="center"> {{ m.handicap|floatformat:2 }} </td>
         <td align="center"> {{ m.season_matches_played }} </td>
         <td align="center"> {{ m.season_matches_won }} </td>
         <td align="center"> {{ m.season_clearance }} </td>

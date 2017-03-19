@@ -31,5 +31,5 @@ def ranking_league(request, league_name='Poke n Hope HK 8-Ball', rankby='points'
         frame.save()
         match.update_all()
     """
-    ranking = lg.get_ranking()
-    return render(request, 'ranking.html', {'ranking': ranking})
+    ranking = lg.get_player_ranking()
+    return render(request, 'ranking.html', {'ranking': ranking, 'last_update': lg.last_update})

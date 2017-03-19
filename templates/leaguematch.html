@@ -1,5 +1,6 @@
 {% extends "base_site.html" %}
 {% load match_extras %}
+{% load i18n %}
 
 {% block title %} Edit Match {% endblock %}
 
@@ -26,8 +27,26 @@
     .away_win {background-color: red; margin: 5pt}
     td {vertical-align: middle}
     #add_new_frame {padding: 4pt}
-    .edit_score {width: 20px; height: 8px}
-    #submit_edit {display: {% if has_blank_fields %}inline-block{% else %}none{% endif %}}
+    .edit_score {width: 20px; height: 7px}
+    #header_div {
+        height: 100px;
+        vertical-align: middle;
+    }
+    #header_score { 
+        width: 800px;
+        margin: 0px;
+        text-align: left;
+        vertical-align: middle;
+        display:inline-block;
+        float: left;
+    }
+    #submit_edit {
+        width: 200px;
+        margin-top: 40px;
+        vertical-align: middle;
+        float: left;
+        display: {% if has_blank_fields %}inline-block{% else %}none{% endif %}
+    }
     .clear_mark {
         content: url({% static "star.png" %});
         width: 16px;
@@ -42,6 +61,7 @@
         filter: grayscale(100%);
         display: none;
     }
+
 </style>
 
 <script src="{% static "js/jquery-3.1.1.min.js" %}"></script>
@@ -57,7 +77,7 @@
         }
 
         $(".frame_score").click(function () {
-            $("#submit_edit").show();
+            $("#submit_edit").css('display', 'inline-block');
             var value = $( this ).html().trim();
             var score_location = $(this).attr("value");
             var home_away = score_location.split(" ")[1];
@@ -82,34 +102,6 @@
                 other_span.replaceWith(other_input);
             }
 
-            /*
-            $(".clear_mark").click(function() {
-                $("#submit_edit").show();
-                var this_mark = $(this);
-                var clear_location = this_mark.attr("id").split("_");
-                var frame_id = clear_location[0];
-                var home_away = clear_location[2];
-                var input_name = frame_id + " " + "clear";
-                var input = $("input[name='" + input_name + "']");
-                console.log("tatata");
-                if (input.length == 0) {
-                    input = $("<input>").attr({type: "hidden", name: input_name, value: "none"});
-                    $("#edit_form").append(input);
-                }
-                var other_home_away = (home_away == "home") ? "away" : "home";
-                var other_location = frame_id + "_clear_" + other_home_away;
-                var other_mark = $("#" + other_location);
-                var this_on = !this_mark.hasClass("unselected");
-                // var other_on = !other_mark.hasClass("unselected");
-                if (this_on) {
-                    input.val("none");
-                    this_mark.addClass("unselected").show();
-                } else {
-                    input.val(home_away);
-                    this_mark.removeClass("unselected");
-                    other_mark.addClass("unselected").show();
-                }
-            });*/
         });
         
         $(".clear_mark").click(function() {
@@ -159,49 +151,55 @@
 
 <h3> Match Date: {{match.match_date}} {% if match.is_completed %} Match Completed. {% elif match.race_to <= frames.count %} Match under review. {% else %} Match in Progress. {% endif %}</h3>
 
-<table border="0"> 
-    <col width="80">
-    <col width="400">
-    <col width="50">
-    <col width="120">
-    <col width="60">
-  <tr>
-    <td align="right"><h2><span class="header"> Away : </span></h2></td>
-    <td><h2><span class="header"> {{match.away}} </span></h2></td>
-    <td align="right"><h2>  {% if match.winner == match.away %} ✔ {% endif %} </h2></td>
-    <td align="center"><h2><span class="{% if match.away_score > match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.away_score}} </span></h2></td>
-    <td align="center"><h2><span class="raw_pts"> ({{match.away_points_raw}}) </span></h2></td>
-  </tr>
-  <tr>
-    <td align="right"><h2><span class="header"> Home : </span></h2></td>
-    <td><h2><span class="header"> {{match.home}} </span></h2></td>
-    <td align="right"><h2> {% if match.winner == match.home %} ✔ {% endif %} </h2></td>
-    <td align="center"><h2><span class="{% if match.away_score < match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.home_score}}</span></h2></td>
-    <td align="center"><h2><span class="raw_pts"> ({{match.home_points_raw}}) </span></h2></td>
-  </tr>
-</table>
-
-<p></p>
-
 <form action="{% url 'match_edit' 'LeagueMatch' match.id %}" method="post" id="edit_form">
-{% csrf_token %}
-<input type="submit" value="Submit Changes" id="submit_edit"/>
+<div id="header_div">
+    <div id="header_score">
+        <table border="0"> 
+            <col width="80">
+            <col width="400">
+            <col width="50">
+            <col width="120">
+            <col width="60">
+            <tr>
+                <td align="right"><h2><span class="header"> Away : </span></h2></td>
+                <td><h2><span class="header"> {{match.away}} </span></h2></td>
+                <td align="right"><h2>  {% if match.winner == match.away %} ✔ {% endif %} </h2></td>
+                <td align="center"><h2><span class="{% if match.away_score > match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.away_score}} </span></h2></td>
+                <td align="center"><h2><span class="raw_pts"> ({{match.away_points_raw}}) </span></h2></td>
+            </tr>
+            <tr>
+                <td align="right"><h2><span class="header"> Home : </span></h2></td>
+                <td><h2><span class="header"> {{match.home}} </span></h2></td>
+                <td align="right"><h2> {% if match.winner == match.home %} ✔ {% endif %} </h2></td>
+                <td align="center"><h2><span class="{% if match.away_score < match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.home_score}}</span></h2></td>
+                <td align="center"><h2><span class="raw_pts"> ({{match.home_points_raw}}) </span></h2></td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="submit_edit">
+        {% csrf_token %}
+        <input type="submit" value="Submit Changes"/>
+    </div>
+</div>
+
+<div style="margin-top:40px;">
 <table border="0">    
     <col width="20">
     <col width="150">
     <col width="40">
-    <col width="40">
+    <col width="50">
     <col width="10">
-    <col width="40">
+    <col width="50">
     <col width="40">
     <col width="150">    
     <col width="30">
     <col width="20">
     <col width="150">    
     <col width="40">
-    <col width="40">
+    <col width="50">
     <col width="10">
-    <col width="40">
+    <col width="50">
     <col width="40">
     <col width="150">
     <tr>
@@ -251,5 +249,6 @@
     {% endfor %}
 </table>
 </form>
+</div>
 {% endblock %}
 

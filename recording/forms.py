@@ -46,7 +46,7 @@ class FrameForm(ModelForm):
                                  (self.match.home.id, str(self.match.home.player))]
         elif self.match.break_type=='A':
             last_frame = self.match.frame_set.get(frame_number=nb_frames)
-            if last_frame.break_player == self.away:
+            if last_frame.break_player == self.match.away:
                 break_choices = [(self.match.home.id, str(self.match.home.player)),
                                  (self.match.away.id, str(self.match.away.player))]
             else:

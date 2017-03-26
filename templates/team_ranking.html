@@ -1,0 +1,46 @@
+{% extends "base_site.html" %}
+
+{% block title %} Ranking {% endblock %}
+
+{% block content %}
+Last Update: {{ last_update }}
+# TODO Add filters that allows to select all matches by player, date, team
+
+ <table border="0">    
+    <col width="50">
+    <col width="150">
+    <col width="200">
+    <col width="128">
+    <col width="128">
+    <col width="128">
+    <col width="128">
+    <col width="128">
+    <col width="128">
+    <tr>
+        <td align="center"><h3> Rank </h3></td>
+        <td align="center"><h3> Team </h3></td>
+        <td align="center"><h3> Season Legs Won </h3></td>
+        <td align="center"><h3> Ranking Points </h3></td>
+        <td align="center"><h3> Total Points </h3></td>
+        <td align="center"><h3> Average </h3></td>
+        <td align="center"><h3> Match Played </h3></td>
+        <td align="center"><h3> Match Won </h3></td>
+        <td align="center"><h3> Clearance </h3></td>
+    </tr>
+    {% for m in ranking %}
+    <tr>
+        <td align="center"> {{ m.ranking }} </td>
+        <td align="center"> {{ m.name }} </td>
+        <td align="center"> {{ m.season_legs_won }} </td>
+        <td align="center"> {{ m.points|floatformat:"0" }} </td>
+        <td align="center"> {{ m.raw_points|floatformat:"0" }} </td>
+        <td align="center"> {{ m.handicap|floatformat:2 }} </td>
+        <td align="center"> {{ m.season_matches_played }} </td>
+        <td align="center"> {{ m.season_matches_won }} </td>
+        <td align="center"> {{ m.season_clearance }} </td>
+            <!--<a href=" url 'leg_view' leg.pk %}"> -->
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
+

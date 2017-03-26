@@ -77,31 +77,36 @@
         }
 
         $(".frame_score").click(function () {
-            $("#submit_edit").css('display', 'inline-block');
-            var value = $( this ).html().trim();
-            var score_location = $(this).attr("value");
-            var home_away = score_location.split(" ")[1];
-            var frame_id = score_location.split(" ")[0];
-            var home_mark = $("#" + frame_id + "_clear_home");
-            var away_mark = $("#" + frame_id + "_clear_away");
-            home_mark.show();
-            away_mark.show();
-            console.log(frame_id)
+            var is_completed = {{match.is_completed|yesno:"true,false"}};
+            //console.log(is_completed)
+            if (is_completed) {
+                return 
+            } else {
+                $("#submit_edit").css('display', 'inline-block');
+                var value = $( this ).html().trim();
+                var score_location = $(this).attr("value");
+                var home_away = score_location.split(" ")[1];
+                var frame_id = score_location.split(" ")[0];
+                var home_mark = $("#" + frame_id + "_clear_home");
+                var away_mark = $("#" + frame_id + "_clear_away");
+                home_mark.show();
+                away_mark.show();
+                //console.log(frame_id)
 
-            var input = $("<input>").attr({type: "text", value: value, name: score_location}).addClass("edit_score");
-            $( this ).replaceWith(input);
+                var input = $("<input>").attr({type: "text", value: value, name: score_location}).addClass("edit_score");
+                $( this ).replaceWith(input);
 
-            // replace other span to input
-            var other_home_away = (home_away == "home") ? "away" : "home";
-            var other_location = frame_id + " " + other_home_away;
-            var other_span = $("#" + frame_id + "_" + other_home_away + "_score");
-            if (other_span.length > 0 ) {
-                var other_value = other_span.html().trim();
-                var other_score_location = other_span.attr("value");
-                var other_input = $("<input>").attr({type: "text", value: other_value, name: other_score_location}).addClass("edit_score");
-                other_span.replaceWith(other_input);
+                // replace other span to input
+                var other_home_away = (home_away == "home") ? "away" : "home";
+                var other_location = frame_id + " " + other_home_away;
+                var other_span = $("#" + frame_id + "_" + other_home_away + "_score");
+                if (other_span.length > 0 ) {
+                    var other_value = other_span.html().trim();
+                    var other_score_location = other_span.attr("value");
+                    var other_input = $("<input>").attr({type: "text", value: other_value, name: other_score_location}).addClass("edit_score");
+                    other_span.replaceWith(other_input);
+                }
             }
-
         });
         
         $(".clear_mark").click(function() {

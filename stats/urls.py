@@ -4,5 +4,6 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.index, name='stats'),
-    url(r'^ranking/$', views.ranking_league, name='ranking_league'),
+    url(r'^ranking/players$', views.ranking_players, name='ranking_players'),
+    url(r'^ranking/teams$', views.ranking_teams, name='ranking_teams'),
 ]

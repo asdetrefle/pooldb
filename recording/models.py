@@ -49,6 +49,10 @@ class AbstractMatch(models.Model):
     venue = models.CharField(max_length=200, blank=True, null=True)
     match_date = models.DateTimeField('Event date', default=timezone.now)
     #do we need week for single match as well? in discussion
+    season = models.ForeignKey(Season,
+                               models.CASCADE,
+                               blank=True,
+                               null=True)
     week = models.ForeignKey(MatchWeek,
                              models.CASCADE,
                              blank=True,
@@ -254,12 +258,12 @@ class LeagueMatch(AbstractMatch):
     home = models.ForeignKey(
         Team,
         models.CASCADE,
-        related_name='home'
+        related_name='%(class)s_home'
     )
     away = models.ForeignKey(
         Team,
         models.CASCADE,
-        related_name='away'
+        related_name='%(class)s_away'
     )
 
     home_points_raw = models.IntegerField(default=0)
@@ -275,7 +279,7 @@ class LeagueMatch(AbstractMatch):
     winner = models.ForeignKey(
         Team,
         models.CASCADE,
-        related_name='winner_team',
+        related_name='%(class)s_winner',
         blank=True,
         null=True
     )
@@ -339,6 +343,7 @@ class LeagueMatch(AbstractMatch):
                                                       leg_number=2*r+j-1)
                     nlf.save()
 
+        self.set_handicap()
         self.is_initialized = True
         self.save()
         return
@@ -393,19 +398,52 @@ class LeagueMatch(AbstractMatch):
 
         return res
 
+    def count_frames(self):
+        frames = self.frames()
+        if self.handicap>=0:
+            res = [[0,0] for i in range(self.legs)]
+        else:
+            res = [[0,0] for i in range(self.legs)]
+
+        for f in frames:
+            try:
+                res[f.leg_number - 1][0] += (f.away_score>f.home_score)
+                res[f.leg_number - 1][1] += (f.home_score>f.away_score)
+            except TypeError:
+                pass
+
+        return res
+
+    def get_matches(self):
+        frames = self.frames()
+
+        match_set = set()
+        for f in frames:
+            match_set.add(f.match)
+
+        return list(match_set)
+
+
     def _update_progress(self):
         legs_sum = self.sum_legs()
+        legs_count = self.count_frames()
         #super(LeagueMatch, self)._update_progress()
         self.away_points_raw = sum([x[0] for x in legs_sum])
         self.home_points_raw = sum([x[1] for x in legs_sum])
 
         home_win_leg = 0
         away_win_leg = 0
-        for [a, h] in legs_sum:
-            if a>h:
+        for i, [a, h] in enumerate(legs_sum):
+            if a>h and a!=0 and h!=0:
                 away_win_leg += 1
-            elif h>a:
+            elif h>a and a!=0 and h!=0:
                 home_win_leg += 1
+            else:
+                ac, hc = legs_count[i]
+                if ac>hc:
+                    away_win_leg += 1
+                elif hc>ac:
+                    home_win_leg += 1
 
         self.home_score = home_win_leg
         self.away_score = away_win_leg
@@ -426,6 +464,10 @@ class LeagueMatch(AbstractMatch):
         return
 
     def completes(self):
+        ms = self.get_matches()
+        for m in ms:
+            m.completes()
+
         if self.home_points_raw > self.away_points_raw:
             self.home_score += 1
         elif self.home_points_raw < self.away_points_raw:
@@ -446,9 +488,10 @@ class LeagueMatch(AbstractMatch):
         return
 
     def submits(self):
-        # TODO this one does not work yet
-        # We need to create a way for Leg to be completed
-        # Currently it nevers finishes.
+        ms = self.get_matches()
+        for m in ms:
+            m.submits()
+
         if not self.is_completed:
             return
 
@@ -486,8 +529,6 @@ class LeagueMatch(AbstractMatch):
 
     def update_all(self):
         self._update_progress()
-        self._update_handicap()
-        self._upon_completion()
         return
 
     def __str__(self):

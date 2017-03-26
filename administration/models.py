@@ -3,8 +3,10 @@ from __future__ import unicode_literals
 from django.db import models
 from django.utils import timezone
 from django.core.validators import RegexValidator
+from schedule.models import Season
 import datetime
 import scipy.stats as ss
+from utils import default_season
 
 # Create your models here.
 
@@ -60,18 +62,39 @@ class League(models.Model):
             mb.ranking = order[i]
             mb.save()
 
-        self.last_update = timezone.now
+        self.last_update = timezone.now() #.format("%Y-%m-%d %H:%M:%S")
+        self.save()
 
         return
 
-    def rank_teams(self):
+    def rank_teams(self, rank_by='season_legs_won'):
+        ts = self.team_set.all()
+
+        pk_set = []
+        point_set = []
+        for t in ts:
+            pk_set.append(t.pk)
+            try:
+                point_set.append([getattr(t, rank_by), t.season_points()])
+            except AttributeError:
+                point_set.append([getattr(t, 'season_legs_won'), t.season_points()])
+
+        point_set = [- (x[0] + x[1] * 10e-9) for x in point_set]
+
+        order = ss.rankdata(point_set, method='min')
+        for i, tpk in enumerate(pk_set):
+            tm = Team.objects.get(pk=tpk)
+            tm.ranking = order[i]
+            tm.save()
+
+        self.last_update = timezone.now()
         return
 
     def update_all(self):
         self._update_size()
         return
 
-    def get_player_ranking(self):
+    def get_ranked_players(self):
         ts = self.team_set.all()
 
         members = []
@@ -83,7 +106,7 @@ class League(models.Model):
         members.sort(key=lambda m: m.ranking)
         return members
 
-    def get_team_ranking(self):
+    def get_ranked_teams(self):
         ts = list(self.team_set.all());
 
         ts.sort(key=lambda m: m.ranking)
@@ -144,6 +167,19 @@ class Team(Group):
         blank=True,
         null=True
     )
+
+    def season_points(self):
+        season = Season.objects.get(season=default_season())
+        points = 0
+        ms_home = self.leaguematch_home.filter(season=season)
+        for m in ms_home:
+            points += m.home_points_raw
+
+        ms_away = self.leaguematch_away.filter(season=season)
+        for m in ms_away:
+            points += m.away_points_raw
+
+        return points
 
     def _update_legs(self):
         # TODO

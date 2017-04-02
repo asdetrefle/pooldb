@@ -251,7 +251,7 @@ class Match(AbstractMatch):
         return
 
     def __str__(self):
-        return "{} {} vs. {} ".format(self.match_date.date(), self.away, self.home)
+        return "{} {} vs. {} ".format(self.match_date.date(), self.home, self.away)
 
 
 class LeagueMatch(AbstractMatch):
@@ -385,14 +385,14 @@ class LeagueMatch(AbstractMatch):
     def sum_legs(self):
         frames = self.frames()
         if self.handicap>=0:
-            res = [[0,self.handicap] for i in range(self.legs)]
+            res = [[self.handicap,0] for i in range(self.legs)]
         else:
-            res = [[-self.handicap,0] for i in range(self.legs)]
+            res = [[0, -self.handicap] for i in range(self.legs)]
 
         for f in frames:
             try:
-                res[f.leg_number - 1][0] += f.away_score
-                res[f.leg_number - 1][1] += f.home_score
+                res[f.leg_number - 1][0] += f.home_score
+                res[f.leg_number - 1][1] += f.away_score
             except TypeError:
                 pass
 
@@ -427,9 +427,9 @@ class LeagueMatch(AbstractMatch):
     def _update_progress(self):
         legs_sum = self.sum_legs()
         legs_count = self.count_frames()
-        #super(LeagueMatch, self)._update_progress()
-        self.away_points_raw = sum([x[0] for x in legs_sum])
+
         self.home_points_raw = sum([x[1] for x in legs_sum])
+        self.away_points_raw = sum([x[0] for x in legs_sum])
 
         home_win_leg = 0
         away_win_leg = 0
@@ -532,7 +532,7 @@ class LeagueMatch(AbstractMatch):
         return
 
     def __str__(self):
-        return "{} {} vs. {}".format(self.match_date.date(), self.away, self.home)
+        return "{} {} vs. {}".format(self.match_date.date(), self.home, self.away)
 
 
 class Frame(models.Model):

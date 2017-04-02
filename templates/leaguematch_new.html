@@ -1,0 +1,259 @@
+{% extends "base_site.html" %}
+{% load match_extras %}
+{% load i18n %}
+
+{% block title %} Edit Match {% endblock %}
+
+{% block extrahead %}
+{% load static %}
+<style>
+    .header     {font-size:1.17em; color:dimgrey; font-weight:normal}
+    .header_loss    {font-size:1.5em; color:dimgrey; font-weight:normal}
+    .raw_pts    {font-size:1.0em; color:midnightblue; font-weight:normal}
+    .header_win {font-size:1.5em; color:dodgerblue; font-weight:bold}
+    .leg_win {display: block;
+        font-size: 1.17em;
+        margin-top: 1em;
+        margin-bottom: 1em;
+        margin-left: 0;
+        margin-right: 0;
+        font-weight: bold;
+        color:dodgerblue;
+    }
+    .home_handicap {font-size:0.85em; color:green}
+    .away_handicap {font-size:0.85em; color:green}
+    .frame_win   {font-weight:bold; color:dodgerblue;}
+    .draw {background-color: deepskyblue; margin: 5pt}
+    .away_win {background-color: red; margin: 5pt}
+    td {vertical-align: middle}
+    #add_new_frame {padding: 4pt}
+    .edit_score {width: 20px; height: 7px}
+    #header_div {
+        height: 100px;
+        vertical-align: middle;
+    }
+    #header_score { 
+        width: 800px;
+        margin: 0px;
+        text-align: left;
+        vertical-align: middle;
+        display:inline-block;
+        float: left;
+    }
+    #submit_edit {
+        width: 200px;
+        margin-top: 40px;
+        vertical-align: middle;
+        float: left;
+        display: {% if has_blank_fields %}inline-block{% else %}none{% endif %}
+    }
+    .clear_mark {
+        content: url({% static "star.png" %});
+        width: 16px;
+        height: 16px;
+        -webkit-transition: all 0.5s ease;
+        -moz-transition: all 0.5s ease;
+        -o-transition: all 0.5s ease;
+        transition: all 0.5s ease;
+    }
+    .unselected {
+        -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+        filter: grayscale(100%);
+        display: none;
+    }
+
+</style>
+
+<script src="{% static "js/jquery-3.1.1.min.js" %}"></script>
+<script>
+    $(document).ready(function () {
+        // show handicap
+        var handicap = {{ match.handicap }};
+        var handicap_display = " (" + Math.abs(handicap).toString() + ")";
+        if (handicap > 0) {
+            $(".home_handicap").html(handicap_display);
+        } else if (handicap < 0) {
+            $(".away_handicap").html(handicap_display);
+        }
+
+        $(".frame_score").click(function () {
+            var is_completed = {{match.is_completed|yesno:"true,false"}};
+            //console.log(is_completed)
+            if (is_completed) {
+                return 
+            } else {
+                $("#submit_edit").css('display', 'inline-block');
+                var value = $( this ).html().trim();
+                var score_location = $(this).attr("value");
+                var home_away = score_location.split(" ")[1];
+                var frame_id = score_location.split(" ")[0];
+                var home_mark = $("#" + frame_id + "_clear_home");
+                var away_mark = $("#" + frame_id + "_clear_away");
+                home_mark.show();
+                away_mark.show();
+                //console.log(frame_id)
+
+                var input = $("<input>").attr({type: "text", value: value, name: score_location}).addClass("edit_score");
+                $( this ).replaceWith(input);
+
+                // replace other span to input
+                var other_home_away = (home_away == "home") ? "away" : "home";
+                var other_location = frame_id + " " + other_home_away;
+                var other_span = $("#" + frame_id + "_" + other_home_away + "_score");
+                if (other_span.length > 0 ) {
+                    var other_value = other_span.html().trim();
+                    var other_score_location = other_span.attr("value");
+                    var other_input = $("<input>").attr({type: "text", value: other_value, name: other_score_location}).addClass("edit_score");
+                    other_span.replaceWith(other_input);
+                }
+            }
+        });
+        
+        $(".clear_mark").click(function() {
+            var this_mark = $(this);
+            var clear_location = this_mark.attr("id").split("_");
+            var frame_id = clear_location[0];
+            var home_away = clear_location[2];
+            var home_score = $("#" + frame_id + "_" + home_away + "_score") 
+            if (!home_score.hasClass("frame_score")) {
+                $("#submit_edit").show();
+                var home_away = clear_location[2];
+                var input_name = frame_id + " " + "clear";
+                var input = $("input[name='" + input_name + "']");
+                console.log(input);
+                if (input.length == 0) {
+                    input = $("<input>").attr({type: "hidden", name: input_name, value: "none"});
+                    $("#edit_form").append(input);
+                }
+                var other_home_away = (home_away == "home") ? "away" : "home";
+                var other_location = frame_id + "_clear_" + other_home_away;
+                var other_mark = $("#" + other_location);
+                var this_on = !this_mark.hasClass("unselected");
+                if (this_on) {
+                    input.val("none");
+                    this_mark.addClass("unselected").show();
+                } else {
+                    input.val(home_away);
+                    this_mark.removeClass("unselected");
+                    other_mark.addClass("unselected").show();
+                }
+            }
+        });
+    });
+
+    $(document).keyup(function(e) {
+        if (e.keyCode == 27) { 
+            location.reload()
+        }
+    });  
+</script>
+
+
+{% endblock %}
+
+{% block content %}
+
+
+<h3> Match Date: {{match.match_date}} {% if match.is_completed %} Match Completed. {% elif match.race_to <= frames.count %} Match under review. {% else %} Match in Progress. {% endif %}</h3>
+
+<form action="{% url 'match_edit' 'LeagueMatch' match.id %}" method="post" id="edit_form">
+<div id="header_div">
+    <div id="header_score">
+        <table border="0"> 
+            <col width="80">
+            <col width="400">
+            <col width="50">
+            <col width="120">
+            <col width="60">
+            <tr>
+                <td align="right"><h2><span class="header"> Home : </span></h2></td>
+                <td><h2><span class="header"> {{match.home}} </span></h2></td>
+                <td align="right"><h2> {% if match.winner == match.home %} ✔ {% endif %} </h2></td>
+                <td align="center"><h2><span class="{% if match.away_score < match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.home_score}}</span></h2></td>
+                <td align="center"><h2><span class="raw_pts"> ({{match.home_points_raw}}) </span></h2></td>
+            </tr>
+            <tr>
+                <td align="right"><h2><span class="header"> Away : </span></h2></td>
+                <td><h2><span class="header"> {{match.away}} </span></h2></td>
+                <td align="right"><h2>  {% if match.winner == match.away %} ✔ {% endif %} </h2></td>
+                <td align="center"><h2><span class="{% if match.away_score > match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.away_score}} </span></h2></td>
+                <td align="center"><h2><span class="raw_pts"> ({{match.away_points_raw}}) </span></h2></td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="submit_edit">
+        {% csrf_token %}
+        <input type="submit" value="Submit Changes"/>
+    </div>
+</div>
+
+<div style="margin-top:40px;">
+<table border="0">    
+    <col width="20">
+    <col width="150">
+    <col width="40">
+    <col width="50">
+    <col width="10">
+    <col width="50">
+    <col width="40">
+    <col width="150">    
+    <col width="30">
+    <col width="20">
+    <col width="150">    
+    <col width="40">
+    <col width="50">
+    <col width="10">
+    <col width="50">
+    <col width="40">
+    <col width="150">
+    <tr>
+        <td align="center"><h3> Leg </h3></td>
+        <td colspan='3' align="center"><h3> Home </h3></td>
+        <td align="center"> </td>
+        <td colspan='3' align="center"><h3> Away </h3></td>
+        <td align="center"> </td>
+        <td align="center"><h3> Leg </h3></td>
+        <td colspan='3' align="center"><h3> Home </h3></td>
+        <td align="center"> </td>
+        <td colspan='3' align="center"><h3> Away </h3></td>
+    </tr>
+    {% for round in frames %}
+        {% for frame in round %}
+            <tr>
+            {% for f in frame %}
+                {% if forloop.counter > 1 %}
+                    <td align="center"> </td>
+                {% endif %}
+                <td align="center"> {{f.leg_number}} </td>
+                <td align="center"> {{f.home_player.player}} </td>
+                <td align="right"> <img class="clear_mark {% if f.cleared_by != f.home_player %}unselected{% endif %}" id="{{ f.id }}_clear_home" style="{% if f.home_score == None or f.home_score == None %}display:inline-block{% endif %}"/></td>
+                <td align="right"> {% if f.home_score == None %} <input type="text" name="{{ f.id }} home" id="{{ f.id }}_home_score" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score < f.home_score %}frame_win{% endif %} frame_score" id="{{ f.id }}_home_score" value="{{ f.id }} home"> {{ f.home_score }} </span> {% endif %}   </td>
+                <td align="center"> : </td>
+                <td align="left">  {% if f.away_score == None %} <input type="text" name="{{ f.id }} away" id="{{ f.id }}_away_score" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score > f.home_score %}frame_win{% endif %} frame_score" id="{{ f.id }}_away_score" value="{{ f.id }} away"> {{ f.away_score }} </span>{% endif %} </td>
+                <td align="left"> <img class="clear_mark {% if f.cleared_by != f.away_player %}unselected{% endif %}" id="{{ f.id }}_clear_away" style="{% if f.away_score == None or f.away_score == None %}display:inline-block{% endif %}"/></td>
+                <td align="center"> {{f.away_player.player}} </td>
+            {% endfor %}
+            </tr>
+        {% endfor %}
+        <tr>
+            {% with s0=summary|get_item:forloop.counter0|get_item:0|get_item:0 s1=summary|get_item:forloop.counter0|get_item:1|get_item:0 s2=summary|get_item:forloop.counter0|get_item:0|get_item:1 s3=summary|get_item:forloop.counter0|get_item:1|get_item:1 %}
+            <td></td>
+            <td align="right"> <h3>Total :</h3> </td>
+            <td colspan="2" align="right"> {% if s0 > s1 %} <h3 style="color:dodgerblue;display:inline-block;"> {% else %} <h3 style="display:inline-block;"> {% endif %} {{s0}} </h3><span class="away_handicap"></span></td>
+            <td><h3>:</h3></td>
+            <td colspan="2" align="left"> {% if s1 > s0 %} <h3 style="color:dodgerblue;display:inline-block;"> {% else %} <h3 style="display:inline-block;"> {% endif %} {{s1}} </h3><span class="home_handicap"></span></td>
+            <td colspan="3"></td>
+            <td align="right"> <h3>Total:</h3> </td>
+            <td colspan="2" align="right"> {% if s2 > s3 %} <h3 style="color:dodgerblue;display:inline-block;"> {% else %} <h3 style="display:inline-block;"> {% endif %} {{s2}} </h3><span class="away_handicap"></span></td>
+            <td><h3>:</h3></td>
+            <td colspan="2" align="left"> {% if s3 > s2 %} <h3 style="color:dodgerblue;display:inline-block;"> {% else %} <h3 style="display:inline-block;"> {% endif %} {{s3}} </h3><span class="home_handicap"></span></td>
+            <td></td>
+            {% endwith %}
+        </tr>
+    {% endfor %}
+</table>
+</form>
+</div>
+{% endblock %}
+

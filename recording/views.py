@@ -177,7 +177,7 @@ def match_view(request, type_, match_id):
             has_blank_fields = True
 
         print "toto", not match.is_completed
-        return render(request, 'leaguematch.html', {'frames': frames, 'match': match, 'summary': summary, 'has_blank_fields': not match.is_completed})
+        return render(request, 'leaguematch_new.html', {'frames': frames, 'match': match, 'summary': summary, 'has_blank_fields': not match.is_completed})
     elif type_ == 'Match':
         match = get_object_or_404(Match, pk=match_id)
         if request.method == 'POST':

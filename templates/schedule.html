@@ -69,7 +69,7 @@
         {% for match in v %} 
         <tr>
             <td align="center"> {{ forloop.counter }} </td>
-            <td align="left"> {{ match.away }} vs. {{ match.home }} </td>
+            <td align="left"> {{ match.home }} vs. {{ match.away }} </td>
             <td align="center"> {{ match.match_date|date:"H:i" }} </td>
             <td align="center"> {{ match.venue }} </td>
         </tr>

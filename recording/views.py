@@ -29,11 +29,10 @@ def index(request):
 
 def listmatch(request, type_):
     if type_=='Match':
-        matches = Match.objects.all().order_by('match_date')
+        matches = Match.objects.all().order_by('-match_date')
     elif type_=='LeagueMatch':
         matches = LeagueMatch.objects.all().order_by('match_date')
     eow = end_of_week()
-    print eow
     return render(request, 'listmatch.html', {'matches': matches, 'type_': type_, 'eow': eow})
 
 
@@ -166,18 +165,12 @@ def match_view(request, type_, match_id):
                 res.append(zip(*to_zip))
             return res
         frames = group_by_n(match.to_view().values())
-        # TODO: use a var to indicate whether all scores are not None (e.g. is_completed or is_submitted?)
         try:
-            # print match.sum_legs()
             summary = group_by_n(match.sum_legs())
-            # print frames, summary
-            has_blank_fields = False
         except TypeError:
             summary = [[('-', '-'), ('-', '-')]] * 3
-            has_blank_fields = True
 
-        print "toto", not match.is_completed
-        return render(request, 'leaguematch_new.html', {'frames': frames, 'match': match, 'summary': summary, 'has_blank_fields': not match.is_completed})
+        return render(request, 'leaguematch.html', {'frames': frames, 'match': match, 'summary': summary, 'has_blank_fields': match._has_blank()})
     elif type_ == 'Match':
         match = get_object_or_404(Match, pk=match_id)
         if request.method == 'POST':

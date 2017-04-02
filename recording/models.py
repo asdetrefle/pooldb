@@ -424,7 +424,22 @@ class LeagueMatch(AbstractMatch):
         return list(match_set)
 
 
+    def _has_blank(self):
+        if self.is_completed:
+            return False
+        else:
+            frames = self.frames()
+            for f in frames:
+                if f.home_score is None or f.away_score is None:
+                    return True
+
+        return False
+
+
     def _update_progress(self):
+        """
+        This method needs to be called during match progress
+        """
         legs_sum = self.sum_legs()
         legs_count = self.count_frames()
 
@@ -447,13 +462,12 @@ class LeagueMatch(AbstractMatch):
 
         self.home_score = home_win_leg
         self.away_score = away_win_leg
-        #self._update_handicap()
         self.save()
         return
 
     def _update_handicap(self):
         """
-        This method needs to be called everytime after _update_progress
+        Undeprecated: To Remove
         """
         if self.handicap > 0:
             self.home_score += self.handicap

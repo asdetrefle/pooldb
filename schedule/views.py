@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.db.models import Q
+from django.utils import timezone
 from recording.models import Match, LeagueMatch
 from collections import OrderedDict
 import datetime, pytz
@@ -20,11 +21,16 @@ def match_to_dict(l):
         d[m.match_date.strftime('%A')].append(m)
     return d
 
+def current_week():
+    season = default_season()
+    s = Season.objects.get(season=season)
+    w = MatchWeek.objects.filter(end_date__gte=timezone.now()).order_by('week_number')
+    return w[0].week_number
 
 def index(request, season=default_season()):
     s = Season.objects.get(season=season)
     w = MatchWeek.objects.filter(season=s)
-    return listweek(request, 1)
+    return listweek(request, current_week())
 
 def listweek(request, week_number, season=default_season()):
     s = Season.objects.get(season=season)

@@ -60,5 +60,17 @@ def ranking_teams(request, league_name='Poke n Hope HK 8-Ball', rankby='points')
         match.update_all()
     """
     ranking = lg.get_ranked_teams()
+    summary = {}
+    for t in ranking:
+        summary[t.pk] = t.stats_summary()
     #print tr
-    return render(request, 'team_ranking.html', {'ranking': ranking, 'last_update': lg.last_update})
+    return render(request, 'team_ranking.html', {'ranking': ranking, 'summary': summary, 'last_update': lg.last_update})
+
+
+def team_summary(request, team_pk, rankby='points'):
+    t = Team.objects.get(pk=team_pk)
+
+    members = t.member_set.filter(ranking__gt=0).order_by('ranking')
+    additional = t.member_set.filter(ranking=0)
+    ranking = list(members) + list(additional)
+    return render(request, 'ranking.html', {'ranking': ranking, 'last_update': ""})

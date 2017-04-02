@@ -6,4 +6,5 @@ urlpatterns = [
     url(r'^$', views.index, name='stats'),
     url(r'^ranking/players$', views.ranking_players, name='ranking_players'),
     url(r'^ranking/teams$', views.ranking_teams, name='ranking_teams'),
+    url(r'^ranking/team/id_(?P<team_pk>\d+)/$', views.team_summary, name='team_summary'),
 ]

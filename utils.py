@@ -28,8 +28,8 @@ def with_timezone(dt, tzinfo=TIME_ZONE):
 
 
 def end_of_week():
-    today = datetime.datetime.now().date()
-    eow = with_timezone(datetime.datetime.combine(today + datetime.timedelta(days=(7-today.weekday())), datetime.datetime.min.time()))
+    today = datetime.date.today()
+    eow = with_timezone(datetime.datetime.combine(today + datetime.timedelta(days=(7-today.isoweekday()%7)), datetime.datetime.min.time()))
     return eow
 
 

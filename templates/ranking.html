@@ -29,12 +29,12 @@ Last Update: {{ last_update }}
     </tr>
     {% for m in ranking %}
     <tr>
-        <td align="center"> {{ m.ranking }} </td>
+        <td align="center"> {% if m.ranking > 0 %} {{ m.ranking }} {% else %} - {% endif %} </td>
         <td align="center"> {{ m.player }} </td>
         <td align="center"> {{ m.group }} </td>
-        <td align="center"> {{ m.points|floatformat:"0" }} </td>
+        <td align="center"> {% if m.ranking > 0 %} {{ m.points|floatformat:"0" }} {% else %} - {% endif %} </td>
         <td align="center"> {{ m.raw_points|floatformat:"0" }} </td>
-        <td align="center"> {{ m.handicap|floatformat:2 }} </td>
+        <td align="center"> {% if m.ranking > 0 %} {{ m.handicap|floatformat:2 }} {% else %} - {% endif %} </td>
         <td align="center"> {{ m.season_matches_played }} </td>
         <td align="center"> {{ m.season_matches_won }} </td>
         <td align="center"> {{ m.season_clearance }} </td>

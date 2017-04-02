@@ -1,4 +1,5 @@
 {% extends "base_site.html" %}
+{% load match_extras %}
 
 {% block title %} Ranking {% endblock %}
 
@@ -20,21 +21,21 @@ Last Update: {{ last_update }}
         <td align="center"><h3> Rank </h3></td>
         <td align="center"><h3> Team </h3></td>
         <td align="center"><h3> Season Legs Won </h3></td>
-        <td align="center"><h3> Ranking Points </h3></td>
-        <td align="center"><h3> Total Points </h3></td>
-        <td align="center"><h3> Average </h3></td>
+        <td align="center"><h3> Leg Average </h3></td>
+        <td align="center"><h3> Clearances </h3></td>
+        <td align="center"><h3> Median Average </h3></td>
         <td align="center"><h3> Match Played </h3></td>
         <td align="center"><h3> Match Won </h3></td>
-        <td align="center"><h3> Clearance </h3></td>
+        <td align="center"><h3> - </h3></td>
     </tr>
     {% for m in ranking %}
     <tr>
         <td align="center"> {{ m.ranking }} </td>
-        <td align="center"> {{ m.name }} </td>
+        <td align="center"> <a href="{% url 'team_summary' m.pk %}"> {{ m.name }} </a> </td>
         <td align="center"> {{ m.season_legs_won }} </td>
-        <td align="center"> {{ m.points|floatformat:"0" }} </td>
-        <td align="center"> {{ m.raw_points|floatformat:"0" }} </td>
-        <td align="center"> {{ m.handicap|floatformat:2 }} </td>
+        <td align="center"> {{ summary|get_item:m.pk|get_item:"leg_average"|floatformat:"1" }} </td>
+        <td align="center"> {{ summary|get_item:m.pk|get_item:"clearances"|floatformat:"0" }} </td>
+        <td align="center"> {{ summary|get_item:m.pk|get_item:"median_average"|floatformat:"1" }} </td>
         <td align="center"> {{ m.season_matches_played }} </td>
         <td align="center"> {{ m.season_matches_won }} </td>
         <td align="center"> {{ m.season_clearance }} </td>

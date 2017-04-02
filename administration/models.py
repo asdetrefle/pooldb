@@ -7,6 +7,7 @@ from schedule.models import Season
 import datetime
 import scipy.stats as ss
 from utils import default_season
+import numpy as np
 
 # Create your models here.
 
@@ -181,13 +182,24 @@ class Team(Group):
 
         return points
 
-    def _update_legs(self):
-        # TODO
-        return
+    def stats_summary(self):
+        mbs = self.member_set.all()
 
-    def _update_ranking(self):
+        header = ['points', 'clearances', 'average']
+        data = []
+        for mb in mbs:
+            if mb.handicap<0:
+                continue
+            data.append([mb.raw_points, mb.season_clearance, mb.handicap])
+
+        data = np.array(data)
+        res = {}
+
+        res['leg_average'] = data[:,0].sum() / (self.total_matches_played * 6)
+        res['clearances'] = data[:,1].sum()
+        res['median_average'] = np.median(data[:, 2], axis=None)
         # TODO
-        return
+        return res
 
     def update_all(self):
         self._update_size()

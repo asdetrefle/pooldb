@@ -73,10 +73,17 @@
     <col width="400">
     <col width="400">
     <tr>
-        <td align="center"><h2> {{ match.away }} </h2></td>
         <td align="center"><h2> {{ match.home }} </h2></td>
+        <td align="center"><h2> {{ match.away }} </h2></td>
     </tr>
     <tr>
+         <td align="center">
+            <ul id="home_players" class="players">
+            {% for p in home_players %}
+                <li value="{{ p.id }}">{{ p.player }}</li>
+            {% endfor %}
+            </ul>
+        </td>       
         <td align="center">
             <ul id="away_players" class="players">
             {% for p in away_players %}
@@ -84,13 +91,7 @@
             {% endfor %}
             </ul>
         </td>
-        <td align="center">
-            <ul id="home_players" class="players">
-            {% for p in home_players %}
-                <li value="{{ p.id }}">{{ p.player }}</li>
-            {% endfor %}
-            </ul>
-        </td>
+
     </tr>
 </table>
 

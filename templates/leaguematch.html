@@ -220,7 +220,8 @@
     </tr>
     {% for round in frames %}
         {% for frame in round %}
-            summaray[m.pk].0{% for f in frame %}
+            <tr>
+            {% for f in frame %}
                 {% if forloop.counter > 1 %}
                     <td align="center"> </td>
                 {% endif %}

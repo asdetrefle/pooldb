@@ -350,8 +350,11 @@ class LeagueMatch(AbstractMatch):
 
     def set_handicap(self, max_handicap=15):
         players = self._get_ordered_players()
+        print players
         away_handicap = [Member.objects.get(pk=i).handicap for i in players['away']]
         home_handicap = [Member.objects.get(pk=i).handicap for i in players['home']]
+
+        print away_handicap, home_handicap
 
         away_handicap = [x for x in away_handicap if x > 0]
         home_handicap = [x for x in home_handicap if x > 0]
@@ -407,8 +410,8 @@ class LeagueMatch(AbstractMatch):
 
         for f in frames:
             try:
-                res[f.leg_number - 1][0] += (f.away_score>f.home_score)
-                res[f.leg_number - 1][1] += (f.home_score>f.away_score)
+                res[f.leg_number - 1][0] += (f.home_score>f.away_score)
+                res[f.leg_number - 1][1] += (f.away_score>f.home_score)
             except TypeError:
                 pass
 
@@ -443,18 +446,18 @@ class LeagueMatch(AbstractMatch):
         legs_sum = self.sum_legs()
         legs_count = self.count_frames()
 
-        self.home_points_raw = sum([x[1] for x in legs_sum])
-        self.away_points_raw = sum([x[0] for x in legs_sum])
+        self.home_points_raw = sum([x[0] for x in legs_sum])
+        self.away_points_raw = sum([x[1] for x in legs_sum])
 
         home_win_leg = 0
         away_win_leg = 0
-        for i, [a, h] in enumerate(legs_sum):
+        for i, [h, a] in enumerate(legs_sum):
             if a>h and a!=0 and h!=0:
                 away_win_leg += 1
             elif h>a and a!=0 and h!=0:
                 home_win_leg += 1
             else:
-                ac, hc = legs_count[i]
+                hc, ac = legs_count[i]
                 if ac>hc:
                     away_win_leg += 1
                 elif hc>ac:

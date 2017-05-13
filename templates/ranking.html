@@ -2,31 +2,83 @@
 
 {% block title %} Ranking {% endblock %}
 
+{% block extrahead %}
+{% load staticfiles %}
+<style>
+    .header     {font-size:1.17em; color:dimgrey; font-weight:normal}
+    .sortable   {text-align: center}
+    .asc      {}
+    .desc     {text-align: center}
+</style>
+
+<script src="{% static "js/jquery-3.1.1.min.js" %}"></script>
+<script>
+    $(document).ready(function () {
+        $(".sortable").click(function(){
+            var o = $(this).hasClass('desc') ? 'asc' : 'desc';
+            $('.sortable').removeClass('asc').removeClass('desc');
+            $(this).addClass(o);
+
+            var colIndex = $(this).prevAll().length;
+            var tbod = $(this).closest("table").find("tbody");
+            var rows = tbod.find("tr");
+
+            rows.sort(function(a,b){
+                var A = $(a).find("td").eq(colIndex).text();
+                var B = $(b).find("td").eq(colIndex).text();
+
+                if (!isNaN(A)) {
+                    A = Number(A);
+                } else {
+                    return o == 1;
+                }
+                if (!isNaN(B)) {
+                    B = Number(B);
+                } else {
+                    return o == -1;
+                }
+
+                var r = (o == 'asc' ? A > B : B > A);
+                return r ? 1 : -1;
+            });
+
+            $.each(rows, function(index, ele){
+                tbod.append(ele);
+            });
+        });
+
+    });  
+</script>
+
+
+{% endblock %}
+
 {% block content %}
-Last Update: {{ last_update }}
-# TODO Add filters that allows to select all matches by player, date, team
 
  <table border="0">    
     <col width="50">
     <col width="150">
     <col width="200">
+    <col width="150">
     <col width="128">
     <col width="128">
     <col width="128">
     <col width="128">
     <col width="128">
-    <col width="128">
-    <tr>
-        <td align="center"><h3> Rank </h3></td>
-        <td align="center"><h3> Name </h3></td>
-        <td align="center"><h3> Team </h3></td>
-        <td align="center"><h3> Ranking Points </h3></td>
-        <td align="center"><h3> Total Points </h3></td>
-        <td align="center"><h3> Average </h3></td>
-        <td align="center"><h3> Match Played </h3></td>
-        <td align="center"><h3> Match Won </h3></td>
-        <td align="center"><h3> Clearance </h3></td>
-    </tr>
+    <thead>
+        <tr>
+            <th class="sortable desc"><h3> Rank </h3></th>
+            <th class="sortable"><h3> Name </h3></th>
+            <th class="sortable"><h3> Team </h3></th>
+            <th class="sortable"><h3> Ranking Points </h3></th>
+            <th class="sortable"><h3> Total Points </h3></th>
+            <th class="sortable"><h3> Average </h3></th>
+            <th class="sortable"><h3> Match Played </h3></th>
+            <th class="sortable"><h3> Match Won </h3></th>
+            <th class="sortable"><h3> Clearance </h3></th>
+        </tr>
+    </thead>
+    <tbody>
     {% for m in ranking %}
     <tr>
         <td align="center"> {% if m.ranking > 0 %} {{ m.ranking }} {% else %} - {% endif %} </td>
@@ -41,6 +93,10 @@ Last Update: {{ last_update }}
             <!--<a href=" url 'leg_view' leg.pk %}"> -->
     </tr>
     {% endfor %}
+    </tbody>
 </table>
+
+Last Update: {{ last_update }}
+# TODO Add filters that allows to select all matches by player, date, team
 {% endblock %}
 

@@ -24,7 +24,7 @@
         {% block branding %}{% endblock %}
         </div>
         {% block usertools %}
-        {% if has_permission %}
+        {% if user.is_active %}
         <div id="user-tools">
             {% block welcome-msg %}
                 {% trans 'Welcome,' %}
@@ -43,8 +43,13 @@
                 {% if user.has_usable_password %}
                 <a href="{% url 'admin:password_change' %}">{% trans 'Change password' %}</a> /
                 {% endif %}
-                <a href="{% url 'admin:logout' %}">{% trans 'Log out' %}</a>
+                <a href="{% url 'admin:logout' %}?next={{ request.get_full_path }}">{% trans 'Log out' %}</a>
             {% endblock %}
+        </div>
+        {% else %}
+        <div id="user-tools">
+            {% trans 'Welcome, player.' %}
+            <a href="{% url 'admin:login' %}?next={{ request.get_full_path }}">{%trans 'Log in'%}</a>
         </div>
         {% endif %}
         {% endblock %}

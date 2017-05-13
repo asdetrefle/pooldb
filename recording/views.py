@@ -6,8 +6,11 @@ from administration.models import Member, Team, League
 from django.contrib import messages
 import re, ast
 from utils import end_of_week
+from django.contrib.auth.decorators import login_required
 
-# Create your views here.
+
+_need_login = login_required(login_url='/admin/login/')
+
 
 def load_players(raw_file):
     f = open(raw_file, 'r')
@@ -41,6 +44,7 @@ def listleg(request):
     return render(request, 'listmatch.html', {'matches': matches, 'type_': 'LeagueMatch'})
 
 
+@_need_login
 def initialize(request, match_id, type_):
     # currently only provide initialize method for LeagueMatch
     # initialize method is also useful for Match in case of a tournament.
@@ -243,6 +247,7 @@ def leg_close(request, leg_id):
         return HttpResponseRedirect('/recording/leg/{}/'.format(leg_id))
 
 
+@_need_login
 def edit(request, type_, match_id):
     # TODO: more proper way to edit; add validation; maybe use form/formset again
     # TODO:it may be slow to update DB for each input; instead, we should update all the fields of a frame and then do frame.save()

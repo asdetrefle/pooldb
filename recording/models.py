@@ -271,6 +271,7 @@ class LeagueMatch(AbstractMatch):
     _home_ordered_players = models.CharField(max_length=200, blank=True, null=True)
     _away_ordered_players = models.CharField(max_length=200, blank=True, null=True)
     legs = models.IntegerField('Number of legs', default=6)
+
     # Handicap is always for home
     # If handicap is positive, then it is added to home when computing final scores
     # If handicap is negative, then its opposite value is added to away

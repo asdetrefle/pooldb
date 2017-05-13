@@ -5,7 +5,7 @@
 {% block title %} Edit Match {% endblock %}
 
 {% block extrahead %}
-{% load static %}
+{% load staticfiles %}
 <style>
     .header     {font-size:1.17em; color:dimgrey; font-weight:normal}
     .header_loss    {font-size:1.5em; color:dimgrey; font-weight:normal}
@@ -156,6 +156,9 @@
 
 <h3> Match Date: {{match.match_date}} {% if match.is_completed %} Match Completed. {% elif match.race_to <= frames.count %} Match under review. {% else %} Match in Progress. {% endif %}</h3>
 
+
+{% if user.is_active or match.is_completed %}
+
 <form action="{% url 'match_edit' 'LeagueMatch' match.id %}" method="post" id="edit_form">
 <div id="header_div">
     <div id="header_score">
@@ -253,7 +256,12 @@
         </tr>
     {% endfor %}
 </table>
-</form>
 </div>
+</form>
+
+{% else %}
+    <p>The result of this match is coming soon.</p>
+    <p>To input the scores of this match, please log in.</p>
+{% endif %}
 {% endblock %}
 

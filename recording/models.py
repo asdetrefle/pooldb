@@ -222,7 +222,7 @@ class Match(AbstractMatch):
             if f.is_clearance:
                 if f.cleared_by==self.home:
                     self.home.total_clearance += 1
-                    self.home.season_clearance += 1;
+                    self.home.season_clearance += 1
                 else:
                     self.away.total_clearance += 1
                     self.away.season_clearance += 1
@@ -351,11 +351,11 @@ class LeagueMatch(AbstractMatch):
 
     def set_handicap(self, max_handicap=15):
         players = self._get_ordered_players()
-        print players
+        #print players
         away_handicap = [Member.objects.get(pk=i).handicap for i in players['away']]
         home_handicap = [Member.objects.get(pk=i).handicap for i in players['home']]
 
-        print away_handicap, home_handicap
+        #print away_handicap, home_handicap
 
         away_handicap = [x for x in away_handicap if x > 0]
         home_handicap = [x for x in home_handicap if x > 0]

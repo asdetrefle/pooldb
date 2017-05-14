@@ -69,7 +69,16 @@
         {% for match in v %} 
         <tr>
             <td align="center"> {{ forloop.counter }} </td>
-            <td align="left"> {{ match.home }} vs. {{ match.away }} </td>
+            <td align="left"> 
+                {% if match.is_completed %}
+                    <a href="{% url 'match_view' "LeagueMatch" match.pk %}">
+                        {{ match.home }} vs. {{ match.away }} 
+                    </a>
+                {% else %}
+                        {{ match.home }} vs. {{ match.away }} 
+                {% endif %}
+
+            </td>
             <td align="center"> {{ match.match_date|date:"H:i" }} </td>
             <td align="center"> {{ match.venue }} </td>
         </tr>

@@ -25,5 +25,5 @@ urlpatterns = [
     url(r'^recording/', include('recording.urls')),
     url(r'^stats/', include('stats.urls')),
     url(r'^schedule/', include('schedule.urls')),
-    url(r'^$', RedirectView.as_view(url='/administration/', permanent=False))
+    url(r'^$', RedirectView.as_view(url='/schedule/', permanent=False))
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

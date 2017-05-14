@@ -6,47 +6,61 @@
 {% load staticfiles %}
 <style>
     .header     {font-size:1.17em; color:dimgrey; font-weight:normal}
-    .sortable   {text-align: center}
-    .asc      {}
-    .desc     {text-align: center}
+    .sortable   {font-size:1em; vertical-align: middle; text-align: center}
+    .asc        {font-size:1em; color:black; vertical-align: middle; text-align: center; height:35px}
+    .desc       {font-size:1em; color:black; vertical-align: middle; text-align: center; height:35px}
+    .unsorted   {font-size:1em; color:dimgrey; vertical-align: middle; text-align: center; height:35px}
 </style>
 
 <script src="{% static "js/jquery-3.1.1.min.js" %}"></script>
 <script>
     $(document).ready(function () {
         $(".sortable").click(function(){
-            var o = $(this).hasClass('desc') ? 'asc' : 'desc';
-            $('.sortable').removeClass('asc').removeClass('desc');
+            if ($(this).hasClass('desc')) {
+                var o = 'asc';
+            } else if ($(this).hasClass('asc')) {
+                var o = 'unsorted';
+            } else {
+                var o = 'desc';
+            }
+            $('.sortable').removeClass('asc').removeClass('desc').removeClass('unsorted');
             $(this).addClass(o);
 
             var colIndex = $(this).prevAll().length;
             var tbod = $(this).closest("table").find("tbody");
-            var rows = tbod.find("tr");
+            
+            if (o=='unsorted') {
+                rows = _rows_cached;
+            } else {
+                var rows = tbod.find("tr");
 
-            rows.sort(function(a,b){
-                var A = $(a).find("td").eq(colIndex).text();
-                var B = $(b).find("td").eq(colIndex).text();
+                rows.sort(function(a,b){
+                    var A = $(a).find("td").eq(colIndex).text();
+                    var B = $(b).find("td").eq(colIndex).text();
 
-                if (!isNaN(A)) {
-                    A = Number(A);
-                } else {
-                    return o == 1;
-                }
-                if (!isNaN(B)) {
-                    B = Number(B);
-                } else {
-                    return o == -1;
-                }
+                    if (!isNaN(A)) {
+                        A = Number(A);
+                    } else {
+                        return o == 1;
+                    }
+                    if (!isNaN(B)) {
+                        B = Number(B);
+                    } else {
+                        return o == -1;
+                    }
 
-                var r = (o == 'asc' ? A > B : B > A);
-                return r ? 1 : -1;
-            });
-
+                    var r = (o == 'asc' ? A > B : B > A);
+                    return r ? 1 : -1;
+                });
+            }
+            
             $.each(rows, function(index, ele){
                 tbod.append(ele);
             });
         });
-
+        
+        var _rows_cached = $('#prtable').find("tbody").find("tr");
+        //console.log(_rows_cached);
     });  
 </script>
 
@@ -55,7 +69,7 @@
 
 {% block content %}
 
- <table border="0">    
+ <table border="0" id='prtable'>    
     <col width="50">
     <col width="150">
     <col width="200">
@@ -66,16 +80,16 @@
     <col width="128">
     <col width="128">
     <thead>
-        <tr>
-            <th class="sortable desc"><h3> Rank </h3></th>
-            <th class="sortable"><h3> Name </h3></th>
-            <th class="sortable"><h3> Team </h3></th>
-            <th class="sortable"><h3> Ranking Points </h3></th>
-            <th class="sortable"><h3> Total Points </h3></th>
-            <th class="sortable"><h3> Average </h3></th>
-            <th class="sortable"><h3> Match Played </h3></th>
-            <th class="sortable"><h3> Match Won </h3></th>
-            <th class="sortable"><h3> Clearance </h3></th>
+        <tr height>
+            <th class="unsorted"> Rank </th>
+            <th class="unsorted"> Name </th>
+            <th class="unsorted"> Team </th>
+            <th class="sortable desc"> Ranking Points </th>
+            <th class="sortable unsorted"> Total Points </th>
+            <th class="sortable unsorted"> Average </th>
+            <th class="sortable unsorted"> Match Played </th>
+            <th class="sortable unsorted"> Match Won </th>
+            <th class="sortable unsorted"> Clearance </th>
         </tr>
     </thead>
     <tbody>
@@ -96,7 +110,10 @@
     </tbody>
 </table>
 
-Last Update: {{ last_update }}
-# TODO Add filters that allows to select all matches by player, date, team
+<br>
+<p>
+    Last Update: {{ last_update }} <br>
+    * The ranking points are calculated based on the <a href="https://en.wikipedia.org/wiki/Elo_rating_system"> Elo Rating System</a>.
+</p>
 {% endblock %}
 

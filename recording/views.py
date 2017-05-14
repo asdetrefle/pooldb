@@ -34,9 +34,27 @@ def listmatch(request, type_):
     if type_=='Match':
         matches = Match.objects.all().order_by('-match_date')
     elif type_=='LeagueMatch':
-        matches = LeagueMatch.objects.all().order_by('match_date')
+        matches = LeagueMatch.objects.all().order_by('-match_date')
     eow = end_of_week()
-    return render(request, 'listmatch.html', {'matches': matches, 'type_': type_, 'eow': eow})
+    return render(request, 'listmatch.html', {'matches': matches, 'type_': type_})
+
+
+def listarchive(request, type_):
+    if type_=='Match':
+        matches = Match.objects.all().order_by('-match_date')
+    elif type_=='LeagueMatch':
+        matches = LeagueMatch.objects.filter(is_completed=True).order_by('-match_date')
+    eow = end_of_week()
+    return render(request, 'listmatch.html', {'matches': matches, 'type_': type_})
+
+
+def listlive(request, type_='LeagueMatch'):
+    eow = end_of_week()
+    if type_=='Match':
+        matches = Match.objects.filter(is_completed=False).order_by('match_date')
+    elif type_=='LeagueMatch':
+        matches = LeagueMatch.objects.filter(is_completed=False, match_date__lte=eow).order_by('match_date')
+    return render(request, 'listmatch.html', {'content': 'Bonjour Les Amis.', 'matches': matches, 'type_': type_})
 
 
 def listleg(request):
@@ -54,6 +72,9 @@ def initialize(request, match_id, type_):
         match = get_object_or_404(LeagueMatch, pk=match_id)
         if match.is_initialized:
             return redirect('match_view', type_=type_, match_id=match_id)
+
+        if match.match_date>=end_of_week():
+            raise Http404
 
         home_players = match.home.member_set.all()
         away_players = match.away.member_set.all()
@@ -177,6 +198,8 @@ def match_view(request, type_, match_id):
         return render(request, 'leaguematch.html', {'frames': frames, 'match': match, 'summary': summary, 'has_blank_fields': match._has_blank()})
     elif type_ == 'Match':
         match = get_object_or_404(Match, pk=match_id)
+        ## TODO MOVE THIS TO edit function and need login
+        """
         if request.method == 'POST':
             form = FrameForm(request.POST, match=match)
             if form.is_valid():
@@ -193,6 +216,8 @@ def match_view(request, type_, match_id):
                 form = FrameForm(match=match)
         else:
             form = FrameForm(match=match)
+        """
+        form = FrameForm(match=match)
         frames = match.frame_set.all()
         return render(request, 'match.html', {'frames': frames, 'match': match, 'form': form})
     else:

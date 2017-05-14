@@ -157,7 +157,7 @@
 <h3> Match Date: {{match.match_date}} {% if match.is_completed %} Match Completed. {% elif match.race_to <= frames.count %} Match under review. {% else %} Match in Progress. {% endif %}</h3>
 
 
-{% if user.is_active or match.is_completed %}
+{% if user.is_active or match.is_completed or True %}
 
 <form action="{% url 'match_edit' 'LeagueMatch' match.id %}" method="post" id="edit_form">
 <div id="header_div">

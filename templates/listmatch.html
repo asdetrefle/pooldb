@@ -4,7 +4,7 @@
 {% block title %} Matches {% endblock %}
 
 {% block content %}
-# TODO Add filters that allows to select all matches by player, date, team
+<!-- TODO Add filters that allows to select all matches by player, date, team-->
 
  <table border="0">    
     <col width="50">
@@ -20,8 +20,7 @@
         <td align="center"> {{ forloop.counter }} </td>
         <td align="center"> {{ match.match_date.date|date:"Y-m-d" }} </td>
         <td align="left"> 
-            {% if match.match_date <= eow %} <a href="{% url 'match_view' type_ match.pk %}"> {{ match.home }} vs. {{ match.away }}</a> 
-            {% else %} {{ match.home }} vs. {{ match.away }}  {% endif %}
+            <a href="{% url 'match_view' type_ match.pk %}"> {{ match.home }} vs. {{ match.away }}</a> 
         </td>
     </tr>
     {% endfor %}

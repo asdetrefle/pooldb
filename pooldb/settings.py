@@ -118,7 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = str(get_localzone())
+TIME_ZONE = 'Asia/Hong_Kong' #str(get_localzone())
 
 USE_I18N = True
 

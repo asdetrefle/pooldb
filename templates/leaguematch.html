@@ -27,7 +27,7 @@
     .away_win {background-color: red; margin: 5pt}
     td {vertical-align: middle}
     #add_new_frame {padding: 4pt}
-    .edit_score {width: 20px; height: 7px}
+    .edit_score {width: 20px; height: 7px; {% if not user.is_active %}display: none{% endif %};}
     #header_div {
         height: 100px;
         vertical-align: middle;
@@ -77,7 +77,8 @@
         }
 
         $(".frame_score").click(function () {
-            var is_completed = {{match.is_completed|yesno:"true,false"}};
+            var is_completed = {{ match.is_completed|yesno:"true,false" }};
+            is_completed = is_completed || {{ user.is_active|yesno:"false,true" }};
             //console.log(is_completed)
             if (is_completed) {
                 return 
@@ -120,7 +121,7 @@
                 var home_away = clear_location[2];
                 var input_name = frame_id + " " + "clear";
                 var input = $("input[name='" + input_name + "']");
-                console.log(input);
+                //console.log(input);
                 if (input.length == 0) {
                     input = $("<input>").attr({type: "hidden", name: input_name, value: "none"});
                     $("#edit_form").append(input);
@@ -230,11 +231,23 @@
                 {% endif %}
                 <td align="center"> {{f.leg_number}} </td>
                 <td align="center"> {{f.home_player.player}} </td>
-                <td align="right"> <img class="clear_mark {% if f.cleared_by != f.home_player %}unselected{% endif %}" id="{{ f.id }}_clear_home" style="{% if f.home_score == None or f.home_score == None %}display:inline-block{% endif %}"/></td>
-                <td align="right"> {% if f.home_score == None %} <input type="text" name="{{ f.id }} home" id="{{ f.id }}_home_score" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score < f.home_score %}frame_win{% endif %} frame_score" id="{{ f.id }}_home_score" value="{{ f.id }} home"> {{ f.home_score }} </span> {% endif %}   </td>
+                <td align="right"> <img class="clear_mark {% if f.cleared_by != f.home_player %}unselected{% endif %}" id="{{ f.id }}_clear_home" style="{% if f.home_score == None and user.is_active %}display:inline-block{% endif %}"/></td>
+                <td align="right"> 
+                    {% if f.home_score == None %} 
+                        <input type="text" name="{{ f.id }} home" id="{{ f.id }}_home_score" value="" class="edit_score" />
+                    {% else %} 
+                        <span class="{% if f.away_score < f.home_score %}frame_win{% endif %} frame_score" id="{{ f.id }}_home_score" value="{{ f.id }} home"> {{ f.home_score }} </span> 
+                    {% endif %}   
+                </td>
                 <td align="center"> : </td>
-                <td align="left">  {% if f.away_score == None %} <input type="text" name="{{ f.id }} away" id="{{ f.id }}_away_score" value="" class="edit_score" /> {% else %} <span class="{% if f.away_score > f.home_score %}frame_win{% endif %} frame_score" id="{{ f.id }}_away_score" value="{{ f.id }} away"> {{ f.away_score }} </span>{% endif %} </td>
-                <td align="left"> <img class="clear_mark {% if f.cleared_by != f.away_player %}unselected{% endif %}" id="{{ f.id }}_clear_away" style="{% if f.away_score == None or f.away_score == None %}display:inline-block{% endif %}"/></td>
+                <td align="left">  
+                    {% if f.away_score == None %} 
+                        <input type="text" name="{{ f.id }} away" id="{{ f.id }}_away_score" value="" class="edit_score" /> 
+                    {% else %} 
+                        <span class="{% if f.away_score > f.home_score %}frame_win{% endif %} frame_score" id="{{ f.id }}_away_score" value="{{ f.id }} away"> {{ f.away_score }} </span>
+                    {% endif %} 
+                </td>
+                <td align="left"> <img class="clear_mark {% if f.cleared_by != f.away_player %}unselected{% endif %}" id="{{ f.id }}_clear_away" style="{% if f.away_score == None and user.is_active %}display:inline-block{% endif %}"/></td>
                 <td align="center"> {{f.away_player.player}} </td>
             {% endfor %}
             </tr>

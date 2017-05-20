@@ -1,4 +1,6 @@
+#!/bin/zsh
+
 # dump current local for backup
-pg_dump pooldb dump.sql
-dropdb poodb
-heroku pg:pull DATABASE_URL poodb --app pnh
+pg_dump pooldb -f dump.sql
+dropdb pooldb
+heroku pg:pull DATABASE_URL pooldb --app pnh

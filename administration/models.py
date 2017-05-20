@@ -227,7 +227,7 @@ class Member(models.Model):
     create_date = models.DateTimeField('Date joined', default=timezone.now)
     cancel_date = models.DateTimeField('Date quitted', blank=True, null=True)
 
-    points  = models.FloatField(default=1000.)
+    points  = models.FloatField(default=200.)
     raw_points = models.IntegerField(default=0)
     ranking = models.IntegerField(default=0)
     # -1 is a new player flag. handicap will become >=0 when at least 1 match played

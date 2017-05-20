@@ -195,6 +195,7 @@ def match_view(request, type_, match_id):
         except TypeError:
             summary = [[('-', '-'), ('-', '-')]] * 3
 
+        print match._has_blank(), 'toto'
         return render(request, 'leaguematch.html', {'frames': frames, 'match': match, 'summary': summary, 'has_blank_fields': match._has_blank()})
     elif type_ == 'Match':
         match = get_object_or_404(Match, pk=match_id)

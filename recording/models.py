@@ -375,7 +375,7 @@ class LeagueMatch(AbstractMatch):
         return self.leagueframe_set.filter(leg=l)
 
     def frames(self):
-        return self.leagueframe_set.all()
+        return self.leagueframe_set.all().order_by('pk')
 
     def to_view(self):
         frames = self.frames()

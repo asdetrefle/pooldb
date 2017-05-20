@@ -184,6 +184,9 @@ class Match(AbstractMatch):
         return self.frame_set.all()
 
     def completes(self):
+        if self.is_completed:
+            return
+
         self._update_progress()
 
         if self.home_score > self.away_score:
@@ -482,6 +485,9 @@ class LeagueMatch(AbstractMatch):
         return
 
     def completes(self):
+        if self.is_completed:
+            return
+
         ms = self.get_matches()
         for m in ms:
             m.completes()

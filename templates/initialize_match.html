@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
   <script src="//code.jquery.com/jquery-1.12.4.js"></script>
   <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script src="jquery.ui.touch-punch.min.js"></script>
     
     <script>
 
@@ -13,7 +14,9 @@
         // var nb_players = 8;
         var nb_playing_players = {{ nb_selected_players }};
         var home_players = $("#home_players li");
+        //home_players.draggable();
         var away_players = $("#away_players li");
+        //away_players.draggable();
         var update_class = function (index) {
             if (index < nb_playing_players) {
                 return "playing";

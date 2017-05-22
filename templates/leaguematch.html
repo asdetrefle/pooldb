@@ -45,7 +45,7 @@
         margin-top: 40px;
         vertical-align: middle;
         float: left;
-        display: {% if has_blank_fields %}inline-block{% else %}none{% endif %}
+        display: {% if has_blank_fields and user.is_active %}inline-block{% else %}none{% endif %}
     }
     .clear_mark {
         content: url({% static "star.png" %});

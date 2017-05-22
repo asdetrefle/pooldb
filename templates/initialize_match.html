@@ -90,7 +90,7 @@
         <td align="center">
             <ul id="away_players" class="players">
             {% for p in away_players %}
-                <li value="{{ p.id }}">{{ p.player }}</li>
+                <li value="{{ p.id }}">{{ p.player }}({{p.handicap}})</li>
             {% endfor %}
             </ul>
         </td>

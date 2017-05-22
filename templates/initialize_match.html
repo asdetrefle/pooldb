@@ -83,14 +83,14 @@
          <td align="center">
             <ul id="home_players" class="players">
             {% for p in home_players %}
-                <li value="{{ p.id }}">{{ p.player }}</li>
+                <li value="{{ p.id }}">{{ p.player }}{% if p.handicap>0 %} ({{ p.handicap|floatformat:2 }}){% endif %}</li>
             {% endfor %}
             </ul>
         </td>       
         <td align="center">
             <ul id="away_players" class="players">
             {% for p in away_players %}
-                <li value="{{ p.id }}">{{ p.player }}({{p.handicap}})</li>
+                <li value="{{ p.id }}">{{ p.player }}{% if p.handicap>0 %} ({{ p.handicap|floatformat:2 }}){% endif %}</li>
             {% endfor %}
             </ul>
         </td>

@@ -33,11 +33,11 @@
             }
         }
 
-        var info = "home ids: ";
+        var info = "Home total handicap: ";
         for (var i = 0; i < nb_playing_players; i++) {
             info += $("input[name=home" + i + "]")[0].value + " ";
         }
-        info += " away ids: ";
+        info += " Away total handicap: ";
         for (var i = 0; i < nb_playing_players; i++) {
             info += $("input[name=away" + i + "]")[0].value + " ";
         }
@@ -83,14 +83,14 @@
          <td align="center">
             <ul id="home_players" class="players">
             {% for p in home_players %}
-                <li value="{{ p.id }}">{{ p.player }}{% if p.handicap>0 %} ({{ p.handicap|floatformat:2 }}){% endif %}</li>
+                <li value="{{ p.id }}">{{ p.player }}{% if p.handicap > 0 %} ({{ p.handicap|floatformat:1 }}){% endif %}</li>
             {% endfor %}
             </ul>
         </td>       
         <td align="center">
             <ul id="away_players" class="players">
             {% for p in away_players %}
-                <li value="{{ p.id }}">{{ p.player }}{% if p.handicap>0 %} ({{ p.handicap|floatformat:2 }}){% endif %}</li>
+                <li value="{{ p.id }}">{{ p.player }}{% if p.handicap > 0 %} ({{ p.handicap|floatformat:1 }}){% endif %}</li>
             {% endfor %}
             </ul>
         </td>
@@ -110,6 +110,8 @@
     </form>
     </p>
     <p id="info"></p>
+
+{{total}}
 
 {% endblock %}
 

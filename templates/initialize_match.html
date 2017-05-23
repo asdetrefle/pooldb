@@ -24,23 +24,28 @@
                 return "resting";
             }
         };
+        var home_handicap = 0;
+        var away_handicap = 0;
         for (var i = 0; i < nb_playing_players; i++) {
             if (home_players[i]) {
                 $("input[name=home" + i + "]").val(home_players[i].value);
+                home_handicap += Math.max(parseFloat(home_players[i].getAttribute("handicap")), 0);
             }
             if (away_players[i]) {
                 $("input[name=away" + i + "]").val(away_players[i].value);
+                away_handicap += Math.max(parseFloat(away_players[i].getAttribute("handicap")), 0);
             }
         }
 
-        var info = "Home total handicap: ";
-        for (var i = 0; i < nb_playing_players; i++) {
-            info += $("input[name=home" + i + "]")[0].value + " ";
-        }
-        info += " Away total handicap: ";
-        for (var i = 0; i < nb_playing_players; i++) {
-            info += $("input[name=away" + i + "]")[0].value + " ";
-        }
+{#        var info = "Home total handicap: ";#}
+{#        for (var i = 0; i < nb_playing_players; i++) {#}
+{#            info += $("input[name=home" + i + "]")[0].value + " ";#}
+{#        }#}
+{#        info += " Away total handicap: ";#}
+{#        for (var i = 0; i < nb_playing_players; i++) {#}
+{#            info += $("input[name=away" + i + "]")[0].value + " ";#}
+{#        }#}
+        var info = "Home total handicap: " + home_handicap + " Away total handicap: " + away_handicap;
         $("#info").html(info);
 
         home_players.removeClass("playing resting").addClass(update_class);
@@ -83,14 +88,14 @@
          <td align="center">
             <ul id="home_players" class="players">
             {% for p in home_players %}
-                <li value="{{ p.id }}">{{ p.player }}{% if p.handicap > 0 %} ({{ p.handicap|floatformat:1 }}){% endif %}</li>
+                <li value="{{ p.id }}" handicap="{{ p.handicap }}">{{ p.player }}{% if p.handicap > 0 %} ({{ p.handicap|floatformat:1 }}){% endif %}</li>
             {% endfor %}
             </ul>
         </td>       
         <td align="center">
             <ul id="away_players" class="players">
             {% for p in away_players %}
-                <li value="{{ p.id }}">{{ p.player }}{% if p.handicap > 0 %} ({{ p.handicap|floatformat:1 }}){% endif %}</li>
+                <li value="{{ p.id }}" handicap="{{ p.handicap }}">{{ p.player }}{% if p.handicap > 0 %} ({{ p.handicap|floatformat:1 }}){% endif %}</li>
             {% endfor %}
             </ul>
         </td>

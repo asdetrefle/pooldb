@@ -19,11 +19,13 @@ from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 
+from . import views
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^administration/', include('administration.urls')),
     url(r'^recording/', include('recording.urls')),
     url(r'^stats/', include('stats.urls')),
     url(r'^schedule/', include('schedule.urls')),
-    url(r'^$', RedirectView.as_view(url='/schedule/', permanent=False))
+    url(r'^$', views.index, name='home')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -33,3 +33,44 @@ def end_of_week():
     return eow
 
 
+def reset_results(lgpk):
+    from administration.models import League
+    lg = League.objects.get(pk=lgpk)
+    ts = lg.team_set.all()
+
+    for t in ts:
+        for m in t.member_set.all():
+            m.points = 200.
+            m.raw_points = 0
+            m.ranking = 0
+            m.handicap = -1
+            m._point_adj = 0
+            m.total_matches_played = 0
+            m.total_matches_won = 0
+            m.total_clearance = 0
+            m.season_matches_played = 0
+            m.season_matches_won = 0
+            m.season_clearance = 0
+            m.save()
+
+        t.ranking = 0
+        t.total_matches_played = 0
+        t.total_matches_won   = 0
+        t.season_matches_played = 0
+        t.season_matches_won   = 0
+        t.total_legs_played   = 0
+        t.total_legs_won      = 0
+        t.season_legs_played  = 0
+        t.season_legs_won     = 0
+        t.save()
+
+
+    for i in range(1,x):
+        lms = LeagueMatch.objects.filter(week_id=i)
+        for lm in lms:
+            lm.submits()
+        lg.rank_players()
+        lg.rank_teams()
+    return
+
+

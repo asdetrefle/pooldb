@@ -62,7 +62,6 @@ def listleg(request):
     return render(request, 'listmatch.html', {'matches': matches, 'type_': 'LeagueMatch'})
 
 
-@_need_login
 def initialize(request, match_id, type_):
     # currently only provide initialize method for LeagueMatch
     # initialize method is also useful for Match in case of a tournament.
@@ -76,26 +75,41 @@ def initialize(request, match_id, type_):
         if match.match_date>=end_of_week():
             raise Http404
 
+        if request.method == 'POST':
+            pass
+
         home_players = match.home.member_set.all().order_by('-season_matches_played')
         away_players = match.away.member_set.all().order_by('-season_matches_played')
         nb_selected_players = 5
-        if request.method == 'POST':
-            selected_home_players = []
-            selected_away_players = []
-            for i in range(nb_selected_players):
-                selected_home_players.append(int(request.POST['home{}'.format(i)]))
-                selected_away_players.append(int(request.POST['away{}'.format(i)]))
-            match.initialize(selected_away_players, selected_home_players)
-            return redirect('match_view', type_=type_, match_id=match_id)
-        else:
-            return render(request, 'initialize_match.html', {'match': match,
-                                                             'home_players': home_players,
-                                                             'away_players': away_players,
-                                                             'nb_selected_players': nb_selected_players,
-                                                             'inds': list(range(nb_selected_players))})
+
+        return render(request, 'initialize_match.html', {'match': match,
+                                                            'home_players': home_players,
+                                                            'away_players': away_players,
+                                                            'nb_selected_players': nb_selected_players,
+                                                            'inds': list(range(nb_selected_players))})
     else:
         raise Http404
 
+
+@_need_login
+def init_submit(request, type_, match_id):
+    # TODO: more proper way to edit; add validation; maybe use form/formset again
+    # TODO:it may be slow to update DB for each input; instead, we should update all the fields of a frame and then do frame.save()
+    # TODO: after each edit, the league match view is loaded again: this makes it inconvenient to go back to match list
+    match = get_object_or_404(LeagueMatch, pk=match_id)
+
+    if request.method == 'POST':
+        selected_home_players = []
+        selected_away_players = []
+        nb_selected_players = 5
+        for i in range(nb_selected_players):
+            selected_home_players.append(int(request.POST['home{}'.format(i)]))
+            selected_away_players.append(int(request.POST['away{}'.format(i)]))
+        print selected_away_players
+        match.initialize(selected_away_players, selected_home_players)
+        return redirect('match_view', type_=type_, match_id=match_id)
+    else:
+        raise Http404
 
 
 def match_view_old(request, match_id, type_):
@@ -195,7 +209,7 @@ def match_view(request, type_, match_id):
         except TypeError:
             summary = [[('-', '-'), ('-', '-')]] * 3
 
-        print match._has_blank(), 'toto'
+        #print match._has_blank(), 'toto'
         return render(request, 'leaguematch.html', {'frames': frames, 'match': match, 'summary': summary, 'has_blank_fields': match._has_blank()})
     elif type_ == 'Match':
         match = get_object_or_404(Match, pk=match_id)

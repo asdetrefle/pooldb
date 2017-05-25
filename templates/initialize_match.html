@@ -37,15 +37,15 @@
             }
         }
 
-{#        var info = "Home total handicap: ";#}
-{#        for (var i = 0; i < nb_playing_players; i++) {#}
-{#            info += $("input[name=home" + i + "]")[0].value + " ";#}
-{#        }#}
-{#        info += " Away total handicap: ";#}
-{#        for (var i = 0; i < nb_playing_players; i++) {#}
-{#            info += $("input[name=away" + i + "]")[0].value + " ";#}
-{#        }#}
-        var info = "Home total handicap: " + home_handicap + " Away total handicap: " + away_handicap;
+        //var info = "Home total handicap: ";#}
+        //for (var i = 0; i < nb_playing_players; i++) {#}
+        //    info += $("input[name=home" + i + "]")[0].value + " ";#}
+        //}
+        //info += " Away total handicap: ";#}
+        //for (var i = 0; i < nb_playing_players; i++) {#}
+        //    info += $("input[name=away" + i + "]")[0].value + " ";#}
+        //}
+        var info = "Indicative home handicap: " + home_handicap.toFixed(1) + "<br>" + "Indicative away handicap: " + away_handicap.toFixed(1);
         $("#info").html(info);
 
         home_players.removeClass("playing resting").addClass(update_class);
@@ -76,6 +76,9 @@
 {% endblock %}
 
 {% block content %}
+
+{% if user.is_active or match.is_initialized %}
+
 <p> Drag to choose the players who play and rank them in desired orders. </p>
 <table border="0">    
     <col width="400">
@@ -105,18 +108,19 @@
 
 <div style="height:10px"></div>
 <p>
-    <form method="post">
+    <form action="{% url 'match_init_submit' 'LeagueMatch' match.id %}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Initialize Match">
     {% for ind in inds %}
         <input type="hidden" name="home{{ ind }}" value="">
         <input type="hidden" name="away{{ ind }}" value="">
     {% endfor %}
-    <input type="submit" value="Initialize Match">
-    {% csrf_token %}
     </form>
-    </p>
-    <p id="info"></p>
-
-{{total}}
-
+</p>
+<p id="info"></p>
+{% else %}
+    <p>This match has not started or has not been updated. Please come back later.</p>
+    <p>If you are the admin and want to input the scores of this match, please log in.</p>
+{% endif %}
 {% endblock %}
 

@@ -63,10 +63,10 @@
             div.breadcrumbs a {margin: 4pt}
         </style>
 
-        <a href="{% url 'index' %}">{% trans 'Home' %} </a>
+        <a href="{% url 'home' %}">{% trans 'Home' %} </a>
         <a href="{% url 'listlive' %}">{% trans 'Live' %}</a>
-        <a href="{% url 'stats' %}">{% trans 'Stats' %}</a>
         <a href="{% url 'schedule' %}">{% trans 'Schedule' %}</a>
+        <a href="{% url 'stats' %}">{% trans 'Stats' %}</a>
         <a href="{% url 'recording1' %}">{% trans 'Archive' %}</a>
     {% if title %} &rsaquo; {{ title }}{% endif %}
     </div>

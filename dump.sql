@@ -1227,11 +1227,9 @@ COPY administration_player (id, name, username, sex, phone, email, nb_groups) FR
 29	Ankit Jain	ankitj	M	\N	\N	0
 30	Nick Fong	nickf	M	\N	\N	0
 31	Simon Yeung	simony	M	\N	\N	0
-32	Dinesh Kripalani	dineshk	M			0
 33	Louis Poon	louisp	M	\N	\N	0
 34	Olive Lai	olivel	F			0
 35	Tim Newton	timn	M	\N	\N	0
-36	Andrew Hollingshead	andrewh	M	\N	\N	0
 37	Clarence Yung	clarencey	M			0
 38	Jon Somers	jonso	M			0
 39	Levis Santos	leviss	M	\N	\N	0
@@ -1274,6 +1272,8 @@ COPY administration_player (id, name, username, sex, phone, email, nb_groups) FR
 77	Ryan Leung	ryanl	M			0
 78	Michael Chang	michaelc	M			0
 79	Stanley Wong	stanleyw	M			0
+36	Andrew H	andrewh	M			0
+32	Don Kripalani	donk	M			0
 \.
 
 
@@ -1413,7 +1413,7 @@ SELECT pg_catalog.setval('auth_permission_id_seq', 63, true);
 --
 
 COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-1	pbkdf2_sha256$30000$PnLVA3JIFomi$8QoE7EwYwYcADnNh9fSScFbBSCQOv2PNV7yHvRVRUzI=	2017-05-21 00:19:41.711315+08	t	admin			admin@hkpl.com	t	t	2017-02-07 21:18:36.653+08
+1	pbkdf2_sha256$30000$PnLVA3JIFomi$8QoE7EwYwYcADnNh9fSScFbBSCQOv2PNV7yHvRVRUzI=	2017-05-24 23:34:50.094229+08	t	admin			admin@hkpl.com	t	t	2017-02-07 21:18:36.653+08
 \.
 
 
@@ -1949,6 +1949,9 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 488	2017-05-20 12:33:23.663558+08	706	2017-05-17 Andrew Hollingshead (The Meanions) vs. Fiona Chow (Pink Platypuses) 	2	[{"changed": {"fields": ["is_completed", "is_submitted"]}}]	6	1
 489	2017-05-20 12:34:00.482899+08	702	2017-05-17 Nick Fong (The Meanions) vs. Fiona Chow (Pink Platypuses) 	2	[{"changed": {"fields": ["is_completed", "is_submitted"]}}]	6	1
 490	2017-05-20 12:34:37.588949+08	698	2017-05-17 Clara Szeto (The Meanions) vs. Fiona Chow (Pink Platypuses) 	2	[{"changed": {"fields": ["is_completed", "is_submitted"]}}]	6	1
+491	2017-05-22 23:38:49.194598+08	36	Andrew H	2	[{"changed": {"fields": ["name"]}}]	3	1
+492	2017-05-22 23:40:15.749538+08	32	Don Kripalani	2	[{"changed": {"fields": ["name", "username"]}}]	3	1
+493	2017-05-23 22:18:41.822722+08	101	2017-05-23 Holy Strokes (3) vs. The Meanions (2)	2	[{"changed": {"fields": ["handicap"]}}]	7	1
 \.
 
 
@@ -1956,7 +1959,7 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('django_admin_log_id_seq', 490, true);
+SELECT pg_catalog.setval('django_admin_log_id_seq', 493, true);
 
 
 --
@@ -2093,6 +2096,7 @@ COPY django_migrations (id, app, name, applied) FROM stdin;
 38	recording	0011_auto_20170326_1334	2017-05-18 23:23:32.247957+08
 39	recording	0012_auto_20170326_2355	2017-05-18 23:23:32.291257+08
 40	sessions	0001_initial	2017-05-18 23:23:32.301533+08
+41	administration	0012_auto_20170521_0052	2017-05-21 00:52:46.200618+08
 \.
 
 
@@ -2100,7 +2104,7 @@ COPY django_migrations (id, app, name, applied) FROM stdin;
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('django_migrations_id_seq', 40, true);
+SELECT pg_catalog.setval('django_migrations_id_seq', 41, true);
 
 
 --
@@ -2116,6 +2120,12 @@ hc9wgpojo749s30iyib6wevoyxqq3u0j	YzdiMTEwN2UzNDZlNTYwZDlkZTU1OTRjNmZjODU2YTgzNjY
 u9rqsanj3lqrmq3v5id3f9woax5trf3z	MmMxNDMyYjg1OWU5ZjQ5M2FhNWJkYzEyMjlhM2Y5ODEyYTFiZDAyYjp7Il9hdXRoX3VzZXJfaGFzaCI6IjllNjdkM2E2ZjVhODkzZWUyNmI1YzM3NmFlMzNkOGEyYjQwMjUzNTkiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-03-26 23:01:53.115+08
 auxbtpf4tytrq8rk2na6yh7njeou8eaz	OGE1NzhlMjFjNzVmMmEzZTdjOGVmNWI4MjlkOTBiMWE3OTdhZTBmNDp7Il9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIiwiX2F1dGhfdXNlcl9oYXNoIjoiOTg2MWExMjgyZDFiYjJmODliMWEzYWIxZjQxM2JmYWNmNTg5MjBkZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-06-02 23:29:26.966325+08
 ry89ikpdkmujcfkipgclx6eaoj8j6nmr	YmVmNzQyNmRjYzA1YmM5OGJlZGMwNjA1YjRhZGFiOWE5NmZjMzI5Njp7Il9hdXRoX3VzZXJfaGFzaCI6Ijk4NjFhMTI4MmQxYmIyZjg5YjFhM2FiMWY0MTNiZmFjZjU4OTIwZGQiLCJfYXV0aF91c2VyX2lkIjoiMSIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIn0=	2017-06-03 12:31:05.129475+08
+0z05af8rq94mlbxe5yhto6e2vvzy9mwg	YzdiMTEwN2UzNDZlNTYwZDlkZTU1OTRjNmZjODU2YTgzNjY0ZDE2Yzp7Il9hdXRoX3VzZXJfaGFzaCI6Ijk4NjFhMTI4MmQxYmIyZjg5YjFhM2FiMWY0MTNiZmFjZjU4OTIwZGQiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-06-04 13:11:08.760626+08
+w1y3502qtj339vsq9dgxzypzp44xd1so	ZmRiMWI1Yzk0ZDQwMWZhYjZhNDA2MmI2NzY5MDJiODY3MzE1ZmNmZTp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiI5ODYxYTEyODJkMWJiMmY4OWIxYTNhYjFmNDEzYmZhY2Y1ODkyMGRkIn0=	2017-06-06 00:32:17.137359+08
+4f9uk6c3s0fl20e59q823rx39jxx86ee	OGE1NzhlMjFjNzVmMmEzZTdjOGVmNWI4MjlkOTBiMWE3OTdhZTBmNDp7Il9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIiwiX2F1dGhfdXNlcl9oYXNoIjoiOTg2MWExMjgyZDFiYjJmODliMWEzYWIxZjQxM2JmYWNmNTg5MjBkZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-06-06 19:52:03.552191+08
+5lhbewzsf3ksi9u0ub9g1kqx8k8rc0c5	YzdiMTEwN2UzNDZlNTYwZDlkZTU1OTRjNmZjODU2YTgzNjY0ZDE2Yzp7Il9hdXRoX3VzZXJfaGFzaCI6Ijk4NjFhMTI4MmQxYmIyZjg5YjFhM2FiMWY0MTNiZmFjZjU4OTIwZGQiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-06-07 07:53:59.115724+08
+wu5ihz1j4djg6idw8nvvfnfhx8x3ccpz	ZmRiMWI1Yzk0ZDQwMWZhYjZhNDA2MmI2NzY5MDJiODY3MzE1ZmNmZTp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiI5ODYxYTEyODJkMWJiMmY4OWIxYTNhYjFmNDEzYmZhY2Y1ODkyMGRkIn0=	2017-06-07 18:35:08.961945+08
+wt7epwt3bk6uttbrehbkt9q5svexhef2	ODMzYTQ1M2JiNDg2NWJhZWZlZGUxNDAyNmFiODFhMWM2NDQzODgzNDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9oYXNoIjoiOTg2MWExMjgyZDFiYjJmODliMWEzYWIxZjQxM2JmYWNmNTg5MjBkZCIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIn0=	2017-06-07 23:34:50.107977+08
 \.
 
 
@@ -3483,6 +3493,66 @@ COPY recording_frame (id, frame_number, home_score, away_score, is_clearance, br
 1422	1	10	5	f	69	\N	696
 1451	2	6	10	f	48	\N	710
 1446	1	0	10	f	61	\N	708
+1491	2	10	2	f	52	\N	730
+1478	1	10	7	f	7	\N	724
+1476	1	10	7	f	81	\N	723
+1472	1	10	2	f	89	\N	721
+1493	2	6	10	f	55	\N	731
+1473	2	10	3	f	67	\N	721
+1477	2	10	7	f	65	\N	723
+1475	2	7	10	f	69	\N	722
+1495	2	10	4	f	54	\N	732
+1497	2	6	10	f	100	\N	733
+1480	1	10	7	f	90	\N	725
+1479	2	10	0	t	105	7	724
+1496	1	10	7	f	78	\N	733
+1481	2	6	10	f	63	\N	725
+1494	1	10	3	f	92	\N	732
+1498	1	1	10	f	5	\N	734
+1499	2	0	10	t	52	52	734
+1500	1	10	5	f	71	\N	735
+1501	2	10	7	f	53	\N	735
+1507	2	5	10	f	52	\N	738
+1456	1	10	7	f	81	\N	713
+1452	1	10	4	f	89	\N	711
+1454	1	6	10	f	6	\N	712
+1458	1	10	3	t	7	7	714
+1460	1	7	10	f	90	\N	715
+1457	2	10	5	f	67	\N	713
+1455	2	10	7	f	63	\N	712
+1459	2	10	7	f	69	\N	714
+1453	2	10	4	f	105	\N	711
+1461	2	5	10	f	65	\N	715
+1470	1	10	3	f	90	\N	720
+1464	1	10	6	f	6	\N	717
+1468	1	10	5	f	7	\N	719
+1466	1	10	7	f	81	\N	718
+1462	1	10	6	f	89	\N	716
+1465	2	7	10	f	67	\N	717
+1469	2	10	7	f	65	\N	719
+1467	2	10	6	f	69	\N	718
+1471	2	10	1	f	105	\N	720
+1463	2	10	2	t	63	89	716
+1509	2	10	2	f	53	\N	739
+1474	1	10	5	f	6	\N	722
+1504	1	10	5	f	92	\N	737
+1483	2	10	6	f	53	\N	726
+1506	1	7	10	f	78	\N	738
+1484	1	6	10	f	92	\N	727
+1482	1	10	1	t	76	76	726
+1508	1	10	3	f	5	\N	739
+1502	1	10	4	f	76	\N	736
+1486	1	10	6	f	78	\N	728
+1485	2	7	10	f	55	\N	727
+1503	2	10	0	t	54	76	736
+1505	2	10	4	f	100	\N	737
+1510	1	7	10	f	71	\N	740
+1487	2	10	6	f	54	\N	728
+1488	1	10	3	f	5	\N	729
+1490	1	10	5	f	71	\N	730
+1489	2	6	10	f	100	\N	729
+1511	2	10	6	f	55	\N	740
+1492	1	10	1	f	76	\N	731
 \.
 
 
@@ -3490,7 +3560,7 @@ COPY recording_frame (id, frame_number, home_score, away_score, is_clearance, br
 -- Name: recording_frame_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('recording_frame_id_seq', 1451, true);
+SELECT pg_catalog.setval('recording_frame_id_seq', 1511, true);
 
 
 --
@@ -4818,6 +4888,66 @@ COPY recording_leagueframe (frame_ptr_id, leg_number, away_player_id, home_playe
 1448	5	110	105	98
 1445	6	49	63	98
 1450	5	48	113	98
+1491	2	52	71	103
+1463	4	63	89	101
+1493	4	55	76	103
+1509	6	53	5	103
+1499	4	52	5	103
+1511	6	55	71	103
+1474	5	69	6	101
+1500	3	53	71	103
+1478	5	105	7	101
+1476	5	65	81	101
+1472	5	67	89	101
+1501	4	53	71	103
+1504	5	100	92	103
+1456	1	67	81	101
+1473	6	67	89	101
+1477	6	65	81	101
+1452	1	105	89	101
+1454	1	63	6	101
+1475	6	69	6	101
+1458	1	69	7	101
+1460	1	65	90	101
+1506	5	52	78	103
+1480	5	63	90	101
+1479	6	105	7	101
+1481	6	63	90	101
+1457	2	67	81	101
+1455	2	63	6	101
+1459	2	69	7	101
+1453	2	105	89	101
+1461	2	65	90	101
+1486	1	54	78	103
+1485	2	55	92	103
+1470	3	105	90	101
+1495	4	54	92	103
+1464	3	67	6	101
+1468	3	65	7	101
+1466	3	69	81	101
+1462	3	63	89	101
+1497	4	100	78	103
+1465	4	67	6	101
+1469	4	65	7	101
+1467	4	69	81	101
+1471	4	105	90	101
+1508	5	53	5	103
+1502	5	54	76	103
+1503	6	54	76	103
+1505	6	100	92	103
+1510	5	55	71	103
+1487	2	54	78	103
+1496	3	100	78	103
+1488	1	100	5	103
+1483	2	53	76	103
+1490	1	52	71	103
+1484	1	55	92	103
+1482	1	53	76	103
+1494	3	54	92	103
+1489	2	100	5	103
+1498	3	52	5	103
+1492	3	55	76	103
+1507	6	52	78	103
 \.
 
 
@@ -4866,9 +4996,7 @@ COPY recording_leaguematch (id, venue, match_date, number_frames, table_size, is
 94	Billidart	2017-05-10 20:00:00+08	0	9	t	t	8-Ball	P	4	3	238	222	6	-1	6	8	10	8	t	59_53_54_57_55	69_65_67_63_113	A	1
 95	Racks	2017-05-10 20:00:00+08	0	9	t	t	8-Ball	P	5	2	232	219	6	0	2	3	10	3	t	75_84_2_72_74	41_42_43_44_40	A	1
 96	Billidart	2017-05-10 20:00:00+08	0	9	t	t	8-Ball	P	4	3	246	237	6	-8	1	5	10	5	t	109_83_80_79_87	5_71_78_77_76	A	1
-101	Racks	2017-05-23 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	8	7	12	\N	f			A	1
 102	Billidart	2017-05-24 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	2	4	12	\N	f			A	1
-103	Racks	2017-05-24 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	6	5	12	\N	f	\N	\N	A	1
 104	Billidart	2017-05-24 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	3	1	12	\N	f	\N	\N	A	1
 105	Racks	2017-05-30 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	3	8	13	\N	f	\N	\N	A	1
 106	Billidart	2017-05-31 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	2	6	13	\N	f			A	1
@@ -4882,6 +5010,8 @@ COPY recording_leaguematch (id, venue, match_date, number_frames, table_size, is
 98	Billidart	2017-05-17 20:00:00+08	0	9	t	t	8-Ball	P	5	2	217	179	6	-1	4	8	11	8	t	110_48_47_49_70	69_63_61_105_113	A	1
 97	Racks	2017-05-16 20:00:00+08	0	9	t	t	8-Ball	P	5	2	219	216	6	2	5	3	11	3	t	82_71_78_76_5	42_3_43_41_45	A	1
 99	Billidart	2017-05-17 20:00:00+08	0	9	t	t	8-Ball	P	4	3	237	221	6	4	2	7	11	7	t	73_84_2_75_74	7_89_81_6_90	A	1
+101	Racks	2017-05-23 20:00:00+08	0	9	f	f	8-Ball	P	6	0	278	196	6	-3	8	7	12	\N	t	105_63_67_69_65	89_6_81_7_90	A	1
+103	Racks	2017-05-24 20:00:00+08	0	9	f	f	8-Ball	P	5	1	251	210	6	-5	6	5	12	\N	t	53_55_54_100_52	76_92_78_5_71	A	1
 \.
 
 
@@ -5560,6 +5690,36 @@ COPY recording_match (id, venue, match_date, number_frames, table_size, is_compl
 693	Racks	2017-05-17 20:00:00+08	2	9	t	t	8-Ball	P	15	17	2	E	97	54	\N	97	f	A	\N
 694	Racks	2017-05-17 20:00:00+08	2	9	t	t	8-Ball	P	17	13	2	E	108	57	\N	57	f	A	\N
 695	Racks	2017-05-17 20:00:00+08	2	9	t	t	8-Ball	P	6	20	2	E	79	56	\N	79	f	A	\N
+711	Racks	2017-05-23 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	105	89	\N	\N	f	A	\N
+712	Racks	2017-05-23 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	63	6	\N	\N	f	A	\N
+713	Racks	2017-05-23 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	67	81	\N	\N	f	A	\N
+714	Racks	2017-05-23 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	69	7	\N	\N	f	A	\N
+715	Racks	2017-05-23 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	65	90	\N	\N	f	A	\N
+716	Racks	2017-05-23 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	63	89	\N	\N	f	A	\N
+717	Racks	2017-05-23 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	67	6	\N	\N	f	A	\N
+718	Racks	2017-05-23 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	69	81	\N	\N	f	A	\N
+719	Racks	2017-05-23 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	65	7	\N	\N	f	A	\N
+720	Racks	2017-05-23 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	105	90	\N	\N	f	A	\N
+721	Racks	2017-05-23 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	67	89	\N	\N	f	A	\N
+722	Racks	2017-05-23 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	69	6	\N	\N	f	A	\N
+723	Racks	2017-05-23 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	65	81	\N	\N	f	A	\N
+724	Racks	2017-05-23 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	105	7	\N	\N	f	A	\N
+725	Racks	2017-05-23 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	63	90	\N	\N	f	A	\N
+726	Racks	2017-05-24 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	53	76	\N	\N	f	A	\N
+727	Racks	2017-05-24 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	55	92	\N	\N	f	A	\N
+728	Racks	2017-05-24 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	54	78	\N	\N	f	A	\N
+729	Racks	2017-05-24 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	100	5	\N	\N	f	A	\N
+730	Racks	2017-05-24 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	52	71	\N	\N	f	A	\N
+731	Racks	2017-05-24 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	55	76	\N	\N	f	A	\N
+732	Racks	2017-05-24 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	54	92	\N	\N	f	A	\N
+733	Racks	2017-05-24 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	100	78	\N	\N	f	A	\N
+734	Racks	2017-05-24 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	52	5	\N	\N	f	A	\N
+735	Racks	2017-05-24 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	53	71	\N	\N	f	A	\N
+736	Racks	2017-05-24 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	54	76	\N	\N	f	A	\N
+737	Racks	2017-05-24 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	100	92	\N	\N	f	A	\N
+738	Racks	2017-05-24 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	52	78	\N	\N	f	A	\N
+739	Racks	2017-05-24 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	53	5	\N	\N	f	A	\N
+740	Racks	2017-05-24 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	55	71	\N	\N	f	A	\N
 \.
 
 
@@ -5567,7 +5727,7 @@ COPY recording_match (id, venue, match_date, number_frames, table_size, is_compl
 -- Name: recording_match_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('recording_match_id_seq', 710, true);
+SELECT pg_catalog.setval('recording_match_id_seq', 740, true);
 
 
 --

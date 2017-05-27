@@ -1,11 +1,13 @@
 {% extends "base_site.html" %}
 {% load match_extras %}
-{% load static %}
-{% load staticfiles %}
+{% load i18n static admin_list %}
 
 {% block title %} Matches {% endblock %}
-<link rel="stylesheet" type="text/css" href="{% static "changelists.css" %}" />
 
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}" />
+{% endblock %}
 {% block content %}
 
 
@@ -32,20 +34,36 @@
 </table>
 
 
-<div class="paginator">
-        {% if matches.has_previous %}
-            <a href="?page={{ matches.previous_page_number }}">previous</a>
+{% block pagination %}
+<p class="paginator">
+    {% for i in matches.paginator.page_range %}
+        {% if i == matches.number %}
+            {% if i > 4 %}
+                ...
+            {% endif %}
+            {% if i > 1 %}
+                <a href="?page={{ matches.previous_page_number }}">{{ matches.previous_page_number }}</a>
+            {% endif %}
+                <span class="current" style="margin-left:4px;margin-right:4px"> {{ matches.number }} </span>
+            {% if i < matches.paginator.num_pages %}
+                <a href="?page={{ matches.next_page_number }}">{{ matches.next_page_number }}</a>
+            {% endif %}
+            {% if i|add:3 < matches.paginator.num_pages %}
+                ...
+            {% endif %}
+        {% elif matches.number|add:2 > i and matches.number < i %}
+        {% elif i|add:2 > matches.number and matches.number > i %}
+        {% elif i == 1 or i == 2 or i|add:1 == matches.paginator.num_pages or i == matches.paginator.num_pages %}
+            <a href="?page={{ i }}">{{ i }}</a>
         {% endif %}
 
-        <span class="current">
-            Page {{ matches.number }} of {{ matches.paginator.num_pages }}.
-        </span>
 
-        {% if matches.has_next %}
-            <a href="?page={{ matches.next_page_number }}">next</a>
-        {% endif %}
-</div>
+    {% endfor %}
 
+    &nbsp;&nbsp;{{ matches.paginator.count }} results. 
+</p>
+
+{% endblock %}
 <!--
 <br>
 <div class="page_prev"> 

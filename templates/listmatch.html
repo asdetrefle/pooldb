@@ -1,33 +1,13 @@
 {% extends "base_site.html" %}
 {% load match_extras %}
+{% load static %}
+{% load staticfiles %}
 
 {% block title %} Matches {% endblock %}
-{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static "changelists.css" %}" />
+
 {% block content %}
-    <style>
-    tab {padding-left: 3em}
-    div.page_prev {
-        width:200px;
-        margin:0px;
-        text-align: right;
-        vertical-align: middle;
-        display:inline-block;
-    }       
-    div.page {
-        width:200px;
-        margin:0px;
-        text-align: center;
-        vertical-align: middle;
-        display:inline-block;
-    }
-    div.page_next {
-        width:200px;
-        margin:0px;
-        text-align: left;
-        vertical-align: middle;
-        display:inline-block;
-    }
-    </style>
+
 
 <!-- TODO Add filters that allows to select all matches by player, date, team-->
 
@@ -51,6 +31,22 @@
     {% endfor %}
 </table>
 
+
+<div class="paginator">
+        {% if matches.has_previous %}
+            <a href="?page={{ matches.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ matches.number }} of {{ matches.paginator.num_pages }}.
+        </span>
+
+        {% if matches.has_next %}
+            <a href="?page={{ matches.next_page_number }}">next</a>
+        {% endif %}
+</div>
+
+<!--
 <br>
 <div class="page_prev"> 
     {% if page > 1 %}
@@ -69,5 +65,6 @@
     </a>
     {% endif %}
 </div>
+//-->
 {% endblock %}
 

@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Match, LeagueMatch, Frame, LeagueFrame
 from .forms import FrameForm
 from administration.models import Member, Team, League
@@ -39,6 +40,7 @@ def listmatch(request, type_):
     return render(request, 'listmatch.html', {'matches': matches, 'type_': type_})
 
 
+"""
 def listarchive(request, type_, page=1):
     if type_=='Match':
         matches = Match.objects.all().order_by('-match_date')
@@ -49,6 +51,27 @@ def listarchive(request, type_, page=1):
     has_next = (until!=len(matches))
     return render(request, 'listmatch.html', {'matches': matches[(int(page)-1)*30:int(page)*30],
                                               'type_': type_, 'page': int(page), 'has_next': has_next})
+"""
+
+def listarchive(request, type_):
+    if type_=='Match':
+        matches = Match.objects.all().order_by('-match_date')
+    elif type_=='LeagueMatch':
+        matches = LeagueMatch.objects.filter(is_completed=True).order_by('-match_date')
+
+    paginator = Paginator(matches, 30)
+
+    page = request.GET.get('page')
+    try:
+        selected = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        selected = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        selected = paginator.page(paginator.num_pages)
+
+    return render(request, 'listmatch.html', {'matches': selected, 'type_': type_})
 
 
 def listlive(request, type_='LeagueMatch'):

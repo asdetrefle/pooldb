@@ -39,13 +39,16 @@ def listmatch(request, type_):
     return render(request, 'listmatch.html', {'matches': matches, 'type_': type_})
 
 
-def listarchive(request, type_):
+def listarchive(request, type_, page=1):
     if type_=='Match':
         matches = Match.objects.all().order_by('-match_date')
     elif type_=='LeagueMatch':
         matches = LeagueMatch.objects.filter(is_completed=True).order_by('-match_date')
     eow = end_of_week()
-    return render(request, 'listmatch.html', {'matches': matches, 'type_': type_})
+    until = min(len(matches), int(page)*30)
+    has_next = (until!=len(matches))
+    return render(request, 'listmatch.html', {'matches': matches[(int(page)-1)*30:int(page)*30],
+                                              'type_': type_, 'page': int(page), 'has_next': has_next})
 
 
 def listlive(request, type_='LeagueMatch'):

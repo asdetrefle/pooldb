@@ -33,10 +33,21 @@ def end_of_week():
     return eow
 
 
-def reset_results(lgpk):
+def reset_submit(lgpk, week):
     from administration.models import League
+    from recording.models import LeagueMatch
     lg = League.objects.get(pk=lgpk)
     ts = lg.team_set.all()
+
+    """
+    lms = LeagueMatch.objects.filter(is_submitted=True)
+    for lm in lms:
+        lm.is_submitted = False
+        lm.save()
+        ms = lm.get_matches()
+        for m in ms:
+            m.is_submitted = False
+            m.save()
 
     for t in ts:
         for m in t.member_set.all():
@@ -65,12 +76,45 @@ def reset_results(lgpk):
         t.save()
 
 
-    for i in range(1,x):
+    """
+    for i in range(1,week):
         lms = LeagueMatch.objects.filter(week_id=i)
         for lm in lms:
             lm.submits()
         lg.rank_players()
         lg.rank_teams()
     return
+
+
+def get_weekly(id_):
+    from administration.models import Member
+    from recording.models import LeagueMatch
+
+    res ={}
+    mem = Member.objects.get(pk=id_)
+    hlm = LeagueMatch.objects.filter(home=mem.group).order_by('week_id')
+
+    for lm in hlm:
+        ms =lm.get_matches()
+
+        for m in ms:
+            if m.home==mem:
+                res[lm.week_id] = res.get(lm.week_id, 0) + m.home_score
+
+    hlm = LeagueMatch.objects.filter(away=mem.group).order_by('week_id')
+
+    for lm in hlm:
+        ms =lm.get_matches()
+
+        for m in ms:
+            if m.away==mem:
+                res[lm.week_id] = res.get(lm.week_id, 0) + m.away_score
+    wl = res.keys()
+
+    wl.sort()
+
+    for w in wl:
+        print w, res[w]
+
 
 

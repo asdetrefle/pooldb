@@ -6,6 +6,7 @@ urlpatterns = [
     url(r'^$', views.index, name='recording'),
     url(r'^archive/$', views.index, name='recording1'),
     url(r'^archive/(?P<type_>\w+)/$', views.listarchive, name='listarchive'),
+    url(r'^archive/(?P<type_>\w+)/page/(?P<page>\d+)/$', views.listarchive, name='listarchive_page'),
     url(r'^live/$', views.listlive, name='listlive'),
     url(r'^leg/$', views.listleg, name='listleg'),
     url(r'^(?P<type_>\w+)/id/(?P<match_id>\d+)/$', views.match_view, name='match_view'),

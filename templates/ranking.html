@@ -98,7 +98,7 @@
         <td align="center"> {% if m.ranking > 0 %} {{ m.ranking }} {% else %} - {% endif %} </td>
         <td align="center"> {{ m.player }} </td>
         <td align="center"> {{ m.group }} </td>
-        <td align="center"> {% if m.ranking > 0 %} {{ m.points|floatformat:"0" }} {% else %} - {% endif %} </td>
+        <td align="center"> {% if m.ranking > 0 %} {{ m.points|floatformat:1 }} {% else %} - {% endif %} </td>
         <td align="center"> {{ m.raw_points|floatformat:"0" }} </td>
         <td align="center"> {% if m.ranking > 0 %} {{ m.handicap|floatformat:2 }} {% else %} - {% endif %} </td>
         <td align="center"> {{ m.season_matches_played }} </td>

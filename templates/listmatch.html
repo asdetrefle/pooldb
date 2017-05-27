@@ -2,8 +2,33 @@
 {% load match_extras %}
 
 {% block title %} Matches {% endblock %}
-
+{% load static %}
 {% block content %}
+    <style>
+    tab {padding-left: 3em}
+    div.page_prev {
+        width:200px;
+        margin:0px;
+        text-align: right;
+        vertical-align: middle;
+        display:inline-block;
+    }       
+    div.page {
+        width:200px;
+        margin:0px;
+        text-align: center;
+        vertical-align: middle;
+        display:inline-block;
+    }
+    div.page_next {
+        width:200px;
+        margin:0px;
+        text-align: left;
+        vertical-align: middle;
+        display:inline-block;
+    }
+    </style>
+
 <!-- TODO Add filters that allows to select all matches by player, date, team-->
 
  <table border="0">    
@@ -25,5 +50,24 @@
     </tr>
     {% endfor %}
 </table>
+
+<br>
+<div class="page_prev"> 
+    {% if page > 1 %}
+    <a href="{% url 'listarchive_page' type_ page|add:"-1" %}">
+        <img src="{% static "left_black.svg" %}" width="20"></img>   
+    </a>
+    {% endif %}
+</div>
+<div class="page"> 
+    Page {{ page }}
+</div>
+<div class="page_next"> 
+    {% if has_next %}
+    <a href="{% url 'listarchive_page' type_ page|add:"1" %}">
+        <img src="{% static "right_black.svg" %}" width="20"></img>   
+    </a>
+    {% endif %}
+</div>
 {% endblock %}
 

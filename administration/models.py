@@ -128,19 +128,26 @@ class League(models.Model):
             ts['clearances'].setdefault(lm.home, {})[week] = 0
             ts['clearances'].setdefault(lm.away, {})[week] = 0
 
+            """
             for m in lm.get_matches():
                 ps['points'].setdefault(m.home.player, {})[week] = ps['points'].get(m.home.player, {}).get(week, 0) + m.home_score
                 ps['points'].setdefault(m.away.player, {})[week] = ps['points'].get(m.away.player, {}).get(week, 0) + m.away_score
                 ps['clearances'].setdefault(m.home.player, {})[week] = 0
                 ps['clearances'].setdefault(m.away.player, {})[week] = 0
+            """
 
             for lf in lm.leagueframe_set.all():
+                hp = str(lf.home_player.player)
+                ap = str(lf.away_player.player)
+                ps['points'].setdefault(hp, {})[week] = ps['points'].get(hp, {}).get(week, 0) + int(lf.home_score or 0)
+                ps['points'].setdefault(ap, {})[week] = ps['points'].get(ap, {}).get(week, 0) + int(lf.away_score or 0)
                 if lf.cleared_by == lf.home_player:
                     ts['clearances'][lm.home][week] += 1
-                    ps['clearances'][lf.home_player.player][week] += 1
+                    ps['clearances'].setdefault(hp, {})[week] = ps['clearances'].get(hp, {}).get(week, 0) + 1
                 elif lf.cleared_by == lf.away_player:
                     ts['clearances'][lm.away][week] += 1
-                    ps['clearances'][lf.away_player.player][week] += 1
+                    ps['clearances'].setdefault(ap, {})[week] = ps['clearances'].get(ap, {}).get(week, 0) + 1
+
 
         return ts, ps
 

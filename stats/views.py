@@ -87,12 +87,6 @@ def weekly_summary(request):
     ts = process_dict(ts)
     ps = process_dict(ps)
 
-    t = Team.objects.get(pk=team_pk)
-
-    members = t.member_set.filter(ranking__gt=0).order_by('ranking')
-    additional = t.member_set.filter(ranking=0)
-    ranking = list(members) + list(additional)
-    #ts ={"legs": ["abc",1,2,3,4,5]}
-    return render(request, 'weekly_summary.html', {'ranking': ranking, 'last_update': lg.last_update, "weeks": range(1,15), "ts": ts, "ps": ps})
+    return render(request, 'weekly_summary.html', {'last_update': lg.last_update, "weeks": range(1,15), "ts": ts, "ps": ps})
 
 

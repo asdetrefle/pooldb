@@ -288,6 +288,13 @@ class LeagueMatch(AbstractMatch):
         null=True
     )
 
+    league = models.ForeignKey(
+        League,
+        models.CASCADE,
+        blank=True,
+        null=True
+    )
+
     def _get_ordered_players(self):
         res = {}
 

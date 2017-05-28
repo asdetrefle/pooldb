@@ -36,7 +36,6 @@ def listmatch(request, type_):
         matches = Match.objects.all().order_by('-match_date')
     elif type_=='LeagueMatch':
         matches = LeagueMatch.objects.all().order_by('-match_date')
-    eow = end_of_week()
     return render(request, 'listmatch.html', {'matches': matches, 'type_': type_})
 
 

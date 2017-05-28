@@ -12,7 +12,7 @@
     .unsorted   {font-size:1em; color:dimgrey; vertical-align: middle; text-align: center; height:35px}
 </style>
 
-<script src="{% static "js/jquery-3.1.1.min.js" %}"></script>
+<script src="//code.jquery.com/jquery-3.1.1.min.js"></script>
 <script>
     $(document).ready(function () {
         $(".sortable").click(function(){
@@ -34,6 +34,8 @@
             } else {
                 var rows = tbod.find("tr");
 
+                // We use Rank to rank for Ranking points.
+                // This is because Ranking points may have duplicated number
                 rows.sort(function(a,b){
                     var A = $(a).find("td").eq(colIndex).text();
                     var B = $(b).find("td").eq(colIndex).text();
@@ -49,7 +51,14 @@
                         return o == -1;
                     }
 
-                    var r = (o == 'asc' ? A > B : B > A);
+                    if (A != B) {
+                        var r = (o == 'asc' ? A > B : B > A);
+                    } else {
+                        var A_ = Number($(a).find("td").eq(0).text());
+                        var B_ = Number($(b).find("td").eq(0).text());
+                        var r = (o == 'asc' ? A_ < B_ : B_ < A_);
+                    }
+
                     return r ? 1 : -1;
                 });
             }
@@ -98,7 +107,7 @@
         <td align="center"> {% if m.ranking > 0 %} {{ m.ranking }} {% else %} - {% endif %} </td>
         <td align="center"> {{ m.player }} </td>
         <td align="center"> {{ m.group }} </td>
-        <td align="center"> {% if m.ranking > 0 %} {{ m.points|floatformat:1 }} {% else %} - {% endif %} </td>
+        <td align="center"> {% if m.ranking > 0 %} {{ m.points|floatformat:0 }} {% else %} - {% endif %} </td>
         <td align="center"> {{ m.raw_points|floatformat:"0" }} </td>
         <td align="center"> {% if m.ranking > 0 %} {{ m.handicap|floatformat:2 }} {% else %} - {% endif %} </td>
         <td align="center"> {{ m.season_matches_played }} </td>

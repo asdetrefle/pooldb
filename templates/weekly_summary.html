@@ -1,0 +1,111 @@
+{% extends "base_site.html" %}
+{% load stats_extras %}
+
+{% block title %} Summary {% endblock %}
+{% block extrahead %}
+{% load staticfiles %}
+<style>
+    .header     {font-size:1.17em; color:dimgrey; font-weight:normal}
+    .sortable   {font-size:1em; vertical-align: middle; text-align: center}
+    .asc        {font-size:1em; color:black; vertical-align: middle; text-align: center; height:35px}
+    .desc       {font-size:1em; color:black; vertical-align: middle; text-align: center; height:35px}
+    .unsorted   {font-size:1em; color:dimgrey; vertical-align: middle; text-align: center; height:35px}
+</style>
+
+<script src="//code.jquery.com/jquery-3.1.1.min.js"></script>
+<script>
+
+    var select_data = function () {
+        var field = $("#summary_field").find(":selected").text();
+        var showf = $("#show_for").find(":selected").text();
+
+        if (showf=='player' && field=='legs') {
+            return;
+        }
+        
+        var tbody = $("#summary tbody");
+        tbody.empty()
+        if (showf=='team') {
+            var allData = {{ts|safe}};
+        } else if (showf=='player') {
+            var allData = {{ps|safe}};
+        }
+        tableData = allData[field];
+
+        var c = 0;
+        tableData.forEach(function(rowData) {
+            var row = document.createElement('tr');
+            var cid = document.createElement('td');
+            c++;
+            cid.appendChild(document.createTextNode(c));
+            cid.style.textAlign = 'center';
+            row.appendChild(cid);
+            rowData.forEach(function(cellData) {
+                var cell = document.createElement('td');
+                cell.appendChild(document.createTextNode(cellData));
+                cell.style.textAlign = 'center';
+                row.appendChild(cell);
+            });
+            tbody.append(row);
+        });
+        $("#summary td:last-child").css({"font-weight": "bold"}); 
+
+    }
+
+    $(document).ready(select_data);
+    $(document).on("change", "select", select_data);
+
+</script>
+
+
+{% endblock %}
+
+{% block content %}
+
+Show 
+<select id="summary_field">
+  <option value="1">points</option>
+  <option value="2">clearances</option>
+  <option value="2" selected="selected">legs</option>
+</select>
+summary for
+<select id="show_for">
+  <option value="1" selected="selected">team</option>
+  <option value="2">player</option>
+</select>.
+
+Last Update: {{ last_update }}
+
+ <table border="0" id='summary'>    
+    <col width="50">
+    <col width="170">
+    {% for c in weeks %}
+    <col width="50">
+    {% endfor %}
+    <col width="100">
+
+    <thead>
+    <tr>
+        <td align="center"><h3> # </h3></td>
+        <td align="center"><h3> Name </h3></td>
+    {% for c in weeks %}
+    <td align="center"><h3> W{{c}} </h3></td>
+    {% endfor %}
+        <td align="center"><h3> Total </h3></td>
+    </tr>
+    </thead>
+    <tbody>
+    {% for m in ranking %}
+    <tr>
+        <td align="center"> {{ m.name }} </td>
+    {% for c in weeks %}
+        <td align="center"> {{ m.season_legs_won }} </td>
+    {% endfor %}
+        <td align="center"> {{ m.season_clearance }} </td>
+            <!--<a href=" url 'leg_view' leg.pk %}"> -->
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+

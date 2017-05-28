@@ -34,6 +34,7 @@
 </table>
 
 
+{% if matches.paginator.num_pages > 1 %}
 {% block pagination %}
 <p class="paginator">
     {% for i in matches.paginator.page_range %}
@@ -56,14 +57,11 @@
         {% elif i == 1 or i == 2 or i|add:1 == matches.paginator.num_pages or i == matches.paginator.num_pages %}
             <a href="?page={{ i }}">{{ i }}</a>
         {% endif %}
-
-
     {% endfor %}
-
     &nbsp;&nbsp;{{ matches.paginator.count }} results. 
 </p>
-
 {% endblock %}
+{% endif %}
 <!--
 <br>
 <div class="page_prev"> 

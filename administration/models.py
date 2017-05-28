@@ -113,6 +113,37 @@ class League(models.Model):
         ts.sort(key=lambda m: m.ranking)
         return ts
 
+    def get_weekly_summary(self):
+        lms = self.leaguematch_set.filter(is_completed=True).order_by('week_id')
+
+        ts = { 'points': {}, 'clearances': {}, 'legs': {} }
+        ps = { 'points': {}, 'clearances': {} }
+
+        for lm in lms:
+            week = lm.week.week_number
+            ts['points'].setdefault(lm.home, {})[week] = lm.home_points_raw
+            ts['points'].setdefault(lm.away, {})[week] = lm.away_points_raw
+            ts['legs'].setdefault(lm.home, {})[week] = lm.home_score
+            ts['legs'].setdefault(lm.away, {})[week] = lm.away_score
+            ts['clearances'].setdefault(lm.home, {})[week] = 0
+            ts['clearances'].setdefault(lm.away, {})[week] = 0
+
+            for m in lm.get_matches():
+                ps['points'].setdefault(m.home.player, {})[week] = ps['points'].get(m.home.player, {}).get(week, 0) + m.home_score
+                ps['points'].setdefault(m.away.player, {})[week] = ps['points'].get(m.away.player, {}).get(week, 0) + m.away_score
+                ps['clearances'].setdefault(m.home.player, {})[week] = 0
+                ps['clearances'].setdefault(m.away.player, {})[week] = 0
+
+            for lf in lm.leagueframe_set.all():
+                if lf.cleared_by == lf.home_player:
+                    ts['clearances'][lm.home][week] += 1
+                    ps['clearances'][lf.home_player.player][week] += 1
+                elif lf.cleared_by == lf.away_player:
+                    ts['clearances'][lm.away][week] += 1
+                    ps['clearances'][lf.away_player.player][week] += 1
+
+        return ts, ps
+
     def __str__(self):
         return self.name
 

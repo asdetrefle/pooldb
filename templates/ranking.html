@@ -5,7 +5,7 @@
 {% block extrahead %}
 {% load staticfiles %}
 <style>
-    .header     {font-size:1.17em; color:dimgrey; font-weight:normal}
+    .header     {font-size:1.17em; color:grey; font-weight:normal}
     .sortable   {font-size:1em; vertical-align: middle; text-align: center}
     .asc        {font-size:1em; color:black; vertical-align: middle; text-align: center; height:35px}
     .desc       {font-size:1em; color:black; vertical-align: middle; text-align: center; height:35px}
@@ -82,17 +82,19 @@
     <col width="50">
     <col width="150">
     <col width="200">
+    <col width="40">
     <col width="150">
     <col width="128">
+    <col width="108">
     <col width="128">
-    <col width="128">
-    <col width="128">
-    <col width="128">
+    <col width="108">
+    <col width="108">
     <thead>
-        <tr height>
+        <tr>
             <th class="unsorted"> Rank </th>
             <th class="unsorted"> Name </th>
             <th class="unsorted"> Team </th>
+            <th class="unsorted"> Gender </th>
             <th class="sortable desc"> Ranking Points </th>
             <th class="sortable unsorted"> Total Points </th>
             <th class="sortable unsorted"> Average </th>
@@ -107,6 +109,7 @@
         <td align="center"> {% if m.ranking > 0 %} {{ m.ranking }} {% else %} - {% endif %} </td>
         <td align="center"> {{ m.player }} </td>
         <td align="center"> {{ m.group }} </td>
+        <td align="center"> {{ m.player.sex }} </td>
         <td align="center"> {% if m.ranking > 0 %} {{ m.points|floatformat:0 }} {% else %} - {% endif %} </td>
         <td align="center"> {{ m.raw_points|floatformat:"0" }} </td>
         <td align="center"> {% if m.ranking > 0 %} {{ m.handicap|floatformat:2 }} {% else %} - {% endif %} </td>

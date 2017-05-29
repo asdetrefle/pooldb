@@ -2,32 +2,105 @@
 {% load match_extras %}
 
 {% block title %} Ranking {% endblock %}
+{% block extrahead %}
+{% load staticfiles %}
+<style>
+    .header     {font-size:1.17em; color:grey; font-weight:normal}
+    .sortable   {font-size:1em; vertical-align: middle; text-align: center}
+    .asc        {font-size:1em; color:black; vertical-align: middle; text-align: center; height:35px}
+    .desc       {font-size:1em; color:black; vertical-align: middle; text-align: center; height:35px}
+    .unsorted   {font-size:1em; color:dimgrey; vertical-align: middle; text-align: center; height:35px}
+</style>
+
+<script src="//code.jquery.com/jquery-3.1.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".sortable").click(function(){
+            if ($(this).hasClass('desc')) {
+                var o = 'asc';
+            } else if ($(this).hasClass('asc')) {
+                var o = 'unsorted';
+            } else {
+                var o = 'desc';
+            }
+            $('.sortable').removeClass('asc').removeClass('desc').removeClass('unsorted');
+            $(this).addClass(o);
+
+            var colIndex = $(this).prevAll().length;
+            var tbod = $(this).closest("table").find("tbody");
+            
+            if (o=='unsorted') {
+                rows = _rows_cached;
+            } else {
+                var rows = tbod.find("tr");
+
+                // We use Rank to rank for Ranking points.
+                // This is because Ranking points may have duplicated number
+                rows.sort(function(a,b){
+                    var A = $(a).find("td").eq(colIndex).text();
+                    var B = $(b).find("td").eq(colIndex).text();
+
+                    if (!isNaN(A)) {
+                        A = Number(A);
+                    } else {
+                        return o == 1;
+                    }
+                    if (!isNaN(B)) {
+                        B = Number(B);
+                    } else {
+                        return o == -1;
+                    }
+
+                    if (A != B) {
+                        var r = (o == 'asc' ? A > B : B > A);
+                    } else {
+                        var A_ = Number($(a).find("td").eq(0).text());
+                        var B_ = Number($(b).find("td").eq(0).text());
+                        var r = (o == 'asc' ? A_ < B_ : B_ < A_);
+                    }
+
+                    return r ? 1 : -1;
+                });
+            }
+            
+            $.each(rows, function(index, ele){
+                tbod.append(ele);
+            });
+        });
+        
+        var _rows_cached = $('#trtable').find("tbody").find("tr");
+        //console.log(_rows_cached);
+    });  
+</script>
+
+
+{% endblock %}
+
 
 {% block content %}
-Last Update: {{ last_update }}
-# TODO Add filters that allows to select all matches by player, date, team
 
- <table border="0">    
+ <table border="0" id="trtable">    
     <col width="50">
     <col width="150">
     <col width="200">
     <col width="128">
     <col width="128">
+    <col width="138">
     <col width="128">
     <col width="128">
-    <col width="128">
-    <col width="128">
+    <thead>
     <tr>
-        <td align="center"><h3> Rank </h3></td>
-        <td align="center"><h3> Team </h3></td>
-        <td align="center"><h3> Season Legs Won </h3></td>
-        <td align="center"><h3> Leg Average </h3></td>
-        <td align="center"><h3> Clearances </h3></td>
-        <td align="center"><h3> Median Average </h3></td>
-        <td align="center"><h3> Match Played </h3></td>
-        <td align="center"><h3> Match Won </h3></td>
-        <td align="center"><h3> - </h3></td>
+        <th class="unsorted">Rank</th>
+        <th class="unsorted">Team</th>
+        <th class="sortable desc">Season Legs Won</th>
+        <th class="sortable unsorted">Leg Average</th>
+        <th class="sortable unsorted">Clearances</th>
+        <th class="sortable unsorted">Median Average</th>
+        <th class="sortable unsorted">Match Played</th>
+        <th class="sortable unsorted">Match Won</th>
     </tr>
+    </thead>
+    <tbody>
     {% for m in ranking %}
     <tr>
         <td align="center"> {{ m.ranking }} </td>
@@ -38,10 +111,11 @@ Last Update: {{ last_update }}
         <td align="center"> {{ summary|get_item:m.pk|get_item:"median_average"|floatformat:"1" }} </td>
         <td align="center"> {{ m.season_matches_played }} </td>
         <td align="center"> {{ m.season_matches_won }} </td>
-        <td align="center"> {{ m.season_clearance }} </td>
-            <!--<a href=" url 'leg_view' leg.pk %}"> -->
     </tr>
     {% endfor %}
+    </tbody>
 </table>
+<br>
+Last Update: {{ last_update }}
 {% endblock %}
 

@@ -136,9 +136,9 @@ class League(models.Model):
                 ps['clearances'].setdefault(m.away.player, {})[week] = 0
             """
 
-            for lf in lm.leagueframe_set.all():
-                hp = str(lf.home_player.player)
-                ap = str(lf.away_player.player)
+            for lf in lm.leagueframe_set.select_related("home_player__player", "away_player__player").all():
+                hp = lf.home_player.player
+                ap = lf.away_player.player
                 ps['points'].setdefault(hp, {})[week] = ps['points'].get(hp, {}).get(week, 0) + int(lf.home_score or 0)
                 ps['points'].setdefault(ap, {})[week] = ps['points'].get(ap, {}).get(week, 0) + int(lf.away_score or 0)
                 if lf.cleared_by == lf.home_player:

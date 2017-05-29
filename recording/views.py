@@ -31,6 +31,7 @@ def index(request):
     return render(request, 'recording.html')
 
 
+"""
 def listmatch(request, type_):
     if type_=='Match':
         matches = Match.objects.all().order_by('-match_date')
@@ -39,7 +40,6 @@ def listmatch(request, type_):
     return render(request, 'listmatch.html', {'matches': matches, 'type_': type_})
 
 
-"""
 def listarchive(request, type_, page=1):
     if type_=='Match':
         matches = Match.objects.all().order_by('-match_date')
@@ -54,7 +54,7 @@ def listarchive(request, type_, page=1):
 
 def listarchive(request, type_):
     if type_=='Match':
-        matches = Match.objects.all().order_by('-match_date')
+        matches = Match.objects.filter(is_completed=True).order_by('-match_date')
     elif type_=='LeagueMatch':
         matches = LeagueMatch.objects.filter(is_completed=True).order_by('-match_date')
 

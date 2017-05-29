@@ -27,5 +27,6 @@ urlpatterns = [
     url(r'^recording/', include('recording.urls')),
     url(r'^stats/', include('stats.urls')),
     url(r'^schedule/', include('schedule.urls')),
-    url(r'^$', views.index, name='home')
+    url(r'^$', views.index_redirect, name='home_redirect'),
+    url(r'^home/$', views.index, name='home'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

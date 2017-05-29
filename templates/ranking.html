@@ -10,6 +10,7 @@
     .asc        {font-size:1em; color:black; vertical-align: middle; text-align: center; height:35px}
     .desc       {font-size:1em; color:black; vertical-align: middle; text-align: center; height:35px}
     .unsorted   {font-size:1em; color:dimgrey; vertical-align: middle; text-align: center; height:35px}
+    .female     {color:firebrick}
 </style>
 
 <script src="//code.jquery.com/jquery-3.1.1.min.js"></script>
@@ -109,7 +110,7 @@
         <td align="center"> {% if m.ranking > 0 %} {{ m.ranking }} {% else %} - {% endif %} </td>
         <td align="center"> {{ m.player }} </td>
         <td align="center"> {{ m.group }} </td>
-        <td align="center"> {{ m.player.sex }} </td>
+        <td align="center"> {% if m.player.sex == "F" %} <span class="female"> {{ m.player.sex }} </span> {% else %} {{ m.player.sex }} {% endif %}</td>
         <td align="center"> {% if m.ranking > 0 %} {{ m.points|floatformat:0 }} {% else %} - {% endif %} </td>
         <td align="center"> {{ m.raw_points|floatformat:"0" }} </td>
         <td align="center"> {% if m.ranking > 0 %} {{ m.handicap|floatformat:2 }} {% else %} - {% endif %} </td>

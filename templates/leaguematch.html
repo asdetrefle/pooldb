@@ -237,7 +237,7 @@
                     <td align="center"> </td>
                 {% endif %}
                 <td align="center"> {{f.leg_number}} </td>
-                <td align="center"> <span class="{% if f.cleared_by == f.home_player %}player_clear{% endif %}">{{f.home_player.player}}</span> </td>
+                <td align="center"> {{f.home_player.player}} </td>
                 <td align="right"> <img class="clear_mark {% if f.cleared_by != f.home_player %}unselected{% endif %}" id="{{ f.id }}_clear_home" style="{% if f.home_score == None and user.is_active and not match.is_completed %}display:inline-block{% endif %}"/></td>
                 <td align="right"> 
                     {% if f.home_score == None %} 
@@ -255,7 +255,7 @@
                     {% endif %} 
                 </td>
                 <td align="left"> <img class="clear_mark {% if f.cleared_by != f.away_player %}unselected{% endif %}" id="{{ f.id }}_clear_away" style="{% if f.away_score == None and user.is_active and not match.is_completed %}display:inline-block{% endif %}"/></td>
-                <td align="center"> <span class="{% if f.cleared_by == f.away_player %}player_clear{% endif %}">{{f.away_player.player}}</span></td>
+                <td align="center"> {{f.away_player.player}} </td>
             {% endfor %}
             </tr>
         {% endfor %}

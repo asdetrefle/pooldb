@@ -10,7 +10,7 @@ from utils import end_of_week
 from django.contrib.auth.decorators import login_required
 
 
-_need_login = login_required(login_url='/admin/login/')
+_need_login = login_required(login_url='/login/')
 
 
 def load_players(raw_file):

@@ -1,8 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response, redirect
 from recording.models import LeagueMatch
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.utils import timezone
-import datetime
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
+from django.template import RequestContext
 
 # Create your views here.
 
@@ -18,4 +20,20 @@ def index_redirect(request):
         return HttpResponseRedirect('/recording/live/')
     else:
         return render(request, 'index.html')
+
+
+def login_user(request):
+    logout(request)
+    username = password = ''
+    if request.POST:
+        username = request.POST['username']
+        password = request.POST['password']
+
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                return HttpResponseRedirect('/home/')
+    return render(request, 'login.html')
+
 

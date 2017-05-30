@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth import views as auth_views
 
 from . import views
 
@@ -29,4 +30,6 @@ urlpatterns = [
     url(r'^schedule/', include('schedule.urls')),
     url(r'^$', views.index_redirect, name='home_redirect'),
     url(r'^home/$', views.index, name='home'),
+    url(r'^login/$', auth_views.login, {'template_name': 'login.html'}, name='login'),
+    url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

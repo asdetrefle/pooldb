@@ -16,7 +16,7 @@ def index_redirect(request):
     now = timezone.localtime(now)
     today = str(now.date())
     matches = LeagueMatch.objects.filter(match_date__date=today)
-    if matches and now.hour>=20:
+    if matches and now.hour>=19 and now.hour<=23:
         return HttpResponseRedirect('/recording/live/')
     else:
         return render(request, 'index.html')

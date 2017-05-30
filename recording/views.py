@@ -320,6 +320,8 @@ def edit(request, type_, match_id):
     pattern = re.compile(r'(\d+) (home|away|clear)')
     if request.method == 'POST':
         match = get_object_or_404(LeagueMatch, id=match_id)
+        if match.is_completed:
+            return redirect('match_view', type_=type_, match_id=match_id)
         has_blank_fields = False
         for key, value in request.POST.iteritems():
             key_match = pattern.match(key)

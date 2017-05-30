@@ -2,13 +2,21 @@
 
 {% block title %} Home {% endblock %}
 
+{% load static %}
 {% block content %}
 
 <style>
+    #container {height: 100%; width:100%; font-size: 0;}
+    #left, #middle, #right {display: inline-block; *display: inline; zoom: 1; vertical-align: top; font-size: 13px;}
+    #left {width:50%}
+    #middle {width:10%}
+    #right {width:40%}
     div.body {
-        width:800px;
+        width:100%;
     }
 </style>
+<div id="container">
+    <div id="left">
 <div class="body">
 Welcome to Poke n Hope's official website!
 </div>
@@ -56,17 +64,21 @@ We are continually adding more features to this website.  Any suggestions or b
 <div class="body">
 Thank you for your support and we hope together we can take this sport to the next level and create a global pool community where everyone is welcome! You can contact us at poke.n.hope.hk@gmail.com.
 </div>
-
-<!--
-<div class="body">
-    We have to mention in particular on the Player Ranking page a new measure which is commonly used in sport competitions. We encourage you to go <a href="https://en.wikipedia.org/wiki/Elo_rating_system"> here</a> for some documentation. But for those who hate numbers and formulas, we will explain why we have done so in simple words. Let's look at the following situations:
-    <ul>
-        <li>Imagine you play a good player and you are at the same level. Your opponent breaks and runs out the table. You get a 0:10. Then you break and run out as well. Both you and your opponent played excellent pool. But in the current total-points/average framework, you both would be penalized for getting 10 points in total in 2 frames. </li>
-        <li>Now imagine you play a player much less skilled than you. You play bad and missed several shots but your opponent plays much better than her expected level. In the end, she still lost to you 7:10 and 7:10. In the current framework, you get 20 in two frames and it is perfect. You don't have to pay for your struggle.</li>
-    </ul>
-    But in the Ranking Points evaluation, it is different. In the first case, your ranking points will not be affected at all; in the second, your ranking points will decrease and also your opponent will be rewarded for pushing you to the edge.
 </div>
-//-->
+<div id="middle">
+    </div>
+<div id="right">
+    <span style="font-weight:bold;font-size:20px"> NEWS FLASH:</span> 
+    <br>
+    <span style="font-size:15px">Dear Al,</span>
+    <br>
+    <span style="font-size:15px"> Best wishes for your new adventure and you will be missed.</span>
+    <br>
+    <span style="font-size:15px">Come back and visit us soon!</span> <span style="font-size:150%;color:red;">&hearts;</span><span>&#128521;<span> \(^O^)/ 
+    <br>
+        <img src="{% static "al.png" %}" width="60%"></img>  
+    </div>
+</div>
 
 {% endblock %}
 

@@ -32,6 +32,10 @@ def end_of_week():
     eow = with_timezone(datetime.datetime.combine(today + datetime.timedelta(days=(7-today.isoweekday()%7)), datetime.datetime.min.time()))
     return eow
 
+def start_of_week():
+    today = datetime.date.today()
+    sow = with_timezone(datetime.datetime.combine(today - datetime.timedelta(days=(today.isoweekday()%7)), datetime.datetime.min.time()))
+    return sow
 
 def reset_submit(lgpk, week):
     from administration.models import League

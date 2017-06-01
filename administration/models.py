@@ -151,6 +151,45 @@ class League(models.Model):
 
         return ts, ps
 
+
+    def get_weekly_summary_id(self):
+        lms = self.leaguematch_set.filter(is_completed=True).order_by('week_id')
+
+        ts = { 'points': {}, 'clearances': {}, 'legs': {} }
+        ps = { 'points': {}, 'clearances': {} }
+
+        for lm in lms:
+            pk = lm.pk
+            week = lm.week.week_number
+            ts['points'].setdefault(lm.home, {})[week] = [pk, lm.home_points_raw]
+            ts['points'].setdefault(lm.away, {})[week] = [pk, lm.away_points_raw]
+            ts['legs'].setdefault(lm.home, {})[week] = [pk, lm.home_score]
+            ts['legs'].setdefault(lm.away, {})[week] = [pk, lm.away_score]
+            ts['clearances'].setdefault(lm.home, {})[week] = [pk, 0]
+            ts['clearances'].setdefault(lm.away, {})[week] = [pk, 0]
+
+            """
+            for m in lm.get_matches():
+                ps['points'].setdefault(m.home.player, {})[week] = ps['points'].get(m.home.player, {}).get(week, 0) + m.home_score
+                ps['points'].setdefault(m.away.player, {})[week] = ps['points'].get(m.away.player, {}).get(week, 0) + m.away_score
+                ps['clearances'].setdefault(m.home.player, {})[week] = 0
+                ps['clearances'].setdefault(m.away.player, {})[week] = 0
+            """
+
+            for lf in lm.leagueframe_set.select_related("home_player__player", "away_player__player").all():
+                hp = lf.home_player.player
+                ap = lf.away_player.player
+                ps['points'].setdefault(hp, {}).setdefault(week, [pk, 0])[1] += int(lf.home_score or 0)
+                ps['points'].setdefault(ap, {}).setdefault(week, [pk, 0])[1] += int(lf.away_score or 0)
+                if lf.cleared_by == lf.home_player:
+                    ts['clearances'][lm.home][week][1] += 1
+                    ps['clearances'].setdefault(hp, {}).setdefault(week, [pk, 0])[1] += 1
+                elif lf.cleared_by == lf.away_player:
+                    ts['clearances'][lm.away][week][1] += 1
+                    ps['clearances'].setdefault(ap, {}).setdefault(week, [pk, 0])[1] += 1
+
+        return ts, ps
+
     def __str__(self):
         return self.name
 

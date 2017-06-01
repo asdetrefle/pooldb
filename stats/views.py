@@ -62,7 +62,9 @@ def team_summary(request, team_pk):
 def weekly_summary(request):
     lg = League.objects.get(pk=1)
 
-    ts, ps = lg.get_weekly_summary()
+    #ts, ps = lg.get_weekly_summary()
+    ts, ps = lg.get_weekly_summary_id()
+
     def process_dict(d):
         new_res = {}
         for k, v in d.items():
@@ -84,9 +86,30 @@ def weekly_summary(request):
             new_res[str(k)] = r
         return new_res
 
-    ts = process_dict(ts)
-    ps = process_dict(ps)
+    def process_dict_id(d):
+        new_res = {}
+        for k, v in d.items():
+            r = []
+            for kk, vv in v.items():
+                tmp = [['', str(kk)]]
+                s = 0
+                for i in range(1,15):
+                    tmp.append(vv.get(i, ['', '']))
+                    try:
+                        s += max(tmp[-1][1], 0)
+                    except TypeError:
+                        continue
+                if s == 0:
+                    continue
+                tmp.append(['', s])
+                r.append(tmp)
+                r = sorted(r, key=lambda x: (-x[-1][1], x[0]))
+            new_res[str(k)] = r
+        return new_res
 
-    return render(request, 'weekly_summary.html', {'last_update': lg.last_update, "weeks": range(1,15), "ts": ts, "ps": ps})
+    ts = process_dict_id(ts)
+    ps = process_dict_id(ps)
+
+    return render(request, 'summary_id.html', {'last_update': lg.last_update, "weeks": range(1,15), "ts": ts, "ps": ps})
 
 

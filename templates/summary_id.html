@@ -17,6 +17,23 @@
         var field = $("#summary_field").find(":selected").text();
         var showf = $("#show_for").find(":selected").text();
 
+        var $selects = $('select');
+		$('select').change(function () {
+		    $('option:hidden', $selects).each(function () {
+		        var self = this,
+		            toShow = true;
+		        $selects.not($(this).parent()).each(function () {
+		            if (self.value == this.value) toShow = false;
+		        })
+		        if (toShow) $(this).show();
+		    });
+
+            if ($selects.not(this).val() == this.value) {
+                $selects.not(this).val("1").change();
+            }
+		    $selects.not(this).children('option[value=' + this.value + ']').hide();
+		});
+
         if (showf=='player' && field=='legs') {
             return;
         }
@@ -77,12 +94,12 @@ Show
 <select id="summary_field">
   <option value="1">points</option>
   <option value="2">clearances</option>
-  <option value="3" selected="selected">legs</option>
+  <option value="0" selected="selected">legs</option>
 </select>
 summary for
 <select id="show_for">
-  <option value="1" selected="selected">team</option>
-  <option value="2">player</option>
+  <option value="3" selected="selected">team</option>
+  <option value="0">player</option>
 </select>.
 
 Last Update: {{ last_update }}

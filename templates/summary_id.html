@@ -19,14 +19,16 @@
         $('select').change(function () {
             var field = $("#summary_field").val();
             var showf = $("#show_for").val();
+            //console.log($selects.not(this).val());
 
-            if (field == '0' || showf == '0') {
+            if ($selects.not(this).val() == '0') {
+                return; 
+            } else if (field == '0' || showf == '0') {
 		        $selects.not(this).children('option[value="0"]').remove();
             } else if ($("#summary_field").children('option').length != 3 ) {
                 $("#summary_field").html('<option value="1">points</option><option value="2">clearances</option><option value="0">legs</option>');
                 $("#summary_field").val(field).change();
             } else if ($("#show_for").children('option').length != 2 ) {
-                console.log(showf)
                 $("#show_for").html('<option value="3">team</option><option value="0">player</option>');
                 $("#show_for").val(showf).change();
             }

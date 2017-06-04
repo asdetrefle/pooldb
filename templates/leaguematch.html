@@ -167,7 +167,7 @@
 {% block content %}
 
 
-<h3> Match Date: {{match.match_date}} {% if match.is_completed %} Match Completed. {% elif match.race_to <= frames.count %} Match under review. {% else %} Match in Progress. {% endif %}</h3>
+<h3> Match Date: {{match.match_date}} at {{ match.venue }}. {% if match.is_completed %} Match Completed. {% elif match.race_to <= frames.count %} Match under review. {% else %} Match in Progress. {% endif %}</h3>
 
 
 

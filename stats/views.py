@@ -109,7 +109,33 @@ def weekly_summary(request):
 
     ts = process_dict_id(ts)
     ps = process_dict_id(ps)
+    #top10w = top_n_weeks(ps['points'], 10)
 
     return render(request, 'summary_id.html', {'last_update': lg.last_update, "weeks": range(1,15), "ts": ts, "ps": ps})
+
+
+
+def top_n_weeks(ps, n):
+
+    res = {}
+
+    for p in ps:
+        pn = p[0][1]
+
+
+        ws = [x[1] for x in p[1:-1] if x[1]!= '']
+        print pn, ws
+
+        if len(ws) <= n:
+            res[pn] = sum(ws)
+        else:
+            ws.sort(reverse=True)
+            res[pn] = sum(ws[:n])
+
+    for w in res:
+        print w, res[w]
+
+    return res
+
 
 

@@ -122,19 +122,48 @@ def get_weekly(id_):
 
 
 
-"""
 def rpm():
     from administration.models import Member
     from recording.models import LeagueMatch
     wl = range(1, 14)
 
     total_p = {}
+    total_f = {}
+
+    rpm = {}
+
+    def get_match_handicap(home, away):
+        away_handicap = {i: round(total_p.get(i) / total_f.get(i), 1) for i in away if i in total_p}
+        home_handicap = {i: round(total_p.get(i) / total_f.get(i), 1) for i in home if i in total_p}
+
+        #print away_handicap, home_handicap
+
+        return home_handicap, away_handicap
+
 
     for w in wl:
         lms = LeagueMatch.objects.filter(week_id=w)
+        print w
 
+        print total_p, total_f
         for lm in lms:
+            print lm
             ms = lm.get_matches()
+            players = lm._get_ordered_players()
+            hh, ah = get_match_handicap(players['home'], players['away'])
+            print hh, ah
             for m in ms:
-                if m.winner is not None:
-"""
+                if m.home.pk in hh and m.away.pk in ah:
+                    rpm[m.home.pk] = rpm.get(m.home.pk, 0) + (m.home_score - m.away_score) - (hh[m.home.pk] - ah[m.away.pk]) * 2.
+                    rpm[m.away.pk] = rpm.get(m.away.pk, 0) + (m.away_score - m.home_score) - (ah[m.away.pk] - hh[m.home.pk]) * 2.
+
+                total_p[m.home.pk] = total_p.get(m.home.pk, 0) + m.home_score
+                total_p[m.away.pk] = total_p.get(m.away.pk, 0) + m.away_score
+                total_f[m.home.pk] = total_f.get(m.home.pk, 0) + 2.
+                total_f[m.away.pk] = total_f.get(m.away.pk, 0) + 2.
+
+    for k, v in rpm.items():
+        m = Member.objects.get(pk=k)
+        print m.player, v
+
+    return

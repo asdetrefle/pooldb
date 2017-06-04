@@ -258,7 +258,7 @@ def match_view(request, type_, match_id):
             form = FrameForm(match=match)
         """
         form = FrameForm(match=match)
-        frames = match.frame_set.all()
+        frames = match.frame_set.all().order_by('frame_number')
         return render(request, 'match.html', {'frames': frames, 'match': match, 'form': form})
     else:
         raise Http404

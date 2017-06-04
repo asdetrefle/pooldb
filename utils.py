@@ -122,3 +122,19 @@ def get_weekly(id_):
 
 
 
+"""
+def rpm():
+    from administration.models import Member
+    from recording.models import LeagueMatch
+    wl = range(1, 14)
+
+    total_p = {}
+
+    for w in wl:
+        lms = LeagueMatch.objects.filter(week_id=w)
+
+        for lm in lms:
+            ms = lm.get_matches()
+            for m in ms:
+                if m.winner is not None:
+"""

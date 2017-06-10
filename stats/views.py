@@ -109,7 +109,7 @@ def weekly_summary(request):
 
     ts = process_dict_id(ts)
     ps = process_dict_id(ps)
-    top10w = top_n_weeks(ps['points'], 9)
+    #top10w = top_n_weeks(ps['points'], 9)
 
     return render(request, 'summary_id.html', {'last_update': lg.last_update, "weeks": range(1,15), "ts": ts, "ps": ps})
 

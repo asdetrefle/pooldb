@@ -37,17 +37,21 @@
     </style>
 
 <div class="week_left"> 
+    {% if has_prev %}
     <a href="{% url 'listweek' week.week_number|add:"-1" %}">
         <img src="{% static "left_arrow.png" %}" width="20"></img>   
     </a>
+    {% endif %}
 </div>
 <div class="week"> 
     {{ week }}
 </div>
 <div class="week_right"> 
+    {% if has_next %}
     <a href="{% url 'listweek' week.week_number|add:"1" %}">
-        <img src="{% static "right_arrow.png" %}" width="20"></img>   
+        <img src="{% static "right_arrow.png" %}" width="20"></img>
     </a>
+    {% endif %}
 </div>
 
 {% for k, v in matches.items %}

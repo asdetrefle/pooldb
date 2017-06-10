@@ -79,7 +79,11 @@ def listlive(request, type_='LeagueMatch'):
         matches = Match.objects.filter(is_completed=False).order_by('match_date')
     elif type_=='LeagueMatch':
         matches = LeagueMatch.objects.filter(is_completed=False, match_date__lte=eow).order_by('match_date')
-    return render(request, 'listmatch.html', {'content': 'Bonjour Les Amis.', 'matches': matches, 'type_': type_})
+
+    if matches:
+        return render(request, 'listmatch.html', {'content': 'Bonjour Les Amis.', 'matches': matches, 'type_': type_})
+    else:
+        return render(request, 'base_site.html', {'content': 'No matches currently.'})
 
 
 def listleg(request):

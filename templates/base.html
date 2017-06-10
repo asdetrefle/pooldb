@@ -27,22 +27,23 @@
 <style>
 div.nav {
     overflow: hidden;
-    background: #79aec8;
-    font-family: Arial;
+    background: #006bb6;
+    font-weight:lighter;
     border: none;
     padding: 0px 8px 0px 30px;
-    font-size: 16px;
+    font-size: 15px;
     color: #c4dce8;
     text-align: left;
 }
 
 div.nav a {
     float: left;
-    font-size: 16px;
+    font-size: 15px;
     color: white;
     text-align: center;
     padding: 12px 8px;
     text-decoration: none;
+    font-weight:lighter;
 }
 
 div.nav .dropdown {
@@ -52,7 +53,12 @@ div.nav .dropdown {
 }
 
 div.dropdown .dropbtn, .nodropbtn { 
-    font-size: 18px;    
+    font-size: 15px;    
+    font-weight: 200;
+    color: #fff;
+    line-height: normal;
+    letter-spacing: 1px;
+    display: table-cell;
     border: none;
     outline: none;
     color: white;
@@ -63,12 +69,15 @@ div.dropdown .dropbtn, .nodropbtn {
 }
 
 div.dropdown:hover .dropbtn:hover {
-    background-color: grey;
+    background-color: #ddd;
+    color: #002f50;
+    font-weight: 300;
     cursor: pointer;
 }
 
 div.dropdown:hover .nodropbtn:hover {
     cursor: pointer;
+    text-decoration: underline;
 }
 
 div.dropdown-content {
@@ -84,6 +93,7 @@ div.dropdown-content a {
     float: none;
     color: black;
     padding: 10px 16px;
+    font-weight: 300;
     text-decoration: none;
     display: block;
     text-align: left;
@@ -96,6 +106,9 @@ div.dropdown-content a:hover {
 div.dropdown:hover div.dropdown-content {
     display: block;
 }
+
+*{font-family:'Helvetica Neue', 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', sans-serif;}
+
 </style>
 
 </head>
@@ -109,7 +122,7 @@ div.dropdown:hover div.dropdown-content {
 
     {% if not is_popup %}
     <!-- Header -->
-    <div id="header" style="height:40px;padding: 20px 40px">
+    <div id="header" style="background:#002F50;padding: 20px 40px">
         <div id="branding">
         {% block branding %}{% endblock %}
         </div>

@@ -2,10 +2,25 @@
 
 {% block title %}{{ title }} | Hong Kong Pool League {% endblock %}
 
+
+{% load static %}
 {% block branding %}
-<h1 id="site-name">Poke n Hope HK Pool League</h1> 
+<style>
+    #site-name {
+        display:inline;
+    font-size: 8em;
+    margin: 2px 2px 20px;
+    font-weight: 300;
+    font-size: 22px;
+    color: #f5dd5d;
+    }
+    </style>
+<div> <div id="site-name">Poke n Hope HK</div>
+        
+    <div style="display:inline">
+    <img src="{% static "fire8ball.png" %}" width="24"></img> </div>  
+        <div id="site-name" style="margin-left:5px">Pool League</div> </div>
 {% endblock %}
 
 {% block nav-global %}
-
-  {% endblock %}
+{% endblock %}

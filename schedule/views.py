@@ -34,13 +34,20 @@ def index(request, season=default_season()):
 
 def listweek(request, week_number, season=default_season()):
     s = Season.objects.get(season=season)
-    wn = min(14, int(week_number))
-    wn = max(1, wn)
-    w = MatchWeek.objects.get(Q(season=s), Q(week_number=wn))
+    wn = int(week_number)
+    mws = MatchWeek.objects.filter(season=s)
+    n_mw = len(mws)
+    try:
+        w = mws.get(week_number=wn)
+    except:
+        return render(request, 'base_site.html', {'content': 'The page you requested does not exist.'})
+
     eow = end_of_week()
 
     start_date = with_timezone(datetime.datetime.combine(w.start_date, datetime.datetime.min.time()))
     end_date = with_timezone(datetime.datetime.combine(w.end_date, datetime.datetime.min.time()))
     matches = LeagueMatch.objects.filter(Q(match_date__gt=start_date), Q(match_date__lt=end_date)).order_by('match_date', 'venue')
-    return render(request, 'schedule.html', {'week': w, 'matches': match_to_dict(matches), 'eow': eow})
+    has_prev = wn>1
+    has_next = wn<n_mw
+    return render(request, 'schedule.html', {'week': w, 'matches': match_to_dict(matches), 'eow': eow, 'has_next': has_next, 'has_prev': has_prev})
 

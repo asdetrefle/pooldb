@@ -7,73 +7,114 @@
 
 <style>
     #container {height: 100%; width:100%; font-size: 0;}
-    #left, #middle, #right {display: inline-block; *display: inline; zoom: 1; vertical-align: top; font-size: 13px;}
-    #left {width:5%}
-    #middle {width:55%}
-    #right {width:30%}
+    #left, #middle, #right {
+        display: inline-block; *display: inline; zoom: 1; vertical-align: top; font-size: 13px;
+        float:left;
+        margin-right:1%;
+        margin-top:-10px;
+    }
+    #left {width:22%}
+    #middle {width:45%}
+    #right {width:31%; margin-right:0}
     div.body {
         width:100%;
         font-weight: 400;
         font-size: 14px;
+        background-color: white;
+        padding-top: 10px;
+        padding-bottom: 20px;
     }
+
+    div.body p, h2 {
+        padding-left:5%;
+        padding-right:5%;
+        word-wrap:break-word;
+    }
+
 </style>
 <div id="container">
 
 <div id="left">
+    <div class="body" style="overflow:auto; height:200px;">
+        <p><span style="font-size:20px;font-weight:400;vertical-align: text-top;"><a href="{% url 'listlive' %}">Live</a></span></p>
+        <hr>
+        <p>No matches currently.</p>
     </div>
-    <div id="middle">
-<div class="body">
-Welcome to Poke n Hope's official website!
-</div>
-<br>
-<div class="body">
-We have several sections now.
-</div>
-<br>
-<div class="body">
-In <a href="{% url 'listlive' %}">Live</a> you will be able to see the real-time scores during matches on Tuesday's and Wednesday's.  
-</div>
-<br>
-<div class="body">
-In <a href="{% url 'schedule' %}">Schedule</a> you can see the full schedule of matches, showing results from matches played and future fixtures.
-</div>
-<br>
-<div class="body">
-In <a href="{% url 'stats' %}">Stats</a>, you will see the normal weekly summary, Player and Team ranking.
-</div>
-<br>
-<div class="body">
-Last but not least, is the <a href="{% url 'recording1' %}">Archive</a> where you can review all matches recorded in the system.
-</div>
-<br>
-<div class="body">
-We would like to mention, in particular the Player Ranking page, a new measure which is commonly used in sporting competitions. We encourage you click <a href="https://en.wikipedia.org/wiki/Elo_rating_system">here</a> for further details. It encompasses a ranking system that takes into account your opponent's level when calculating your ranking points. You will not be over-penalised/over-rewarded if you play a strong/lesser skilled player.
 
+    <div class="body" style="overflow:auto; height:200px;margin-top:20px">
+        <p><span style="font-size:20px;font-weight:400;vertical-align: text-top;">Calendar</span></p>
+        <hr>
+        <p>Presentation Ceremony will be held at Racks on <u>Wednesday 21st June starting at 20:00</u>.</p>
+    </div>
 </div>
-<br>
-<div class="body">
-The ranking points will not affect the final prize for this season. It only informs you of your relative level compared to others. If you think you're underrated in this ranking, the most efficient way to improve your points is by having more run outs.
+<div id="middle">
 
-</div>
-<br>
 <div class="body">
-We have dedicated a lot of time on launching this website. We would be happy to see how these statistics can benefit you and your team.
-
-</div>
-<br>
-<div class="body">
-We are continually adding more features to this website.  Any suggestions or bug reporting are more than welcome.
-
-</div>
-<br>
-<div class="body">
-Thank you for your support and we hope together we can take this sport to the next level and create a global pool community where everyone is welcome! You can contact us at poke.n.hope.hk@gmail.com.
+    <br>
+    <p>Welcome to Poke n Hope's official website!</p>
+    <p>We have several sections now.</p>
+    <p>In <a href="{% url 'listlive' %}">Live</a>, you will be able to see the real-time scores during matches on Tuesday's and Wednesday's.  </p>
+    <p>In <a href="{% url 'schedule' %}">Schedule</a>, you can see the full schedule of matches, showing results from matches played and future fixtures.</p>
+    <p>In <a href="{% url 'stats' %}">Stats</a>, you will see the normal weekly summary, Player and Team ranking.</p>
+    <p>Last but not least, is the <a href="{% url 'recording1' %}">Archive</a> where you can review all matches recorded in the system.</p>
+    <p>We would like to mention, in particular the Player Ranking page, a new measure which is commonly used in sporting competitions. We encourage you click <a href="https://en.wikipedia.org/wiki/Elo_rating_system">here</a> for further details. It encompasses a ranking system that takes into account your opponent's level when calculating your ranking points. You will not be over-penalised/over-rewarded if you play a strong/lesser skilled player.</p>
+    <p>The ranking points will not affect the final prize for this season. It only informs you of your relative level compared to others. If you think you're underrated in this ranking, the most efficient way to improve your points is by having more run outs.</p>
+    <p>We have dedicated a lot of time on launching this website. We would be happy to see how these statistics can benefit you and your team.</p>
+    <p>We are continually adding more features to this website.  Any suggestions or bug reporting are more than welcome.</p>
+    <p>Thank you for your support and we hope together we can take this sport to the next level and create a global pool community where everyone is welcome! You can contact us at poke.n.hope.hk@gmail.com.</p>
 </div>
 </div>
 <div id="right">
-    <span style="font-weight:bold;font-size:20px"> NEWS FLASH:</span> 
-    <br>
-    <span style="font-size:15px">No more news.</span>
+    <div class="body" style="overflow:auto; height:500px;">
+        <p><span style="font-size:20px;font-weight:500;vertical-align: text-top">Season 3 Results:</span></p>
+        <hr>
+    <p>
+    <b>Champions:</b> Anything is Fine (72)<br>
+    <b>1st Runner Up:</b> Just the Tip (62)<br>
+    <b>2nd Runner Up:</b> The Abangers (56)</p>
+
+    <p>
+<b>Top Male:</b><br>
+Yuri (720)<br>
+Andrew (667)<br>
+Arthur and Elton (647)
+</p>
+
+<p>
+<b>Top Female:</b><br>
+Mancy (683)<br>
+Lily (619)<br>
+Annie (537)
+</p>
+
+<p>
+<b>Top Average Male:</b><br>
+Alvaro (9.0)<br>
+Yuri (8.6)<br>
+Mark Morillo (8.5)
+</p>
+
+<p>
+    <b>Top Average Female:</b><br>
+Mancy (8.1)<br>
+Lily (7.4)<br>
+Catherine (7.0)
+</p>
+
+<p>
+<b>Top Clearance Male:</b><br>
+Lito (9)<br>
+Levis (8)<br>
+Alvaro (7)
+</p>
+
+<p>
+<b>Top Clearance Female:</b><br>
+Annie and Lily (1)
+</p>
+
+<p>Congrats guys and dolls!!!</p>
+    </div>
     <!--
     <br>
     <span style="font-size:15px"> Best wishes for your new adventure and you will be missed.</span>

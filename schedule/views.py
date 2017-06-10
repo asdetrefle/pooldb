@@ -25,6 +25,8 @@ def current_week():
     season = default_season()
     s = Season.objects.get(season=season)
     w = MatchWeek.objects.filter(end_date__gte=timezone.now()).order_by('week_number')
+    if not w:
+        w = MatchWeek.objects.all().order_by("-week_number")
     return w[0].week_number
 
 def index(request, season=default_season()):

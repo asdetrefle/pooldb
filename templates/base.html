@@ -107,6 +107,18 @@ div.dropdown:hover div.dropdown-content {
     display: block;
 }
 
+#main-container { 
+    width: auto;
+    background-color: #EDEEF0;
+}
+
+
+#main-content { 
+    width: 90%;
+    padding-top: 20px;
+    margin:0 auto;
+}
+
 *{font-family:'Helvetica Neue', 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', sans-serif;}
 
 </style>
@@ -114,11 +126,10 @@ div.dropdown:hover div.dropdown-content {
 </head>
 {% load i18n %}
 
-<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}"
-  data-admin-utc-offset="{% now "Z" %}">
+<body id="main-container" data-admin-utc-offset="{% now "Z" %}">
 
 <!-- Container -->
-<div id="container">
+<div id="main-container">
 
     {% if not is_popup %}
     <!-- Header -->
@@ -201,7 +212,7 @@ div.dropdown:hover div.dropdown-content {
     {% endblock messages %}
 
     <!-- Content -->
-    <div id="content" class="{% block coltype %}colM{% endblock %}">
+    <div id="main-content">
         {% block pretitle %}{% endblock %}
         {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
         {% block content %}
@@ -213,7 +224,7 @@ div.dropdown:hover div.dropdown-content {
     </div>
     <!-- END Content -->
 
-    {% block footer %}<div id="footer"></div>{% endblock %}
+    <!--{% block footer %}<div id="footer"></div>{% endblock %}-->
 </div>
 <!-- END Container -->
 

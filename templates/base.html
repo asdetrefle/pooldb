@@ -9,6 +9,95 @@
 {% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}" />{% endif %}
 {% block extrahead %}{% endblock %}
 {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+<script src="//code.jquery.com/jquery-3.1.1.js"></script>
+<script>
+    $(document).ready(function() {
+        $("#stats").hover(
+            function() {
+                $("#statshover").slideDown(500);
+            }, function() {
+                $("#statshover").slideUp(500);
+            }
+        );
+
+    });
+</script>
+
+<style>
+div.nav {
+    overflow: hidden;
+    background: #79aec8;
+    font-family: Arial;
+    border: none;
+    padding: 0px 8px 0px 30px;
+    font-size: 16px;
+    color: #c4dce8;
+    text-align: left;
+}
+
+div.nav a {
+    float: left;
+    font-size: 16px;
+    color: white;
+    text-align: center;
+    padding: 12px 8px;
+    text-decoration: none;
+}
+
+div.nav .dropdown {
+    float: left;
+    overflow: hidden;
+    vertical-align: middle;
+}
+
+div.dropdown .dropbtn, .nodropbtn { 
+    font-size: 18px;    
+    border: none;
+    outline: none;
+    color: white;
+    text-align: center;
+    padding: 10px 10px;
+    background-color: inherit;
+    vertical-align: middle;
+}
+
+div.dropdown:hover .dropbtn:hover {
+    background-color: grey;
+    cursor: pointer;
+}
+
+div.dropdown:hover .nodropbtn:hover {
+    cursor: pointer;
+}
+
+div.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+div.dropdown-content a {
+    float: none;
+    color: black;
+    padding: 10px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+}
+
+div.dropdown-content a:hover {
+    background-color: #ddd;
+}
+
+div.dropdown:hover div.dropdown-content {
+    display: block;
+}
+</style>
+
 </head>
 {% load i18n %}
 
@@ -20,7 +109,7 @@
 
     {% if not is_popup %}
     <!-- Header -->
-    <div id="header">
+    <div id="header" style="height:40px;padding: 20px 40px">
         <div id="branding">
         {% block branding %}{% endblock %}
         </div>
@@ -55,22 +144,39 @@
         {% endif %}
         {% endblock %}
         {% block nav-global %}{% endblock %}
-    </div>
-    <!-- END Header -->
-    {% block breadcrumbs %}
-    <div class="breadcrumbs">
-        <style>
-            div.breadcrumbs a {margin: 4pt}
-        </style>
 
-        <a href="{% url 'home' %}">{% trans 'Home' %} </a>
-        <a href="{% url 'listlive' %}">{% trans 'Live' %}</a>
-        <a href="{% url 'schedule' %}">{% trans 'Schedule' %}</a>
-        <a href="{% url 'stats' %}">{% trans 'Stats' %}</a>
-        <a href="{% url 'recording1' %}">{% trans 'Archive' %}</a>
-    {% if title %} &rsaquo; {{ title }}{% endif %}
+    </div>        
+
+    {% block navbar %}
+    <div class="nav">
+        <div class="dropdown">
+        <a href="{% url 'home' %}" style="padding: 0px"><button class="nodropbtn">Home</button></a> 
+        </div>
+        <div class="dropdown">
+        <a href="{% url 'listlive' %}" style="padding: 0px"><button class="nodropbtn">Live</button></a>
+        </div>
+        <div class="dropdown">
+            <a href="{% url 'schedule' %}" style="padding: 0px"><button class="nodropbtn">Schedule</button></a> 
+        </div>
+        <div class="dropdown">
+            <button class="dropbtn">Stats</button>
+            <div class="dropdown-content">
+                <a href="{% url 'weekly_summary' %}">Summary </a>
+                <a href="{% url 'ranking_teams' %}">Team</a>
+                <a href="{% url 'ranking_players' %}">Player</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <button class="dropbtn">Archive</button>
+            <div class="dropdown-content">
+                <a href="{% url 'listarchive' 'LeagueMatch' %}">League Match</a>
+                <a href="{% url 'listarchive' 'Match' %}">Single Match</a>
+            </div>
+        </div>
     </div>
     {% endblock %}
+    <!-- END Header -->
+
     {% endif %}
 
     {% block messages %}

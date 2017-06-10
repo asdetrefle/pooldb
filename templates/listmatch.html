@@ -9,19 +9,34 @@
   <link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}" />
 {% endblock %}
 {% block content %}
+<style>
+    tr.alt {
+        background: #f6f6f6;
+    }
 
+    tr:nth-child(even){background-color: #f9f9f9;}
+
+
+
+    table {
+        width:100%;
+        border-collapse:collapse;
+        table-layout:fixed;
+    }
+
+    .unsorted   {font-size:1em; color:dimgrey; vertical-align: middle; text-align: center; height:35px}
+</style>
 
 <!-- TODO Add filters that allows to select all matches by player, date, team-->
 
  <table border="0">    
-    <col width="50">
-    <col width="100">
-    <col width="600">
+    <thead>
     <tr>
-        <td align="center"><h3> ID </h3></td>
-        <td align="center"><h3> Date </h3></td>
-        <td align="left"><h3> Match </h3></td>
+        <th class="unsorted" style="width:50px"> ID </td>
+        <th class="unsorted" style="width:100px"> Date </td>
+        <th class="unsorted" style="text-align:left"> Match </td>
     </tr>
+    </thead>
     {% for match in matches %}
     <tr>
         <td align="center"> {{ forloop.counter }} </td>

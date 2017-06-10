@@ -57,7 +57,7 @@ div.dropdown .dropbtn, .nodropbtn {
     font-weight: 300;
     color: #fff;
     line-height: normal;
-    letter-spacing: 1px;
+    letter-spacing: 0px;
     display: table-cell;
     border: none;
     outline: none;
@@ -144,7 +144,7 @@ div.dropdown:hover div.dropdown-content {
                     {% endif %}
                 {% endif %}
                 {% if user.has_usable_password %}
-                <a href="{% url 'admin:password_change' %}">{% trans 'Change password' %}</a> /
+                <a href="{% url 'password_change' %}">{% trans 'Change password' %}</a> /
                 {% endif %}
                 <a href="{% url 'logout' %}?next={{ request.get_full_path }}">{% trans 'Log out' %}</a>
             {% endblock %}

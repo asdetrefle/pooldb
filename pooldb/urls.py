@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^schedule/', include('schedule.urls')),
     url(r'^$', views.index_redirect, name='home_redirect'),
     url(r'^home/$', views.index, name='home'),
-    url(r'^login/$', auth_views.login, {'template_name': 'login.html'}, name='login'),
-    url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
+    url(r'^login/$', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    url(r'^logout/$', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
+    url(r'^change-password/$', auth_views.PasswordResetView.as_view(), name='password_change'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

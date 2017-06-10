@@ -22,6 +22,9 @@ def index_redirect(request):
         return render(request, 'index.html')
 
 
+"""
+### Custom login view template
+
 def login_user(request):
     logout(request)
     username = password = ''
@@ -35,5 +38,5 @@ def login_user(request):
                 login(request, user)
                 return HttpResponseRedirect('/home/')
     return render(request, 'login.html')
-
+"""
 

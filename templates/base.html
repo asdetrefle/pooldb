@@ -153,7 +153,7 @@ div.dropdown:hover div.dropdown-content {
         {% if user.is_active %}
         <div id="user-tools">
             {% block welcome-msg %}
-                {% trans 'Welcome,' %}
+                {% trans '' %}
                 <strong>{% firstof user.get_short_name user.get_username %}</strong>.
             {% endblock %}
             {% block userlinks %}

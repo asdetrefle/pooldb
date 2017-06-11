@@ -5,6 +5,15 @@
 {% block extrahead %}
 {% load staticfiles %}
 <style>
+    #container {height: 100%; width:100%; font-size: 0; min-width: 0;}
+    #main-left {margin-top:-10px;width:72%; margin-left:0; margin-right:1%; background-color:white}
+
+    tr.alt {
+        background: #f6f6f6;
+    }
+
+    tr:nth-child(even){background-color: #f9f9f9;}
+
     .header     {font-size:1.17em; color:grey; font-weight:normal}
     .sortable   {font-size:1em; vertical-align: middle; text-align: center}
     .asc        {font-size:1em; color:black; vertical-align: middle; text-align: center; height:35px}
@@ -79,23 +88,24 @@
 
 {% block content %}
 
- <table border="0" id="trtable" style="display:block;overflow-x:auto">    
+<div id="main-left">
+ <table border="0" id="trtable" style="display:block;overflow-x:auto;">    
     <col width="50">
-    <col width="150">
     <col width="200">
+    <col width="100">
+    <col width="100">
     <col width="128">
     <col width="128">
-    <col width="138">
     <col width="128">
     <col width="128">
     <thead>
     <tr>
         <th class="unsorted">Rank</th>
         <th class="unsorted">Team</th>
-        <th class="sortable desc">Season Legs Won</th>
-        <th class="sortable unsorted">Leg Average</th>
+        <th class="sortable desc">Legs</th>
+        <th class="sortable unsorted">Leg Avg</th>
         <th class="sortable unsorted">Clearances</th>
-        <th class="sortable unsorted">Median Average</th>
+        <th class="sortable unsorted">Median Avg</th>
         <th class="sortable unsorted">Match Played</th>
         <th class="sortable unsorted">Match Won</th>
     </tr>
@@ -117,5 +127,6 @@
 </table>
 <br>
 Last Update: {{ last_update }}
+</div>
 {% endblock %}
 

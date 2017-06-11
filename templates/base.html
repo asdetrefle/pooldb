@@ -9,7 +9,7 @@
 {% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}" />{% endif %}
 {% block extrahead %}{% endblock %}
 {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
-<meta name="viewport" content="width=[widest centered div]"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
 <script src="//code.jquery.com/jquery-3.1.1.js"></script>
 <script>
@@ -26,6 +26,7 @@
 </script>
 
 <style>
+
 div.nav {
     overflow: hidden;
     background: #006bb6;
@@ -108,8 +109,9 @@ div.dropdown:hover div.dropdown-content {
     display: block;
 }
 
-#main-container { 
-    width: auto;
+#main-container, #main-body { 
+    width: 100%;
+    min-width: 0;
     background-color: #EDEEF0;
 }
 
@@ -119,6 +121,7 @@ div.dropdown:hover div.dropdown-content {
     padding-top: 20px;
     margin:0 auto;
     display: block;
+    min-width: 0;
 }
 
 *{font-family:'Helvetica Neue', 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', sans-serif;}
@@ -128,7 +131,7 @@ div.dropdown:hover div.dropdown-content {
 </head>
 {% load i18n %}
 
-<body id="main-container" data-admin-utc-offset="{% now "Z" %}">
+<body id="main-body" data-admin-utc-offset="{% now "Z" %}">
 
 <!-- Container -->
 <div id="main-container">

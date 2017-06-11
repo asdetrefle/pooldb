@@ -6,12 +6,13 @@
 {% block content %}
 
 <style>
-    #container {height: 100%; width:100%; font-size: 0;}
+    #container {height: 100%; width:100%; font-size: 0; min-width: 0;}
     #left, #middle, #right {
         display: inline-block; *display: inline; zoom: 1; vertical-align: top; font-size: 13px;
         float:left;
         margin-right:1%;
         margin-top:-10px;
+        min-width: 0;
     }
     #left {width:22%}
     #middle {width:45%}
@@ -23,6 +24,7 @@
         background-color: white;
         padding-top: 10px;
         padding-bottom: 20px;
+        min-width: 0;
     }
 
     div.body p, h2 {
@@ -34,7 +36,7 @@
 </style>
 <div id="container">
 
-<div id="left">
+<section id="left">
     <div class="body" style="overflow:auto; height:200px;">
         <p><span style="font-size:20px;font-weight:400;vertical-align: text-top;"><a href="{% url 'listlive' %}">Live</a></span></p>
         <hr>
@@ -46,8 +48,8 @@
         <hr>
         <p>Presentation Ceremony will be held at Racks on <u>Wednesday 21st June starting at 20:00</u>.</p>
     </div>
-</div>
-<div id="middle">
+</section>
+<section id="middle">
 
 <div class="body">
     <br>
@@ -63,8 +65,8 @@
     <p>We are continually adding more features to this website.  Any suggestions or bug reporting are more than welcome.</p>
     <p>Thank you for your support and we hope together we can take this sport to the next level and create a global pool community where everyone is welcome! You can contact us at poke.n.hope.hk@gmail.com.</p>
 </div>
-</div>
-<div id="right">
+</section>
+<section id="right">
     <div class="body" style="overflow:auto; height:500px;">
         <p><span style="font-size:20px;font-weight:500;vertical-align: text-top">Season 3 Results:</span></p>
         <hr>
@@ -114,8 +116,8 @@ Annie and Lily (1)
 </p>
 
 <p>Congrats guys and dolls!!!</p>
+<!--
     </div>
-    <!--
     <br>
     <span style="font-size:15px"> Best wishes for your new adventure and you will be missed.</span>
     <br>
@@ -123,7 +125,7 @@ Annie and Lily (1)
     <br>
     <img src="{% static "al.png" %}" width="60%"></img>--> 
     </div>
-</div>
+</section>
 
 {% endblock %}
 

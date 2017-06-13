@@ -28,8 +28,6 @@
     .home_handicap {font-size:0.85em; color:green}
     .away_handicap {font-size:0.85em; color:green}
     .frame_win   {font-weight:bold; color:dodgerblue;}
-    .draw {background-color: deepskyblue; margin: 5pt}
-    .away_win {background-color: red; margin: 5pt}
     td {vertical-align: middle}
     #add_new_frame {padding: 4pt}
     .edit_score {width: 20px; height: 7px; {% if not user.is_active or match.is_completed %}display: none{% endif %};}
@@ -67,19 +65,50 @@
         display: none;
     }
 
-    table {
-        width: 100% !important;
-        table-layout:fixed;
+    .player-name {
+        color:black;
     }
+
 
     @media screen and (max-width: 700px) {
         #header_div {
-            max-width:100vw !important;
+            width:80vw !important;
+        }
+
+        .header {
+            font-size:15px;
         }
 
         #lmatch {
-            max-width:100vw !important;
+            width:50vw !important;
+            min-width:0;
         }
+
+        table {
+            width: 50% !important;
+            min-width:0;
+        }
+
+        .frame_score, .frame_win, .player-name {
+            font-size:10px;
+        }
+        
+        .home_handicap, .away_handicap {
+            font-size:8px;
+        }
+
+        .leg_win {
+            font-size:10px;
+        }
+
+
+    .clear_mark {
+        width: 10px;
+        height: 10px;
+    }
+
+        h3 { font-size:11px !important; }
+
     }
 </style>
 
@@ -188,7 +217,7 @@
 <div id="header_div">
     <div id="header_score">
         <table border="0"> 
-            <col width="80">
+            <col width="90">
             <col width="400">
             <col width="50">
             <col width="120">
@@ -254,7 +283,7 @@
                     <td align="center"> </td>
                 {% endif %}
                 <td align="center"> {{f.leg_number}} </td>
-                <td align="center"> {{f.home_player.player}} </td>
+                <td align="center"> <span class="player-name"> {{f.home_player.player}}</span> </td>
                 <td align="right"> <img class="clear_mark {% if f.cleared_by != f.home_player %}unselected{% endif %}" id="{{ f.id }}_clear_home" style="{% if f.home_score == None and user.is_active and not match.is_completed %}display:inline-block{% endif %}"/></td>
                 <td align="right"> 
                     {% if f.home_score == None %} 
@@ -272,7 +301,7 @@
                     {% endif %} 
                 </td>
                 <td align="left"> <img class="clear_mark {% if f.cleared_by != f.away_player %}unselected{% endif %}" id="{{ f.id }}_clear_away" style="{% if f.away_score == None and user.is_active and not match.is_completed %}display:inline-block{% endif %}"/></td>
-                <td align="center"> {{f.away_player.player}} </td>
+                <td align="center">  <span class="player-name"> {{f.away_player.player}} </span></td>
             {% endfor %}
             </tr>
         {% endfor %}

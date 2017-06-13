@@ -1,0 +1,81 @@
+    .header     {font-size:1.17em; color:dimgrey; font-weight:normal}
+    .header_loss    {font-size:1.5em; color:dimgrey; font-weight:normal}
+    .raw_pts    {font-size:1.0em; color:midnightblue; font-weight:normal}
+    .header_win {font-size:1.5em; color:dodgerblue; font-weight:bold}
+    .leg_win {display: block;
+        font-size: 1.17em;
+        margin-top: 1em;
+        margin-bottom: 1em;
+        margin-left: 0;
+        margin-right: 0;
+        font-weight: bold;
+        color:dodgerblue;
+    }
+    .home_handicap, .away_handicap {font-size:0.85em; color:green}
+    .frame_win   {font-weight:bold; color:dodgerblue;}
+
+    td {vertical-align: middle}
+    .edit_score {width: 20px; height: 7px; {% if not user.is_active or match.is_completed %}display: none{% endif %};}
+    #header_div {
+        max-width:100%;
+        height: 100px;
+        vertical-align: middle;
+    }
+    #header_score { 
+        width: 50%;
+        margin: 0px;
+        text-align: left;
+        vertical-align: middle;
+        display:inline-block;
+        float: left;
+    }
+    #submit_edit {
+        width: 50%;
+        margin-top: 40px;
+        vertical-align: middle;
+        float: left;
+        display: {% if has_blank_fields and user.is_active %}inline-block{% else %}none{% endif %}
+    }
+    .clear_mark {
+        content: url({% static "eight_ball.png" %});
+        width: 16px;
+        height: 16px;
+        -webkit-transition: all 0.5s ease;
+        -moz-transition: all 0.5s ease;
+        -o-transition: all 0.5s ease;
+        transition: all 0.5s ease;
+    }
+    .unselected {
+        -webkit-filter: opacity(20%); /* Safari 6.0 - 9.0 */
+        filter: opacity(20%);
+        display: none;
+    }
+
+
+
+    @media screen and (max-width: 700px) {
+        #header_div {
+            width:100%;
+            margin-left: 0px;
+        }
+
+        #lmatch {
+            width:100%;
+            margin-left: 0px;
+            font-size:2px !important;
+            min-width:0;
+            border-right:2px solid red;
+        }    
+
+        #header_score {
+            width:100vw;
+            margin-left: 0px;
+        }
+        
+        table {
+            width: 100%;
+            min-width: 0;
+            margin-left: 0px;
+            font-size:2px;
+        }
+    }

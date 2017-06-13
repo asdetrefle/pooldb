@@ -12,9 +12,9 @@
 {% endif %}
 <style>
     .header     {font-size:1.17em; color:dimgrey; font-weight:normal}
+    .header_win {font-size:1.5em; color:dodgerblue; font-weight:bold}
     .header_loss    {font-size:1.5em; color:dimgrey; font-weight:normal}
     .raw_pts    {font-size:1.0em; color:midnightblue; font-weight:normal}
-    .header_win {font-size:1.5em; color:dodgerblue; font-weight:bold}
     .player_clear {font-weight:bold;background-color:yellow}
     .leg_win {display: block;
         font-size: 1.17em;
@@ -72,11 +72,15 @@
 
     @media screen and (max-width: 700px) {
         #header_div {
-            width:80vw !important;
+            width:50vw !important;
         }
 
-        .header {
+        .header, .header_win, .header_loss {
             font-size:15px;
+        }
+
+        .raw_pts {
+            font-size:12px;
         }
 
         #lmatch {
@@ -87,6 +91,10 @@
         table {
             width: 50% !important;
             min-width:0;
+        }
+
+        td {
+            padding: 1vw 1vw;
         }
 
         .frame_score, .frame_win, .player-name {

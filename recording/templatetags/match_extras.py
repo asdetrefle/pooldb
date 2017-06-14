@@ -18,3 +18,21 @@ def get_item(l, i):
     except:
         return None
 
+
+@register.filter(name="first_name")
+@stringfilter
+def get_first_name(l):
+    try:
+        splitted = str(l).split(" ")
+        return str(splitted[0])
+    except:
+        return str("")
+
+@register.filter(name="last_name")
+@stringfilter
+def get_last_name(l):
+    try:
+        splitted = l.split(" ")
+        return str(splitted[-1])
+    except:
+        return str("")

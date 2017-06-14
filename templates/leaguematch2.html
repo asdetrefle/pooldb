@@ -71,13 +71,7 @@
 
     @media screen and (max-width: 700px) {
         #header_div {
-            width:100vw !important;
-        }
-        #header_score {
-            width:100vw !important;
-        }
-        #submit_edit {
-            display:none;
+            width:50vw !important;
         }
 
         .header, .header_win, .header_loss {
@@ -128,7 +122,6 @@
         h2 { font-size:12px !important; }
 
     }
-</style>
 
 <script src="{% static "js/jquery-3.1.1.min.js" %}"></script>
 <script>
@@ -222,6 +215,7 @@
     });  
 </script>
 
+
 {% endblock %}
 
 {% block content %}
@@ -235,7 +229,7 @@
 <div id="header_div">
     <div id="header_score">
         <table border="0"> 
-            <col width="90">
+            <col width="80">
             <col width="400">
             <col width="50">
             <col width="120">
@@ -301,7 +295,7 @@
                     <td align="center"> </td>
                 {% endif %}
                 <td align="center"> {{f.leg_number}} </td>
-                <td align="center"> <span class="first-name"> {{ f.home_player.player|first_name }} </span> <span class="last-name"> {{ f.home_player.player|last_name }}</span> </td>
+                <td align="center"> <span class="first-name">{{f.home_player.player|first_name}}</span>  <span class="last-name">{{f.home_player.player|last_name}}</span></td>
                 <td align="right"> <img class="clear_mark {% if f.cleared_by != f.home_player %}unselected{% endif %}" id="{{ f.id }}_clear_home" style="{% if f.home_score == None and user.is_active and not match.is_completed %}display:inline-block{% endif %}"/></td>
                 <td align="right"> 
                     {% if f.home_score == None %} 
@@ -319,7 +313,7 @@
                     {% endif %} 
                 </td>
                 <td align="left"> <img class="clear_mark {% if f.cleared_by != f.away_player %}unselected{% endif %}" id="{{ f.id }}_clear_away" style="{% if f.away_score == None and user.is_active and not match.is_completed %}display:inline-block{% endif %}"/></td>
-                <td align="center">  <span class="first-name"> {{ f.away_player.player|first_name }} </span> <span class="last-name"> {{ f.away_player.player|last_name }}</span> </td>
+                <td align="center"> {{f.away_player.player}} </td>
             {% endfor %}
             </tr>
         {% endfor %}
@@ -344,4 +338,3 @@
 </form>
 
 {% endblock %}
-

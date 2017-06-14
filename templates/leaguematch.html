@@ -65,21 +65,32 @@
         display: none;
     }
 
-    .first-name, .last_name {
+    .first-name, .last_name, .leg-id {
         color:black;
     }
 
     @media screen and (max-width: 700px) {
         #header_div {
-            width:100vw !important;
-        }
+            width:90vw !important;
+            min-width:0;
+        }      
+        
         #header_score {
-            width:100vw !important;
-        }
-        #submit_edit {
-            display:none;
+            width:90vw !important;
+            min-width:0;
         }
 
+        #lmatch {
+            width:95vw !important;
+            min-width:0;
+            margin-top:-30px;
+        }
+
+        #submit_edit {
+            margin-top:10px;
+            display: {% if has_blank_fields and user.is_active %}inline-block{% else %}none{% endif %}
+            width:auto;
+        }
         .header, .header_win, .header_loss {
             font-size:15px;
         }
@@ -88,21 +99,16 @@
             font-size:12px;
         }
 
-        #lmatch {
-            width:100vw !important;
-            min-width:0;
-        }
-
         table {
-            width: 100vw !important;
+            max-width: 95vw !important;
             min-width:0;
         }
 
         td {
-            padding: 1vw 1vw;
+            padding: 0.5vw 0.5vw;
         }
 
-        .frame_score, .frame_win, .first-name {
+        .frame_score, .frame_win, .first-name, .leg-id {
             font-size:10px;
         }
 
@@ -236,9 +242,9 @@
     <div id="header_score">
         <table border="0"> 
             <col width="90">
-            <col width="400">
+            <col width="300">
             <col width="50">
-            <col width="120">
+            <col width="100">
             <col width="60">
             <tr>
                 <td align="right"><h2><span class="header"> Home : </span></h2></td>
@@ -300,7 +306,7 @@
                 {% if forloop.counter > 1 %}
                     <td align="center"> </td>
                 {% endif %}
-                <td align="center"> {{f.leg_number}} </td>
+                <td align="center"> <span class="leg-id"> {{f.leg_number}} </span> </td>
                 <td align="center"> <span class="first-name"> {{ f.home_player.player|first_name }} </span> <span class="last-name"> {{ f.home_player.player|last_name }}</span> </td>
                 <td align="right"> <img class="clear_mark {% if f.cleared_by != f.home_player %}unselected{% endif %}" id="{{ f.id }}_clear_home" style="{% if f.home_score == None and user.is_active and not match.is_completed %}display:inline-block{% endif %}"/></td>
                 <td align="right"> 

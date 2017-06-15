@@ -10,3 +10,5 @@ django_celery_beat==1.0.1
 django-mathfilters==0.4.0
 python-dateutil==2.5.3
 dj_database_url==0.4.2
+django-guardian==1.4.8
+django-grappelli==2.10.1

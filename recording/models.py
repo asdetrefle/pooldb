@@ -257,6 +257,14 @@ class Match(AbstractMatch):
         return "{} {} vs. {} ".format(self.match_date.date(), self.home, self.away)
 
 
+    class Meta:
+        permissions = (
+            ('view_match',      'Can view match'),
+            ('record_match',    'Can record match'),
+            ('approve_match',   'Can approve match'),
+        )
+
+
 class LeagueMatch(AbstractMatch):
     home = models.ForeignKey(
         Team,
@@ -565,6 +573,12 @@ class LeagueMatch(AbstractMatch):
     def __str__(self):
         return "{} {} vs. {}".format(self.match_date.date(), self.home, self.away)
 
+    class Meta:
+        permissions = (
+            ('view_leaguematch',      'Can view leaguematch'),
+            ('record_leaguematch',    'Can record leaguematch'),
+            ('approve_leaguematch',   'Can approve leaguematch'),
+        )
 
 class Frame(models.Model):
     match = models.ForeignKey(

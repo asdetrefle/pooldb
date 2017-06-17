@@ -48,6 +48,7 @@ class Group(models.Model):
     size = models.IntegerField(default=0)
     create_date = models.DateTimeField('date joined', default=timezone.now)
     close_date  = models.DateTimeField('date ended', blank=True, null=True)
+    logo = models.ImageField(blank=True, null=True)
 
     def _update_size(self):
         self.size = len(self.member_set.all())

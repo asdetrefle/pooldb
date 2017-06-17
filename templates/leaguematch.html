@@ -117,7 +117,7 @@
         }
         
         .home_handicap, .away_handicap {
-            font-size:8px;
+            font-size:7px;
         }
 
         .leg_win {
@@ -252,6 +252,7 @@
                 <td align="right"><h2> {% if match.winner == match.home %} ✔ {% endif %} </h2></td>
                 <td align="center"><h2><span class="{% if match.away_score < match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.home_score}}</span></h2></td>
                 <td align="center"><h2><span class="raw_pts"> ({{match.home_points_raw}}) </span></h2></td>
+                <!--<td><img src="{{ match.home.logo.url }}" width="40"></td>-->
             </tr>
             <tr>
                 <td align="right"><h2><span class="header"> Away : </span></h2></td>
@@ -259,6 +260,7 @@
                 <td align="right"><h2>  {% if match.winner == match.away %} ✔ {% endif %} </h2></td>
                 <td align="center"><h2><span class="{% if match.away_score > match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.away_score}} </span></h2></td>
                 <td align="center"><h2><span class="raw_pts"> ({{match.away_points_raw}}) </span></h2></td>
+                <!--<td><img src="{{ match.away.logo.url }}" width="40"></td>-->
             </tr>
         </table>
     </div>

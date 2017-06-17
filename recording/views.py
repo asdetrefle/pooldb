@@ -204,7 +204,7 @@ def edit(request, type_, match_id):
     # TODO: after each edit, the league match view is loaded again: this makes it inconvenient to go back to match list
     pattern = re.compile(r'(\d+) (home|away|clear)')
     if request.method == 'POST':
-        match = get_object_or_404(LeagueMatch, id=match_id)
+        match = get_object_or_404(LeagueMatch, pk=match_id)
         if not request.user.has_perm('recording.record_leaguematch', match):
             return render(request, 'base_site.html', {'content': 'Permission denied.'})
 
@@ -216,7 +216,7 @@ def edit(request, type_, match_id):
             if key_match:
                 frame_id, field = key_match.groups()
                 frame_id = int(frame_id)
-                frame = get_object_or_404(LeagueFrame, id=frame_id)
+                frame = get_object_or_404(LeagueFrame, pk=frame_id)
                 if field in ('home', 'away'):
                     if value:
                         score = int(value)

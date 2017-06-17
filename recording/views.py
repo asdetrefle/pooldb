@@ -7,7 +7,7 @@ from administration.models import Member, Team, League
 from django.contrib import messages
 import re, ast
 from utils import end_of_week
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required as _need_perm
 
 
 _need_login = login_required(login_url='/login/')
@@ -74,6 +74,7 @@ def listarchive(request, type_):
 
 
 def listlive(request, type_='LeagueMatch'):
+    print request.user.is_authenticated()
     eow = end_of_week()
     if type_=='Match':
         matches = Match.objects.filter(is_completed=False).order_by('match_date')
@@ -86,11 +87,7 @@ def listlive(request, type_='LeagueMatch'):
         return render(request, 'base_site.html', {'content': 'No matches currently.'})
 
 
-def listleg(request):
-    matches = LeagueMatch.objects.all()
-    return render(request, 'listmatch.html', {'matches': matches, 'type_': 'LeagueMatch'})
-
-
+@_need_login
 def initialize(request, match_id, type_):
     # currently only provide initialize method for LeagueMatch
     # initialize method is also useful for Match in case of a tournament.
@@ -98,6 +95,9 @@ def initialize(request, match_id, type_):
     # TODO: use django model form; add validation; how to represent properly the lists of players via POST?
     if type_ == 'LeagueMatch':
         match = get_object_or_404(LeagueMatch, pk=match_id)
+        if not request.user.has_perm('recording.record_leaguematch', match):
+            return render(request, 'base_site.html', {'content': 'Permission denied.'})
+
         if match.is_initialized:
             return redirect('match_view', type_=type_, match_id=match_id)
 
@@ -126,6 +126,8 @@ def init_submit(request, type_, match_id):
     # TODO:it may be slow to update DB for each input; instead, we should update all the fields of a frame and then do frame.save()
     # TODO: after each edit, the league match view is loaded again: this makes it inconvenient to go back to match list
     match = get_object_or_404(LeagueMatch, pk=match_id)
+    if not request.user.has_perm('recording.record_leaguematch', match):
+        return render(request, 'base_site.html', {'content': 'Permission denied.'})
 
     if request.method == 'POST':
         selected_home_players = []
@@ -137,79 +139,6 @@ def init_submit(request, type_, match_id):
         print selected_away_players
         match.initialize(selected_away_players, selected_home_players)
         return redirect('match_view', type_=type_, match_id=match_id)
-    else:
-        raise Http404
-
-
-def match_view_old(request, match_id, type_):
-    print 'tata', match_id, type_
-    # TODO: now view_match and add_frame are using the same frame; maybe separate them for clarity
-    # TODO: use django form and add validation
-    if type_ == 'LeagueMatch':
-
-        leaguematch = get_object_or_404(LeagueMatch, pk=match_id)
-        # leg.update_all()
-        if not leaguematch.is_initialized:
-            #raise Http404
-            pass
-
-        if request.method == 'POST':
-            raise
-            break_player = get_object_or_404(Member, pk=int(request.POST['break_player']))
-            home_score = int(request.POST['home_score'])
-            away_score = int(request.POST['away_score'])
-            clear_player_id = int(request.POST['clear_player'])
-            home_player = get_object_or_404(Member, pk=int(request.POST['home_player']))
-            away_player = get_object_or_404(Member, pk=int(request.POST['away_player']))
-            nb = leg.number_frames + 1
-            frame = LeagueFrame(frame_number=nb,
-                                leg=leg,
-                                home_score=home_score,
-                                away_score=away_score,
-                                break_player=break_player,
-                                home_player=home_player,
-                                away_player=away_player)
-            if clear_player_id < 0:  # not a clearance
-                frame.is_clearance = False
-            else:
-                # clear_player_id = int(clear_player_id)
-                frame.is_clearance = True
-                clear_player = get_object_or_404(Member, pk=clear_player_id)
-                frame.cleared_by = clear_player
-            frame.save()
-            leg.update_all()
-        frames = leaguematch.leagueframe_set.all()
-        rounds = len(frames)
-        leg_nb = leaguematch.leg
-
-        legs = {'leg_{}'.format(x): [] for x in range(1, leg_nb+1)}
-        for f in frames:
-            legs['leg_{}'.format(f.leg_number)].append(f)
-
-        return render(request, 'leaguematch.html', {'leg': leg, 'frames': frames, 'away_team_members': away_team_members,
-                                            'home_team_members': home_team_members})
-    elif type_ == 'Match':
-        print 'toto'
-        match = get_object_or_404(Match, pk=match_id)
-        # match.update_all()
-        if request.method == 'POST':
-            break_player = get_object_or_404(Member, pk=int(request.POST['break_player']))
-            home_score = int(request.POST['home_score'])
-            away_score = int(request.POST['away_score'])
-            clear_player_id = request.POST['clear_player']
-            nb = match.number_frames + 1
-            frame = Frame(frame_number=nb, match=match, home_score=home_score, away_score=away_score, break_player=break_player)
-            if clear_player_id == "":  # not a clearance
-                frame.is_clearance = False
-            else:
-                clear_player_id = int(clear_player_id)
-                frame.is_clearance = True
-                clear_player = get_object_or_404(Member, pk=clear_player_id)
-                frame.cleared_by = clear_player
-            frame.save()
-            match.update_all()
-        frames = match.frame_set.all()
-        return render(request, 'match.html', {'match': match, 'frames': frames})
     else:
         raise Http404
 
@@ -268,54 +197,6 @@ def match_view(request, type_, match_id):
         raise Http404
 
 
-def leg_view(request, leg_id):
-    # TODO: now view_match and add_frame are using the same frame; maybe separate them for clarity
-    # TODO: use django form and add validation
-    leg = get_object_or_404(LeagueMatch, pk=leg_id)
-    # leg.update_all()
-    if request.method == 'POST':
-        break_player = get_object_or_404(Member, pk=int(request.POST['break_player']))
-        home_score = int(request.POST['home_score'])
-        away_score = int(request.POST['away_score'])
-        clear_player_id = int(request.POST['clear_player'])
-        home_player = get_object_or_404(Member, pk=int(request.POST['home_player']))
-        away_player = get_object_or_404(Member, pk=int(request.POST['away_player']))
-        nb = leg.number_frames + 1
-        frame = LeagueFrame(frame_number=nb,
-                            leg=leg,
-                            home_score=home_score,
-                            away_score=away_score,
-                            break_player=break_player,
-                            home_player=home_player,
-                            away_player=away_player)
-        if clear_player_id < 0:  # not a clearance
-            frame.is_clearance = False
-        else:
-            # clear_player_id = int(clear_player_id)
-            frame.is_clearance = True
-            clear_player = get_object_or_404(Member, pk=clear_player_id)
-            frame.cleared_by = clear_player
-        frame.save()
-        leg.update_all()
-    frames = leg.leagueframe_set.all()
-    away_team_members = leg.away_team.member_set.all()
-    home_team_members = leg.home_team.member_set.all()
-    return render(request, 'leaguematch.html', {'leg': leg, 'frames': frames, 'away_team_members': away_team_members,
-                                        'home_team_members': home_team_members})
-
-
-def leg_close(request, leg_id):
-    leg = get_object_or_404(LeagueMatch, pk=leg_id)
-    if leg.is_completed:
-        raise Http404
-    else:
-        leg.is_completed = True
-        leg.save()
-        messages.success(request, 'Successfully closed the leg.')
-        # TODO: maybe use redirect
-        return HttpResponseRedirect('/recording/leg/{}/'.format(leg_id))
-
-
 @_need_login
 def edit(request, type_, match_id):
     # TODO: more proper way to edit; add validation; maybe use form/formset again
@@ -324,6 +205,9 @@ def edit(request, type_, match_id):
     pattern = re.compile(r'(\d+) (home|away|clear)')
     if request.method == 'POST':
         match = get_object_or_404(LeagueMatch, id=match_id)
+        if not request.user.has_perm('recording.record_leaguematch', match):
+            return render(request, 'base_site.html', {'content': 'Permission denied.'})
+
         if match.is_completed:
             return redirect('match_view', type_=type_, match_id=match_id)
         has_blank_fields = False

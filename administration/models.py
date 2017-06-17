@@ -3,13 +3,44 @@ from __future__ import unicode_literals
 from django.db import models
 from django.utils import timezone
 from django.core.validators import RegexValidator
+from django.contrib.auth.models import User
 from schedule.models import Season
 import datetime
 import scipy.stats as ss
 from utils import default_season
 import numpy as np
 
+
 # Create your models here.
+class Player(models.Model):
+    user = models.OneToOneField(User,
+                                on_delete=models.CASCADE,
+                                blank=True,
+                                null=True)
+    SEX_CHOICES = (
+        ('F', 'Female'),
+        ('M', 'Male'),
+        ('I', 'Intersex')
+    )
+    phone_regex = RegexValidator(regex=r'^\+\d{8,15}$',
+                                 message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
+    name    = models.CharField(max_length=200)
+    username = models.CharField(max_length=200)
+    sex     = models.CharField(max_length=1, choices=SEX_CHOICES)
+    phone   = models.CharField(validators=[phone_regex], max_length=16, blank=True, null=True);
+    email   = models.EmailField(max_length=200, blank=True, null=True)
+    nb_groups = models.IntegerField('Number of groups', default=0)
+
+    def _update_nb_groups(self):
+        self.nb_groups = len(self.member_set.all())
+        return
+
+    def update_all(self):
+        self._update_nb_groups()
+        return
+
+    def __str__(self):
+        return self.name
 
 
 class Group(models.Model):
@@ -168,14 +199,6 @@ class League(models.Model):
             ts['clearances'].setdefault(lm.home, {})[week] = [pk, 0]
             ts['clearances'].setdefault(lm.away, {})[week] = [pk, 0]
 
-            """
-            for m in lm.get_matches():
-                ps['points'].setdefault(m.home.player, {})[week] = ps['points'].get(m.home.player, {}).get(week, 0) + m.home_score
-                ps['points'].setdefault(m.away.player, {})[week] = ps['points'].get(m.away.player, {}).get(week, 0) + m.away_score
-                ps['clearances'].setdefault(m.home.player, {})[week] = 0
-                ps['clearances'].setdefault(m.away.player, {})[week] = 0
-            """
-
             for lf in lm.leagueframe_set.select_related("home_player__player", "away_player__player").all():
                 hp = lf.home_player.player
                 ap = lf.away_player.player
@@ -189,33 +212,6 @@ class League(models.Model):
                     ps['clearances'].setdefault(ap, {}).setdefault(week, [pk, 0])[1] += 1
 
         return ts, ps
-
-    def __str__(self):
-        return self.name
-
-
-class Player(models.Model):
-    SEX_CHOICES = (
-        ('F', 'Female'),
-        ('M', 'Male'),
-        ('I', 'Intersex')
-    )
-    phone_regex = RegexValidator(regex=r'^\+\d{8,15}$',
-                                 message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
-    name    = models.CharField(max_length=200)
-    username = models.CharField(max_length=200)
-    sex     = models.CharField(max_length=1, choices=SEX_CHOICES)
-    phone   = models.CharField(validators=[phone_regex], max_length=16, blank=True, null=True);
-    email   = models.EmailField(max_length=200, blank=True, null=True)
-    nb_groups = models.IntegerField('Number of groups', default=0)
-
-    def _update_nb_groups(self):
-        self.nb_groups = len(self.member_set.all())
-        return
-
-    def update_all(self):
-        self._update_nb_groups()
-        return
 
     def __str__(self):
         return self.name
@@ -286,7 +282,6 @@ class Team(Group):
 
     def __str__(self):
         return "{} ({})".format(self.name, self.team_number)
-
 
 class Member(models.Model):
     player = models.ForeignKey(

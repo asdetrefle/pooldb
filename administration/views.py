@@ -12,5 +12,4 @@ def index(request):
 
 def view_team(request, team_pk):
     t = Team.objects.get(pk=team_pk)
-    print t.logo.url
     return render(request, 'team_profile.html', {'team': t})

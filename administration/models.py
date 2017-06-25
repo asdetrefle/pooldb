@@ -284,6 +284,23 @@ class Team(Group):
     def __str__(self):
         return "{} ({})".format(self.name, self.team_number)
 
+
+class TeamSeasonal(models.Model):
+    season = models.ForeignKey(Season, models.CASCADE)
+    team = models.ForeignKey(Team, models.CASCADE)
+    team_number = models.IntegerField(default=0)
+    season_ranking = models.IntegerField(default=0)
+    season_points = models.IntegerField(default=0)
+    season_clearances = models.IntegerField(default=0)
+    season_matches_played= models.IntegerField(default=0)
+    season_matches_won   = models.IntegerField(default=0)
+    season_legs_played  = models.IntegerField(default=0)
+    season_legs_won     = models.IntegerField(default=0)
+
+    def __str__(self):
+        return "Season {} - Team {}".format(self.season, self.team)
+
+
 class Member(models.Model):
     player = models.ForeignKey(
         Player,

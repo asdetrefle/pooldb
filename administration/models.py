@@ -222,6 +222,8 @@ class Team(Group):
     ranking = models.IntegerField(default=0)
     team_number = models.IntegerField(default=0)
 
+    season_points = models.IntegerField(default=0)
+    season_clearances = models.IntegerField(default=0)
     total_matches_played= models.IntegerField(default=0)
     total_matches_won   = models.IntegerField(default=0)
     season_matches_played= models.IntegerField(default=0)
@@ -243,7 +245,28 @@ class Team(Group):
         null=True
     )
 
-    def season_points(self):
+    def update_seasonal(self, s):
+        _s = Season.objects.get(season=s)
+        ts = self.teamseasonal_set.filter(season=_s)
+
+        if not ts:
+            seasonal = self.teamseasonal_set.create(season=_s,
+                                                    team_number=self.team_number)
+        else:
+            seasonal = ts.first()
+
+        seasonal.ranking = self.ranking
+        seasonal.points = self.season_points
+        seasonal.clearances = self.season_clearances
+        seasonal.matches_played= self.season_matches_played
+        seasonal.matches_won   = self.season_matches_won
+        seasonal.legs_played  = self.season_legs_played
+        seasonal.legs_won     = self.season_legs_won
+
+        seasonal.save()
+        return
+
+    def get_season_points(self):
         season = Season.objects.get(season=default_season())
         points = 0
         ms_home = self.leaguematch_home.filter(season=season)
@@ -253,6 +276,10 @@ class Team(Group):
         ms_away = self.leaguematch_away.filter(season=season)
         for m in ms_away:
             points += m.away_points_raw
+        self.season_points = points
+        res = self.stats_summary()
+        self.season_clearances = res['clearances']
+        self.save()
 
         return points
 
@@ -289,16 +316,16 @@ class TeamSeasonal(models.Model):
     season = models.ForeignKey(Season, models.CASCADE)
     team = models.ForeignKey(Team, models.CASCADE)
     team_number = models.IntegerField(default=0)
-    season_ranking = models.IntegerField(default=0)
-    season_points = models.IntegerField(default=0)
-    season_clearances = models.IntegerField(default=0)
-    season_matches_played= models.IntegerField(default=0)
-    season_matches_won   = models.IntegerField(default=0)
-    season_legs_played  = models.IntegerField(default=0)
-    season_legs_won     = models.IntegerField(default=0)
+    ranking = models.IntegerField(default=0)
+    points = models.IntegerField(default=0)
+    clearances = models.IntegerField(default=0)
+    matches_played= models.IntegerField(default=0)
+    matches_won   = models.IntegerField(default=0)
+    legs_played  = models.IntegerField(default=0)
+    legs_won     = models.IntegerField(default=0)
 
     def __str__(self):
-        return "Season {} - Team {}".format(self.season, self.team)
+        return "Season {} - Team {}".format(self.season, self.team.name)
 
 
 class Member(models.Model):

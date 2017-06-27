@@ -123,6 +123,37 @@ class League(models.Model):
         self.last_update = timezone.now()
         return
 
+
+    def create_ranking(self):
+        s = Season.objects.get(season=default_season())
+        team_sid = self.teamranking_set.filter(season=s).values('team_id', 'serial_id', 'date').distinct('team_id').order_ny('-date')
+        player_sid = self.teamranking_set.filter(season=s).values('player_id', 'serial_id', 'date').distinct('team_id').order_ny('-date')
+
+        team_sid = {x['team_id']: x['serial_id'] for x in team_sid}
+        player_sid = {x['player_id']: x['player_id'] for x in player_sid}
+
+        ts = self.team_set.all()
+        """
+        for t in ts:
+            self.teamranking_set.create(team=t,
+                                        season=s,
+                                        week=w,
+                                        serial_id=i,
+                                        ranking=t.ranking,
+                                        raw_points=t.season_points,
+                                        clearances=t.clearances,
+                                        matches_played=,
+                                        matches_won=,
+                                        legs_played=,
+                                        legs_won=,)
+            for m in t.member_set.filter(season_matches_played__gt=0):
+                self.playerranking_set.create()
+
+        self.last_update = timezone.now() #.format("%Y-%m-%d %H:%M:%S")
+        self.save()
+        """
+        return
+
     def update_all(self):
         self._update_size()
         return

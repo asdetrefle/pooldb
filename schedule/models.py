@@ -6,9 +6,11 @@ from django.db import models
 
 class Season(models.Model):
     season = models.IntegerField()
+    name = models.CharField(max_length=200, null=True, blank=True)
+    league = models.ForeignKey('administration.League', models.CASCADE)
 
     def __str__(self):
-        return "{}-{} Season {}".format(self.season+2014, self.season+2015, self.season)
+        return "Season {} - {}".format(self.season, self.name)
 
 
 class MatchWeek(models.Model):

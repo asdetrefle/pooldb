@@ -62,10 +62,10 @@ def reset_submit(lgpk, week):
             m._point_adj = 0
             m.total_matches_played = 0
             m.total_matches_won = 0
-            m.total_clearance = 0
+            m.total_clearances = 0
             m.season_matches_played = 0
             m.season_matches_won = 0
-            m.season_clearance = 0
+            m.season_clearances = 0
             m.save()
 
         t.ranking = 0
@@ -78,15 +78,16 @@ def reset_submit(lgpk, week):
         t.season_legs_played  = 0
         t.season_legs_won     = 0
         t.save()
-
-
     """
-    for i in range(1,week):
+
+    for i in [week]:
         lms = LeagueMatch.objects.filter(week_id=i)
         for lm in lms:
             lm.submits()
         lg.rank_players()
         lg.rank_teams()
+        lg.create_ranking(i)
+
     return
 
 
@@ -167,3 +168,7 @@ def rpm():
         print m.player, v
 
     return
+
+
+if __name__=='__main__':
+    pass

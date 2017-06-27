@@ -17,6 +17,7 @@ class PlayerRanking(models.Model):
 
     league = models.ForeignKey(League, models.CASCADE)
     player = models.ForeignKey(Member, models.CASCADE)
+    season = models.ForeignKey(Season, models.CASCADE)
     week = models.ForeignKey(MatchWeek, models.CASCADE)
     date = models.DateTimeField('Current ranking date', default=timezone.now)
     serial_id = models.IntegerField()
@@ -27,17 +28,18 @@ class PlayerRanking(models.Model):
 
     matches_played = models.IntegerField(default=0)
     matches_won  = models.IntegerField(default=0)
-    clearance = models.IntegerField(default=0)
+    clearances = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.serial_id
+        return str(self.player) + ' R' + str(self.serial_id)
+
 
 class TeamRanking(models.Model):
 
     league = models.ForeignKey(League, models.CASCADE)
     team = models.ForeignKey(Team, models.CASCADE)
     season = models.ForeignKey(Season, models.CASCADE)
-    weak = models.ForeignKey(MatchWeek, models.CASCADE)
+    week = models.ForeignKey(MatchWeek, models.CASCADE)
     date = models.DateTimeField('Current ranking date', default=timezone.now)
     serial_id = models.IntegerField()
     ranking = models.IntegerField()
@@ -52,4 +54,4 @@ class TeamRanking(models.Model):
     legs_won     = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.serial_id
+        return str(self.team) + ' R' + str(self.serial_id)

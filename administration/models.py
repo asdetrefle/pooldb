@@ -106,11 +106,12 @@ class League(models.Model):
         pk_set = []
         point_set = []
         for t in ts:
+            t.get_season_points()
             pk_set.append(t.pk)
             try:
-                point_set.append([getattr(t, rank_by), t.season_points()])
+                point_set.append([getattr(t, rank_by), t.season_points])
             except AttributeError:
-                point_set.append([getattr(t, 'season_legs_won'), t.season_points()])
+                point_set.append([getattr(t, 'season_legs_won'), t.season_points])
 
         point_set = [- (x[0] + x[1] * 10e-9) for x in point_set]
 
@@ -124,34 +125,67 @@ class League(models.Model):
         return
 
 
-    def create_ranking(self):
+    def create_ranking(self, wn):
         s = Season.objects.get(season=default_season())
-        team_sid = self.teamranking_set.filter(season=s).values('team_id', 'serial_id', 'date').distinct('team_id').order_ny('-date')
-        player_sid = self.teamranking_set.filter(season=s).values('player_id', 'serial_id', 'date').distinct('team_id').order_ny('-date')
+        w = s.matchweek_set.get(week_number=wn)
+
+        team_sid = self.teamranking_set.filter(season=s).values('team_id', 'serial_id', 'date').distinct('team_id').order_by('team_id', '-date')
+        player_sid = self.playerranking_set.filter(season=s).values('player_id', 'serial_id', 'date').distinct('player_id').order_by('player_id', '-date')
 
         team_sid = {x['team_id']: x['serial_id'] for x in team_sid}
-        player_sid = {x['player_id']: x['player_id'] for x in player_sid}
+        player_sid = {x['player_id']: x['serial_id'] for x in player_sid}
+        print team_sid
+        print player_sid
 
         ts = self.team_set.all()
-        """
         for t in ts:
             self.teamranking_set.create(team=t,
                                         season=s,
                                         week=w,
-                                        serial_id=i,
+                                        serial_id=team_sid.get(t.id, 0)+1,
                                         ranking=t.ranking,
                                         raw_points=t.season_points,
-                                        clearances=t.clearances,
-                                        matches_played=,
-                                        matches_won=,
-                                        legs_played=,
-                                        legs_won=,)
-            for m in t.member_set.filter(season_matches_played__gt=0):
-                self.playerranking_set.create()
+                                        clearances=t.season_clearances,
+                                        matches_played=t.season_matches_played,
+                                        matches_won=t.season_matches_won,
+                                        legs_played=t.season_legs_played,
+                                        legs_won=t.season_legs_won)
+            """
+            tr = self.teamranking_set.get(team=t, week=w)
+            tr.ranking=t.ranking
+            tr.raw_points=t.season_points
+            tr.clearances=t.season_clearances
+            tr.matches_played=t.season_matches_played
+            tr.matches_won=t.season_matches_won
+            tr.legs_played=t.season_legs_played
+            tr.legs_won=t.season_legs_won
+            tr.save()
+            """
 
-        self.last_update = timezone.now() #.format("%Y-%m-%d %H:%M:%S")
-        self.save()
-        """
+            for m in t.member_set.filter(season_matches_played__gt=0):
+                self.playerranking_set.create(player=m,
+                                              season=s,
+                                              week=w,
+                                              serial_id=player_sid.get(m.id, 0)+1,
+                                              ranking=m.ranking,
+                                              elo_points=m.points,
+                                              raw_points=m.raw_points,
+                                              handicap=m.handicap,
+                                              clearances=m.season_clearances,
+                                              matches_played=m.season_matches_played,
+                                              matches_won=m.season_matches_won)
+                """
+                pr = self.playerranking_set.get(player=m, week=w)
+                pr.ranking=m.ranking
+                pr.elo_points=m.points
+                pr.raw_points=m.raw_points
+                pr.handicap=m.handicap
+                pr.clearances=m.season_clearances
+                pr.matches_played=m.season_matches_played
+                pr.matches_won=m.season_matches_won
+                pr.save()
+                """
+
         return
 
     def update_all(self):
@@ -300,11 +334,11 @@ class Team(Group):
     def get_season_points(self):
         season = Season.objects.get(season=default_season())
         points = 0
-        ms_home = self.leaguematch_home.filter(season=season)
+        ms_home = self.leaguematch_home.filter(season=season, is_submitted=True)
         for m in ms_home:
             points += m.home_points_raw
 
-        ms_away = self.leaguematch_away.filter(season=season)
+        ms_away = self.leaguematch_away.filter(season=season, is_submitted=True)
         for m in ms_away:
             points += m.away_points_raw
         self.season_points = points
@@ -322,7 +356,7 @@ class Team(Group):
         for mb in mbs:
             if mb.handicap<0:
                 continue
-            data.append([mb.raw_points, mb.season_clearance, mb.handicap])
+            data.append([mb.raw_points, mb.season_clearances, mb.handicap])
 
         data = np.array(data)
         res = {}
@@ -387,10 +421,10 @@ class Member(models.Model):
 
     total_matches_played = models.IntegerField(default=0)
     total_matches_won   = models.IntegerField(default=0)
-    total_clearance = models.IntegerField(default=0)
+    total_clearances = models.IntegerField(default=0)
     season_matches_played = models.IntegerField(default=0)
     season_matches_won  = models.IntegerField(default=0)
-    season_clearance = models.IntegerField(default=0)
+    season_clearances = models.IntegerField(default=0)
 
 
     def new_season(self):

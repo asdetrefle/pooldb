@@ -224,11 +224,11 @@ class Match(AbstractMatch):
         for f in self.frames():
             if f.is_clearance:
                 if f.cleared_by==self.home:
-                    self.home.total_clearance += 1
-                    self.home.season_clearance += 1
+                    self.home.total_clearances += 1
+                    self.home.season_clearances += 1
                 else:
-                    self.away.total_clearance += 1
-                    self.away.season_clearance += 1
+                    self.away.total_clearances += 1
+                    self.away.season_clearances += 1
 
         # adjust points for members using ELO Ranking systems
         home_score_ = self.home_score

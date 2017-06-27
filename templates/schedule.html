@@ -15,21 +15,21 @@
     #add_new_frame {padding: 4pt}
     tab {padding-left: 3em}
     div.week_left {
-        width:240px;
+        width:20%;
         margin:0px;
         text-align: right;
         vertical-align: middle;
         display:inline-block;
     }       
     div.week {
-        width:300px;
+        width:50%;
         margin:0px;
         text-align: center;
         vertical-align: middle;
         display:inline-block;
     }
     div.week_right {
-        width:240px;
+        width:20%;
         margin:0px;
         text-align: left;
         vertical-align: middle;
@@ -38,6 +38,8 @@
 
     @media screen and (max-width: 700px) {
         #main-left {width:100%}
+        div.week_left, .week_right {width:10%}
+        div.week {width:80%}
     }
     </style>
 

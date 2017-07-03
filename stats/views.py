@@ -2,6 +2,12 @@ from django.shortcuts import render
 from administration.models import League, Team, Member, Player
 from operator import itemgetter
 import json
+from .models import PlayerRanking
+from django.contrib.auth.decorators import login_required, permission_required as _need_perm
+from utils import local_date
+
+
+_need_login = login_required(login_url='/login/')
 
 # Create your views here.
 
@@ -136,6 +142,24 @@ def top_n_weeks(ps, n):
         print w, res[w]
 
     return res
+
+def player_hist(request):
+    rs = PlayerRanking.objects.all().select_related("week", "player__player").order_by('player_id', 'serial_id')
+
+    data = {}
+    for r in rs:
+        _ld = str(local_date(r.week.end_date))
+        if r.pk not in data:
+            data.setdefault(r.player_id, {})['name'] = str(r.player.player.name)
+            data.setdefault(r.player_id, {})['id'] = r.player_id
+        data.setdefault(r.player_id, {}).setdefault('ranking', []).append([_ld, r.ranking])
+        data.setdefault(r.player_id, {}).setdefault('average', []).append([_ld, r.handicap])
+        data.setdefault(r.player_id, {}).setdefault('elo', []).append([_ld, r.elo_points])
+
+    #print Member.objects.get(pk=player_pk), PlayerRanking.objects.filter(player_id=player_pk)
+    res = data.values()
+    res.sort(key=lambda a: a['name'])
+    return render(request, 'champaths.html', {'data': res})
 
 
 

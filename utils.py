@@ -3,6 +3,11 @@ from dateutil import relativedelta
 from pooldb.settings import TIME_ZONE
 import pytz, datetime
 
+
+def local_date(dt):
+    local = dt.astimezone(timezone.get_current_timezone())
+    return local.date()
+
 def default_season():
     n = timezone.now()
     season_date = n + relativedelta.relativedelta(months=-1)

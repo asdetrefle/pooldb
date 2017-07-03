@@ -1,0 +1,329 @@
+{% extends "base_site.html" %}
+
+{% block title %} Edit Match {% endblock %}
+
+{% load static from staticfiles %}
+
+{% block extrahead %}
+<style>
+#graphHolder {
+    background-color: white;
+	position: absolute;
+}
+p.loading {
+	font-size: 400%;
+	color: gray;
+}
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+.grid line {
+  stroke: lightgrey;
+  stroke-opacity: 0.7;
+  shape-rendering: crispEdges;
+}
+
+.grid path {
+  stroke-width: 0;
+}
+    #container {height: 100%; width:100%; min-width: 0;}
+    #left, #middle, #right {
+        zoom: 1;
+        float:left;
+        margin-right:1%;
+        margin-top:-10px;
+        min-width: 0;
+    }
+    #left {width:21%}
+    #middle {width:50%}
+    #right {width:27%;margin-right:0}
+    div.body {
+        width:100%;
+        font-weight: 400;
+        font-size: 14px;
+        background-color: white;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        min-width: 0;
+    }
+
+    div.body p, h2 {
+        padding-left:5%;
+        padding-right:5%;
+        word-wrap:break-word;
+    }
+
+    #player_list select {
+        padding:10px; 
+        width:95%;
+        height:300px;
+    }
+
+    #chartSelector {
+        width:90%;
+        margin: 0 auto;
+    }
+
+    @media screen and (max-width: 700px) {
+        #left {float:none}
+        #middle {width:auto;margin-top:20px;margin-right:0;margin-bottom:20px;}
+        #right {width:auto;float:none}
+        div.body p {
+            font-size:14px;
+        }
+    }
+</style>
+<!--<script src="{% static "champaths.js" %}"></script>-->
+
+<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+var width = 0, height = 0, selected, chart = "ranking", ymin=0, ymax=70, yrev=true, showTrends = 0;
+
+var parseTime = d3.timeParse("%Y-%m-%d");
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+}
+function initStarpaths(ids) {
+    //selected = d3.map();
+    //showList();
+    console.log('tata');
+    selectPlayers(ids);
+    //drawAllCharts();
+}
+function selectPlayers(a) {
+    null != a && (selected = d3.map(),
+    a.forEach(function(a) {
+        selected.set(a, 1)
+    }));
+    drawAllCharts();
+}
+
+function drawAllCharts() {
+    null != d3.selectAll("#graph") && d3.selectAll("#graph").remove();
+    $("#graphHolder").html("");
+    var a = {
+        top: 40,
+        right: 50,
+        bottom: 30,
+        left: 60
+    };
+    console.log( d3.select("#middle").style("width") );
+    console.log( d3.select("#middle").style("width") );
+
+    console.log( $("#middle").innerWidth() );
+    console.log(Math.round($(window).width() - 20 - $("#graphHolder").position().left) - a.left - a.right);
+    width = Math.round( $("#middle").innerWidth()); // - $("#graphHolder").position().left) - a.left - a.right;
+    //width = Math.round($(window).width() - 20 - $("#graphHolder").position().left) - a.left - a.right;
+    $("#graphHolder").width(width);
+    height = Math.round($(window).height()/2 - $("#graphHolder").position().top) - a.top - a.bottom;
+    $("#graphHolder").height(height + a.top + a.bottom);
+    
+    console.log('tata');
+    var c = null;
+    dataObject = [];
+    var b = parseTime("2099-12-31")
+    var d = parseTime("2000-01-01")
+    data.forEach(function(a) {
+        selected.has(a.id) && (dataObject.push(a),
+        b = d3.min([b, d3.min(a.ranking, function(a) {
+            return a[0]
+        })]),
+        d = d3.max([d, d3.max(a.ranking, function(a) {
+            return a[0]
+        })]))
+    });
+    var ylabel = null, xlabel = null;
+    drawChart(dataObject, ymin, ymax, chart, yrev, ylabel, xlabel, "M$ (with inflation)", width - 100, height - 30, a);
+}
+
+function drawChart(dataAll, min_, max_, y_name, _yrev,  f, n, p, w, h, m) {
+
+    var data = dataAll[0][y_name];
+    // set the ranges
+    var x = d3.scaleTime().range([0, w]);
+    if (_yrev) {
+        var y = d3.scaleLinear().range([0, h]);
+    } else {
+        var y = d3.scaleLinear().range([h, 0]);
+    }
+
+    // define the line
+    var valueline = d3.line()
+    .x(function(d) { return x(d[0]); })
+    .y(function(d) { return y(d[1]); });
+
+    // append the svg obgect to the body of the page
+    // appends a 'group' element to 'svg'
+    // moves the 'group' element to the top left margin
+    var svg = d3.select("#graphHolder").append("svg")
+                .attr("width",  w + m.left + m.right)
+                .attr("height",  h + m.top + m.bottom)
+                .append("g")
+                .attr("transform",
+                      "translate(" + m.left + "," + m.top + ")");
+
+    // Scale the range of the data
+    x.domain(d3.extent(data, function(d) { return d[0]; }));
+    y.domain([min_, max_]);
+    // add the Y gridlines
+    svg.append("g")
+        .attr("class", "grid")
+        .attr("transform", "translate(0," + h + ")")
+        .call(d3.axisBottom(x)
+            .tickSize(-h)
+            .tickFormat("")
+        )
+
+    // add the Y gridlines
+    svg.append("g")
+        .attr("class", "grid")
+        .call(d3.axisLeft(y)
+            .tickSize(-w)
+            .tickFormat("")
+        )
+    // Add the valueline path.
+    svg.append("path")
+        .data([data])
+        .attr("class", "line")
+        .attr("d", valueline);
+
+
+    // Add the X Axis
+    svg.append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(0," + h + ")")
+        .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%b-%d")))
+        .selectAll("text")
+        .style("text-anchor", "middle")
+        .attr("dx", "-.0em")
+        .attr("dy", ".75em")
+
+    /*
+    // text label for the x axis
+    svg.append("text")
+        .attr("transform",
+            "translate(" + (w/2) + " ," + (h + m.bottom) + ")")
+        .style("text-anchor", "middle")
+        .text("Date");
+    */
+
+    // Add the y Axis
+    svg.append("g")
+        .call(d3.axisLeft(y));
+
+    // text label for the y axis
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -m.left + 10)
+        .attr("x",0 - (h / 2))
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text(y_name.capitalize());
+
+    //c.forEach(function(a) { addPoints(a.id, l, e, j, a[b], n, p, k(a.id))})
+}
+
+function selectPlayers(a) {
+    null != a && (selected = d3.map(),
+    a.forEach(function(a) {
+        selected.set(a, 1)
+    }),
+    drawAllCharts())
+}
+
+function chartChange(a) {
+    chart = a;
+    if (a=='ranking') {
+        ymin=0;
+        ymax=70;
+        yrev=true;
+    } else if (a=='elo') {
+        ymin=100;
+        ymax=300;
+        yrev=false;
+    } else if (a=='average') {
+        ymin=0;
+        ymax=10;
+        yrev=false;
+    }
+    drawAllCharts();
+}
+
+function showList() {
+    var c = "";
+    data.forEach(function(a) {
+        c += "<option value='" + a.id + "'>" + a.name + "</option>"
+    });
+    $("#player_list").html("<select id='player_selector' size='20' multiple>" + c + "</select>");
+    $("#player_selector").change(function() {
+        selectPlayers($(this).val());
+    })
+}
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+<div id="container">
+
+    <section id="left">
+        <div class="body">
+            <p> Select charts: </p>
+        </div>
+        <div class="body">
+            <div id="chartSelector">
+                <input type="radio" value="ranking" id="actorsOption" name="chartOption" checked="checked" /><label for="actorsOption">Ranking</label><br/>
+                <input type="radio" value="average" id="composersOption" name="chartOption" /><label for="composersOption">Average</label><br/>
+                <input type="radio" value="elo" id="directorsOption" name="chartOption" /><label for="directorsOption">Elo</label><br/>
+            </div>
+        </div>
+        <div class="body">
+            <p> Select Player to show ranking: </p>
+        </div>
+        <div id="player_list" class="body" style="height:320;text-align:center"></div>
+    </section>
+    <section id="middle">
+
+        <div id="graphHolder"><p class="loading">Loading...</p></div>
+        <script>
+
+            data = {{data|safe}};
+
+            data.forEach(function(a) {
+                a.ranking.forEach(function(d) {
+                    d[0] = parseTime(d[0]);
+                    d[1] = +d[1];
+                });
+                a.elo.forEach(function(d) {
+                    d[0] = parseTime(d[0]);
+                    d[1] = +d[1];
+                });
+                a.average.forEach(function(d) {
+                    d[0] = parseTime(d[0]);
+                    d[1] = +d[1];
+                });
+            });
+            
+            var s = null;
+
+            $(function() {
+                //$("#chartSelector").controlgroup();
+                $("#chartSelector").change(function(event){
+                    chartChange($("input[type=radio]:checked").val());
+                });
+                showList();
+                drawAllCharts();
+                //initStarpaths(s);
+            });
+
+        </script>
+    </section>
+</div>
+
+
+{% endblock %}

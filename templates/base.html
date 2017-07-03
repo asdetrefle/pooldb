@@ -7,7 +7,6 @@
 <link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}" />
 {% block extrastyle %}{% endblock %}
 {% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}" />{% endif %}
-{% block extrahead %}{% endblock %}
 {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
@@ -135,6 +134,7 @@ div.dropdown:hover div.dropdown-content {
 
 </style>
 
+{% block extrahead %}{% endblock %}
 </head>
 {% load i18n %}
 
@@ -198,6 +198,7 @@ div.dropdown:hover div.dropdown-content {
                 <a href="{% url 'weekly_summary' %}">Summary </a>
                 <a href="{% url 'ranking_teams' %}">Team</a>
                 <a href="{% url 'ranking_players' %}">Player</a>
+                <a href="{% url 'player_hist' %}">Champaths</a>
             </div>
         </div>
         <div class="dropdown">

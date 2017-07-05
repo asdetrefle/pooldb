@@ -303,8 +303,8 @@ class Team(Group):
         models.CASCADE
     )
 
-    capitain = models.ForeignKey(
-        Player,
+    captain = models.ForeignKey(
+        "administration.Member",
         models.SET_NULL,
         blank=True,
         null=True

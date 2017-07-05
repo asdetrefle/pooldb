@@ -1,0 +1,96 @@
+{% extends "base_site.html" %}
+
+{% block title %} Initialize Match {% endblock %}
+
+{% block extrahead %}
+  <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.2/jquery.ui.touch-punch.min.js"></script>
+    
+    <script>
+
+    function after_sorting_players() {
+        // var nb_players = 8;
+        var nb_playing_players = {{ nb_selected_players }};
+        var players = $("#players li");
+        //home_players.draggable();
+        var update_class = function (index) {
+            if (index < nb_playing_players) {
+                return "playing";
+            } else {
+                return "resting";
+            }
+        };
+        var handicap = 0;
+        for (var i = 0; i < nb_playing_players; i++) {
+            if (players[i]) {
+                $("input[name=home" + i + "]").val(players[i].value);
+                handicap += Math.max(parseFloat(players[i].getAttribute("handicap")), 0);
+            }
+        }
+
+        var info = "Indicative handicap: " + handicap.toFixed(1) + "<br>";
+        $("#info").html(info);
+
+        players.removeClass("playing resting").addClass(update_class);
+    }
+
+
+    $(document).ready(function () {
+        var player_lists = $("#players");
+        player_lists.sortable({
+{#            change: function( event, ui ) {after_sorting_players()},#}
+            stop: function( event, ui ) {after_sorting_players()},
+{#            update: function( event, ui ) {console.log("update")},#}
+        });
+        player_lists.disableSelection();
+        after_sorting_players();
+    })
+    </script>
+
+    <style>
+    #players { margin: 0; padding:0 ; width: 60%;list-style-position:inside; }
+    #players li { list-style-type: none;list-style-position:inside;  margin: 0 3px 3px 3px; padding: 0.4em; font-size: 1.2em; height: 18px; width: 180px; background:'transparent'}
+    #players li.playing {background: #74ce86}
+    #players li.resting {background: #de8e8a}
+    </style>
+{% endblock %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+
+<p> Drag to choose the players who play and rank them in desired orders. </p>
+<table border="0">    
+    <col width="300">
+    <tr>
+        <td align="center"><h2> {{ team }} </h2></td>
+    </tr>
+    <tr>
+         <td align="center">
+            <ul id="players">
+            {% for p in players %}
+                <li value="{{ p.id }}" handicap="{{ p.handicap }}">{{ p.player }}{% if p.handicap > 0 %} ({{ p.handicap|floatformat:1 }}){% endif %}</li>
+            {% endfor %}
+            </ul>
+        </td>       
+    </tr>
+</table>
+
+<div style="height:10px"></div>
+<p>
+    <form action="{% url 'match_init_submit' 'LeagueMatch' match_id %}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Submit players">
+    {% for ind in inds %}
+        <input type="hidden" name="home{{ ind }}" value="">
+        <input type="hidden" name="away{{ ind }}" value="">
+    {% endfor %}
+    </form>
+</p>
+<p id="info"></p>
+{% else %}
+    <p>This match has not started or has not been updated. Please come back later.</p>
+    <p>If you are authorized to input the scores of this match, please log in.</p>
+{% endif %}
+{% endblock %}
+

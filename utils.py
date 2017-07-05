@@ -174,6 +174,17 @@ def rpm():
 
     return
 
+def perm():
+    from guardian.shortcuts import assign_perm
+    from django.contrib.auth.models import User
+    from recording.models import LeagueMatch
+    lm = LeagueMatch.objects.get(pk=113)
+    brad = User.objects.get(username='bradt')
+    brad.has_perm('init_leaguematch', lm)
+    assign_perm('init_leaguematch', brad, lm)
+    dep = User.objects.get(username='deepv')
+    assign_perm('init_leaguematch', dep, lm)
+
 
 if __name__=='__main__':
     pass

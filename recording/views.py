@@ -94,8 +94,8 @@ def initialize(request, match_id, type_):
     # We know all matchs ahead but will only know players before the Match
     # TODO: use django model form; add validation; how to represent properly the lists of players via POST?
     if type_ == 'LeagueMatch':
-        match = get_object_or_404(LeagueMatch, pk=match_id)
-        if not request.user.has_perm('recording.record_leaguematch', match):
+        match = get_object_or_404(LeagueMatch.objects.select_related("home__captain__player"), pk=match_id)
+        if not request.user.has_perm('recording.init_leaguematch', match):
             return render(request, 'base_site.html', {'content': 'Permission denied.'})
 
         if match.is_initialized:
@@ -111,11 +111,32 @@ def initialize(request, match_id, type_):
         away_players = match.away.member_set.all().order_by('-season_matches_played')
         nb_selected_players = 5
 
-        return render(request, 'initialize_match.html', {'match': match,
-                                                            'home_players': home_players,
-                                                            'away_players': away_players,
-                                                            'nb_selected_players': nb_selected_players,
-                                                            'inds': list(range(nb_selected_players))})
+        if request.user.is_staff:
+
+            return render(request, 'initialize_match.html', {'match': match,
+                                                                'home_players': home_players,
+                                                                'away_players': away_players,
+                                                                'nb_selected_players': nb_selected_players,
+                                                                'inds': list(range(nb_selected_players))})
+        else:
+            p = request.user.player
+
+            if p == match.home.captain.player:
+                return render(request, 'submit_players.html', {'match_id': match.id,
+                                                                'team': match.home,
+                                                                'players': home_players,
+                                                                'nb_selected_players': nb_selected_players,
+                                                                'inds': list(range(nb_selected_players))})
+            elif p == match.away.captain.player:
+                return render(request, 'submit_players.html', {'match_id': match.id,
+                                                                'team': match.away,
+                                                                'players': away_players,
+                                                                'nb_selected_players': nb_selected_players,
+                                                                'inds': list(range(nb_selected_players))})
+            else:
+                print "This is a bug. Please report."
+
+            raise Http404
     else:
         raise Http404
 
@@ -126,7 +147,7 @@ def init_submit(request, type_, match_id):
     # TODO:it may be slow to update DB for each input; instead, we should update all the fields of a frame and then do frame.save()
     # TODO: after each edit, the league match view is loaded again: this makes it inconvenient to go back to match list
     match = get_object_or_404(LeagueMatch, pk=match_id)
-    if not request.user.has_perm('recording.record_leaguematch', match):
+    if not request.user.has_perm('recording.init_leaguematch', match):
         return render(request, 'base_site.html', {'content': 'Permission denied.'})
 
     if request.method == 'POST':

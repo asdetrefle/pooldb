@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = ')_0p!f-dpekqt5oe^)g*5sv)p9clc(6+zhmd&8w05x44)lxthg'
 
 # SECURITY WARNING: don't run with debug turned on in production!DEBUG = True
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'mathfilters',
     'storages',
+    'guardian',
 ]
 
 MIDDLEWARE = [
@@ -133,6 +134,12 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend', # this is default
+    'guardian.backends.ObjectPermissionBackend',
+)
 
 
 # Internationalization

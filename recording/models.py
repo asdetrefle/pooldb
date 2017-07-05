@@ -260,6 +260,7 @@ class Match(AbstractMatch):
     class Meta:
         permissions = (
             ('view_match',      'Can view match'),
+            ('init_match',      'Can init match'),
             ('record_match',    'Can record match'),
             ('approve_match',   'Can approve match'),
         )
@@ -576,8 +577,9 @@ class LeagueMatch(AbstractMatch):
     class Meta:
         permissions = (
             ('view_leaguematch',      'Can view leaguematch'),
-            ('record_leaguematch',    'Can record leaguematch'),
+            ('init_leaguematch',      'Can init leaguematch'),
             ('approve_leaguematch',   'Can approve leaguematch'),
+            ('record_leaguematch',    'Can record leaguematch'),
         )
 
 class Frame(models.Model):

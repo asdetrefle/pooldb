@@ -242,13 +242,13 @@
     <div id="header_score">
         <table border="0"> 
             <col width="90">
-            <col width="300">
-            <col width="50">
+            <col width="320">
+            <col width="40">
             <col width="100">
             <col width="60">
             <tr>
                 <td align="right"><h2><span class="header"> Home : </span></h2></td>
-                <td><h2><span class="header"> {{match.home.name}} </span></h2></td>
+                <td><h2><span class="header"> <img src="{{ match.home.logo.url }}" width="40"> {{match.home.name}} ({{home_seasonal.team_number}}) </span></h2></td>
                 <td align="right"><h2> {% if match.winner == match.home %} ✔ {% endif %} </h2></td>
                 <td align="center"><h2><span class="{% if match.away_score < match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.home_score}}</span></h2></td>
                 <td align="center"><h2><span class="raw_pts"> ({{match.home_points_raw}}) </span></h2></td>
@@ -256,7 +256,7 @@
             </tr>
             <tr>
                 <td align="right"><h2><span class="header"> Away : </span></h2></td>
-                <td><h2><span class="header"> {{match.away.name}} </span></h2></td>
+                <td><h2><span class="header"> <img src="{{ match.away.logo.url }}" width="40"> {{match.away.name}} ({{away_seasonal.team_number}}) </span></h2></td>
                 <td align="right"><h2>  {% if match.winner == match.away %} ✔ {% endif %} </h2></td>
                 <td align="center"><h2><span class="{% if match.away_score > match.home_score %}header_win{% else %}header_loss{% endif %}"> {{match.away_score}} </span></h2></td>
                 <td align="center"><h2><span class="raw_pts"> ({{match.away_points_raw}}) </span></h2></td>

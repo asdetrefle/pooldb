@@ -319,9 +319,13 @@ class LeagueMatch(AbstractMatch):
 
         return res
 
-    def _create_ordered_players(self, away_players, home_players):
-        self._home_ordered_players = '_'.join([str(x) for x in home_players])
-        self._away_ordered_players = '_'.join([str(x) for x in away_players])
+    def _create_ordered_players(self, away_players=None, home_players=None):
+        if home_players is not None:
+            self._home_ordered_players = '_'.join([str(x) for x in home_players])
+
+        if away_players is not None:
+            self._away_ordered_players = '_'.join([str(x) for x in away_players])
+
         self.save()
         return
 
@@ -339,7 +343,6 @@ class LeagueMatch(AbstractMatch):
 
         for r in range(1, rounds+1):
             l = matching(num_players, r)
-            print l
             for i, p in enumerate(l):
                 players = [Member.objects.get(pk=away_players[p]),
                            Member.objects.get(pk=home_players[i])]

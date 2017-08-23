@@ -106,7 +106,7 @@ class League(models.Model):
         pk_set = []
         point_set = []
         for t in ts:
-            t.get_season_points()
+            t.update_stats()
             pk_set.append(t.pk)
             try:
                 point_set.append([getattr(t, rank_by), t.season_points])
@@ -205,7 +205,7 @@ class League(models.Model):
         return members
 
     def get_ranked_teams(self):
-        ts = list(self.team_set.all());
+        ts = list(self.team_set.exclude(close_date__isnull=False));
 
         ts.sort(key=lambda m: m.ranking)
         return ts
@@ -289,6 +289,9 @@ class Team(Group):
 
     season_points = models.IntegerField(default=0)
     season_clearances = models.IntegerField(default=0)
+    season_leg_average  = models.FloatField(default=0)
+    season_median       = models.FloatField(default=0)
+
     total_matches_played= models.IntegerField(default=0)
     total_matches_won   = models.IntegerField(default=0)
     season_matches_played= models.IntegerField(default=0)
@@ -323,6 +326,9 @@ class Team(Group):
         seasonal.ranking = self.ranking
         seasonal.points = self.season_points
         seasonal.clearances = self.season_clearances
+        seasonal.leg_average = self.season_leg_average
+        seasonal.median      = self.season_median
+
         seasonal.matches_played= self.season_matches_played
         seasonal.matches_won   = self.season_matches_won
         seasonal.legs_played  = self.season_legs_played
@@ -331,7 +337,7 @@ class Team(Group):
         seasonal.save()
         return
 
-    def get_season_points(self):
+    def update_stats(self):
         season = Season.objects.get(season=default_season())
         points = 0
         ms_home = self.leaguematch_home.filter(season=season, is_submitted=True)
@@ -342,16 +348,9 @@ class Team(Group):
         for m in ms_away:
             points += m.away_points_raw
         self.season_points = points
-        res = self.stats_summary()
-        self.season_clearances = res['clearances']
-        self.save()
 
-        return points
-
-    def stats_summary(self):
         mbs = self.member_set.all()
 
-        header = ['points', 'clearances', 'average']
         data = []
         for mb in mbs:
             if mb.handicap<0:
@@ -359,12 +358,23 @@ class Team(Group):
             data.append([mb.raw_points, mb.season_clearances, mb.handicap])
 
         data = np.array(data)
+
+        if len(data)>0:
+            self.season_leg_average = data[:,0].sum() / (self.total_matches_played * 6)
+            self.clearances = data[:,1].sum()
+            self.median_average = np.median(data[:, 2], axis=None)
+
+        self.save()
+        return
+
+    def stats_summary(self):
+        header = ['leg_average', 'clearances', 'median']
+
         res = {}
 
-        res['leg_average'] = data[:,0].sum() / (self.total_matches_played * 6)
-        res['clearances'] = data[:,1].sum()
-        res['median_average'] = np.median(data[:, 2], axis=None)
-        # TODO
+        for h in header:
+            res[h] = getattr(self, 'season_'+h)
+
         return res
 
     def update_all(self):
@@ -374,7 +384,7 @@ class Team(Group):
         return
 
     def __str__(self):
-        return "{} ({})".format(self.name, self.team_number)
+        return "{}".format(self.name)
 
 
 class TeamSeasonal(models.Model):
@@ -384,6 +394,8 @@ class TeamSeasonal(models.Model):
     ranking = models.IntegerField(default=0)
     points = models.IntegerField(default=0)
     clearances = models.IntegerField(default=0)
+    leg_average = models.FloatField(default=0)
+    median = models.FloatField(default=0)
     matches_played= models.IntegerField(default=0)
     matches_won   = models.IntegerField(default=0)
     legs_played  = models.IntegerField(default=0)

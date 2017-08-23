@@ -31,27 +31,6 @@ def index(request):
     return render(request, 'recording.html')
 
 
-"""
-def listmatch(request, type_):
-    if type_=='Match':
-        matches = Match.objects.all().order_by('-match_date')
-    elif type_=='LeagueMatch':
-        matches = LeagueMatch.objects.all().order_by('-match_date')
-    return render(request, 'listmatch.html', {'matches': matches, 'type_': type_})
-
-
-def listarchive(request, type_, page=1):
-    if type_=='Match':
-        matches = Match.objects.all().order_by('-match_date')
-    elif type_=='LeagueMatch':
-        matches = LeagueMatch.objects.filter(is_completed=True).order_by('-match_date')
-    eow = end_of_week()
-    until = min(len(matches), int(page)*30)
-    has_next = (until!=len(matches))
-    return render(request, 'listmatch.html', {'matches': matches[(int(page)-1)*30:int(page)*30],
-                                              'type_': type_, 'page': int(page), 'has_next': has_next})
-"""
-
 def listarchive(request, type_):
     if type_=='Match':
         matches = Match.objects.filter(is_completed=True).order_by('-match_date')
@@ -74,7 +53,7 @@ def listarchive(request, type_):
 
 
 def listlive(request, type_='LeagueMatch'):
-    print request.user.is_authenticated()
+    #print request.user.is_authenticated()
     eow = end_of_week()
     if type_=='Match':
         matches = Match.objects.filter(is_completed=False).order_by('match_date')
@@ -122,21 +101,43 @@ def initialize(request, match_id, type_):
             p = request.user.player
 
             if p == match.home.captain.player:
-                return render(request, 'submit_players.html', {'match_id': match.id,
-                                                                'team': match.home,
-                                                                'players': home_players,
-                                                                'nb_selected_players': nb_selected_players,
-                                                                'inds': list(range(nb_selected_players))})
+                team = match.home
+                players = home_players
             elif p == match.away.captain.player:
-                return render(request, 'submit_players.html', {'match_id': match.id,
-                                                                'team': match.away,
-                                                                'players': away_players,
-                                                                'nb_selected_players': nb_selected_players,
-                                                                'inds': list(range(nb_selected_players))})
+                team = match.away
+                players = away_players
             else:
                 print "This is a bug. Please report."
+                raise Http404
+            return render(request, 'submit_players.html', {'match_id': match.id,
+                                                            'team': team,
+                                                            'players': players,
+                                                            'nb_selected_players': nb_selected_players,
+                                                            'inds': list(range(nb_selected_players))})
+    else:
+        raise Http404
 
-            raise Http404
+
+@_need_login
+def submit_players(request, type_, match_id, team_id):
+    # TODO: more proper way to edit; add validation; maybe use form/formset again
+    # TODO:it may be slow to update DB for each input; instead, we should update all the fields of a frame and then do frame.save()
+    # TODO: after each edit, the league match view is loaded again: this makes it inconvenient to go back to match list
+    match = get_object_or_404(LeagueMatch, pk=match_id)
+    if type_ == 'LeagueMatch':
+        match = get_object_or_404(LeagueMatch.objects.select_related("home__captain__player"), pk=match_id)
+        if not request.user.has_perm('recording.init_leaguematch', match):
+            return render(request, 'base_site.html', {'content': 'Permission denied.'})
+
+    if request.method == 'POST':
+        selected_players = []
+        nb_selected_players = 5
+        for i in range(nb_selected_players):
+            selected_players.append(int(request.POST['player{}'.format(i)]))
+
+        print selected_players
+        match._create_ordered_players(selected_players)
+        return render(request, 'base_site.html', {'content': 'Successfully submitted.'})
     else:
         raise Http404
 
@@ -167,7 +168,7 @@ def init_submit(request, type_, match_id):
 def match_view(request, type_, match_id):
     # TODO: fix this dirty fix
     if type_ == 'LeagueMatch':
-        match = get_object_or_404(LeagueMatch, pk=match_id)
+        match = get_object_or_404(LeagueMatch.objects.select_related('home', 'away', 'season'), pk=match_id)
         if not match.is_initialized:
             return redirect('match_initialize', type_=type_, match_id=match_id)
         # show match
@@ -188,8 +189,22 @@ def match_view(request, type_, match_id):
         except TypeError:
             summary = [[('-', '-'), ('-', '-')]] * 3
 
+        home_seasonal = match.home.teamseasonal_set.get(season=match.season)
+        away_seasonal = match.away.teamseasonal_set.get(season=match.season)
+
+        print home_seasonal
+
+        print away_seasonal
+
         #print match._has_blank(), 'toto'
-        return render(request, 'leaguematch.html', {'frames': frames, 'match': match, 'summary': summary, 'has_blank_fields': match._has_blank()})
+        return render(request, 'leaguematch.html', {
+            'frames': frames,
+            'match': match,
+            'summary': summary,
+            'home_seasonal': home_seasonal,
+            'away_seasonal' : away_seasonal,
+            'has_blank_fields': match._has_blank()
+        })
     elif type_ == 'Match':
         match = get_object_or_404(Match, pk=match_id)
         ## TODO MOVE THIS TO edit function and need login

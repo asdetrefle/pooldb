@@ -49,6 +49,7 @@ def ranking_teams(request, league_name='Poke n Hope HK 8-Ball', rankby='points')
     lg = League.objects.get(name=league_name)
 
     ranking = lg.get_ranked_teams()
+    #print ranking
     summary = {}
     for t in ranking:
         summary[t.pk] = t.stats_summary()

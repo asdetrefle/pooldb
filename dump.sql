@@ -206,14 +206,14 @@ CREATE TABLE administration_team (
     season_legs_played integer NOT NULL,
     season_legs_won integer NOT NULL,
     league_id integer NOT NULL,
-    capitain_id integer,
     team_number integer NOT NULL,
     total_matches_played integer NOT NULL,
     total_matches_won integer NOT NULL,
     season_matches_played integer NOT NULL,
     season_matches_won integer NOT NULL,
     season_clearances integer NOT NULL,
-    season_points integer NOT NULL
+    season_points integer NOT NULL,
+    captain_id integer
 );
 
 
@@ -727,6 +727,78 @@ CREATE TABLE django_session (
 ALTER TABLE django_session OWNER TO qijiec;
 
 --
+-- Name: guardian_groupobjectpermission; Type: TABLE; Schema: public; Owner: qijiec
+--
+
+CREATE TABLE guardian_groupobjectpermission (
+    id integer NOT NULL,
+    object_pk character varying(255) NOT NULL,
+    content_type_id integer NOT NULL,
+    group_id integer NOT NULL,
+    permission_id integer NOT NULL
+);
+
+
+ALTER TABLE guardian_groupobjectpermission OWNER TO qijiec;
+
+--
+-- Name: guardian_groupobjectpermission_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
+--
+
+CREATE SEQUENCE guardian_groupobjectpermission_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE guardian_groupobjectpermission_id_seq OWNER TO qijiec;
+
+--
+-- Name: guardian_groupobjectpermission_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
+--
+
+ALTER SEQUENCE guardian_groupobjectpermission_id_seq OWNED BY guardian_groupobjectpermission.id;
+
+
+--
+-- Name: guardian_userobjectpermission; Type: TABLE; Schema: public; Owner: qijiec
+--
+
+CREATE TABLE guardian_userobjectpermission (
+    id integer NOT NULL,
+    object_pk character varying(255) NOT NULL,
+    content_type_id integer NOT NULL,
+    permission_id integer NOT NULL,
+    user_id integer NOT NULL
+);
+
+
+ALTER TABLE guardian_userobjectpermission OWNER TO qijiec;
+
+--
+-- Name: guardian_userobjectpermission_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
+--
+
+CREATE SEQUENCE guardian_userobjectpermission_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE guardian_userobjectpermission_id_seq OWNER TO qijiec;
+
+--
+-- Name: guardian_userobjectpermission_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
+--
+
+ALTER SEQUENCE guardian_userobjectpermission_id_seq OWNED BY guardian_userobjectpermission.id;
+
+
+--
 -- Name: recording_frame; Type: TABLE; Schema: public; Owner: qijiec
 --
 
@@ -1170,6 +1242,20 @@ ALTER TABLE ONLY django_migrations ALTER COLUMN id SET DEFAULT nextval('django_m
 
 
 --
+-- Name: guardian_groupobjectpermission id; Type: DEFAULT; Schema: public; Owner: qijiec
+--
+
+ALTER TABLE ONLY guardian_groupobjectpermission ALTER COLUMN id SET DEFAULT nextval('guardian_groupobjectpermission_id_seq'::regclass);
+
+
+--
+-- Name: guardian_userobjectpermission id; Type: DEFAULT; Schema: public; Owner: qijiec
+--
+
+ALTER TABLE ONLY guardian_userobjectpermission ALTER COLUMN id SET DEFAULT nextval('guardian_userobjectpermission_id_seq'::regclass);
+
+
+--
 -- Name: recording_frame id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
@@ -1224,14 +1310,14 @@ ALTER TABLE ONLY stats_teamranking ALTER COLUMN id SET DEFAULT nextval('stats_te
 
 COPY administration_group (id, name, size, create_date, close_date, logo) FROM stdin;
 9	Les Trois Mousquetaires	0	2017-03-12 12:11:01+08	\N	\N
+1	That's a Beautiful Rack	0	2017-02-07 21:31:15+08	\N	male_VZwTyJq.png
 2	Just the Tip	0	2017-02-07 21:32:04+08	\N	male_H6KLx5T.png
-5	The Abangers	0	2017-02-08 22:36:19+08	\N	male.png
 3	Anything is Fine	0	2017-02-07 21:32:25+08	\N	male_4nE01Bo.png
 4	Pink Platypuses	0	2017-02-08 22:32:23+08	\N	male_YVlC1q2.png
-1	That's a Beautiful Rack	0	2017-02-07 21:31:15+08	\N	male_VZwTyJq.png
-8	The Meanions	0	2017-02-08 22:39:07+08	\N	male_aO7fFLn.png
+5	The Abangers	0	2017-02-08 22:36:19+08	\N	male.png
 6	Dram Good Shots	0	2017-02-08 22:38:27+08	\N	male_EdeiTIm.png
 7	Holy Strokes	0	2017-02-08 22:38:40+08	\N	hs_color.png
+8	The Meanions	0	2017-02-08 22:39:07+08	\N	male_aO7fFLn.png
 \.
 
 
@@ -1450,15 +1536,15 @@ SELECT pg_catalog.setval('administration_player_id_seq', 79, true);
 -- Data for Name: administration_team; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY administration_team (group_ptr_id, ranking, total_legs_played, total_legs_won, season_legs_played, season_legs_won, league_id, capitain_id, team_number, total_matches_played, total_matches_won, season_matches_played, season_matches_won, season_clearances, season_points) FROM stdin;
-2	2	98	62	98	62	1	1	4	14	9	14	9	13	3447
-5	3	98	56	98	56	1	6	6	14	8	14	8	22	3346
-3	1	98	72	98	72	1	2	8	14	13	14	13	23	3432
-4	5	98	44	98	44	1	4	1	14	6	14	6	13	3155
-1	8	98	29	98	29	1	48	7	14	3	14	3	5	3054
-8	7	98	31	98	31	1	36	2	14	4	14	4	4	3067
-6	6	98	43	98	43	1	8	5	14	5	14	5	13	3196
-7	4	98	55	98	55	1	3	3	14	8	14	8	15	3266
+COPY administration_team (group_ptr_id, ranking, total_legs_played, total_legs_won, season_legs_played, season_legs_won, league_id, team_number, total_matches_played, total_matches_won, season_matches_played, season_matches_won, season_clearances, season_points, captain_id) FROM stdin;
+1	8	98	29	98	29	1	7	14	3	14	3	5	3054	80
+2	2	98	62	98	62	1	4	14	9	14	9	13	3447	2
+3	1	98	72	98	72	1	8	14	13	14	13	23	3432	3
+4	5	98	44	98	44	1	1	14	6	14	6	13	3155	4
+5	3	98	56	98	56	1	6	14	8	14	8	22	3346	5
+6	6	98	43	98	43	1	5	14	5	14	5	13	3196	52
+7	4	98	55	98	55	1	3	14	8	14	8	15	3266	6
+8	7	98	31	98	31	1	2	14	4	14	4	4	3067	69
 \.
 
 
@@ -1598,6 +1684,14 @@ COPY auth_permission (id, name, content_type_id, codename) FROM stdin;
 76	Can add team ranking	24	add_teamranking
 77	Can change team ranking	24	change_teamranking
 78	Can delete team ranking	24	delete_teamranking
+79	Can init match	6	init_match
+80	Can init leaguematch	7	init_leaguematch
+81	Can add group object permission	25	add_groupobjectpermission
+82	Can change group object permission	25	change_groupobjectpermission
+83	Can delete group object permission	25	delete_groupobjectpermission
+84	Can add user object permission	26	add_userobjectpermission
+85	Can change user object permission	26	change_userobjectpermission
+86	Can delete user object permission	26	delete_userobjectpermission
 \.
 
 
@@ -1605,7 +1699,7 @@ COPY auth_permission (id, name, content_type_id, codename) FROM stdin;
 -- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('auth_permission_id_seq', 78, true);
+SELECT pg_catalog.setval('auth_permission_id_seq', 86, true);
 
 
 --
@@ -1615,10 +1709,11 @@ SELECT pg_catalog.setval('auth_permission_id_seq', 78, true);
 COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
 3	pbkdf2_sha256$36000$pMsLyFM21O1v$f2UW4aH73gJd6yEI24m60QBlCeHpdY3XxWGB1GjPj64=	2017-06-17 16:41:08+08	t	asdetrefle	Qj	Chv	qjchv@protonmail.ch	t	t	2017-06-17 16:38:01+08
 2	pbkdf2_sha256$30000$qqNZ3YwKlCB1$usTEYFKh0glaZuPPpVgBbnr4Hwfnw3NpjVuqAcorn5w=	2017-05-30 10:59:15+08	f	scorer				f	t	2017-05-30 10:56:11+08
-4	pbkdf2_sha256$36000$NSLSkC9BRwhz$GnNyafwV1TGgR+zkQc+x+jTksNqUNrTOsIfeRCNC2ZQ=	2017-06-17 16:52:21.10197+08	f	kawangl	Kawang	Lau		f	t	2017-06-17 16:44:44+08
-1	pbkdf2_sha256$36000$6dyXjCgP2DuE$UMqKctZVwQdQuOSliAD8mfSE6y31cFFrv3BQR6paavg=	2017-06-25 14:19:15.209383+08	t	admin			admin@hkpl.com	t	t	2017-02-07 21:18:36.653+08
-6	pbkdf2_sha256$36000$wHBdGlKjHdJI$E8vGYD20s3h+8jKi5E0qbs/bdKCBPV0buyKbQg8GrAE=	\N	f	bradt	Brad	Tsui		f	t	2017-07-04 20:39:53+08
-5	pbkdf2_sha256$36000$QeZ0gMBBBnzv$mbuEpsnNDr2Ak6OQke9Gjaxup/tooGVap6BRDfsI+PQ=	2017-07-04 20:55:50.143821+08	f	deepv	Deep	Vaswani		f	t	2017-07-04 19:56:51+08
+7	!UUVp6VLhoU26QMrBHo13CUJ5Gpfllh3jQqrah6JW	\N	f	AnonymousUser				f	t	2017-07-04 22:18:09.687621+08
+1	pbkdf2_sha256$36000$6dyXjCgP2DuE$UMqKctZVwQdQuOSliAD8mfSE6y31cFFrv3BQR6paavg=	2017-07-05 00:07:01.582127+08	t	admin			admin@hkpl.com	t	t	2017-02-07 21:18:36.653+08
+4	pbkdf2_sha256$36000$NSLSkC9BRwhz$GnNyafwV1TGgR+zkQc+x+jTksNqUNrTOsIfeRCNC2ZQ=	2017-07-05 00:07:34.826518+08	f	kawangl	Kawang	Lau		f	t	2017-06-17 16:44:44+08
+6	pbkdf2_sha256$36000$wHBdGlKjHdJI$E8vGYD20s3h+8jKi5E0qbs/bdKCBPV0buyKbQg8GrAE=	2017-07-06 19:04:14.898281+08	f	bradt	Brad	Tsui		f	t	2017-07-04 20:39:53+08
+5	pbkdf2_sha256$36000$QeZ0gMBBBnzv$mbuEpsnNDr2Ak6OQke9Gjaxup/tooGVap6BRDfsI+PQ=	2017-08-20 22:54:18.954111+08	f	deepv	Deep	Vaswani		f	t	2017-07-04 19:56:51+08
 \.
 
 
@@ -1641,7 +1736,7 @@ SELECT pg_catalog.setval('auth_user_groups_id_seq', 1, false);
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('auth_user_id_seq', 6, true);
+SELECT pg_catalog.setval('auth_user_id_seq', 7, true);
 
 
 --
@@ -2016,6 +2111,7 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 344	2017-03-12 00:07:01.306+08	151	2017-03-01 Henrik Pedersen (That's a Beautiful Rack) vs. Deep Vaswani (Holy Strokes) Leg 1	2	[{"changed": {"fields": ["home_score", "away_score"]}}]	9	1
 345	2017-03-12 00:07:13.341+08	152	2017-03-01 Henrik Pedersen (That's a Beautiful Rack) vs. Deep Vaswani (Holy Strokes) Leg 2	2	[{"changed": {"fields": ["home_score", "away_score"]}}]	9	1
 346	2017-03-12 00:07:41.157+08	153	2017-03-01 Wilson Kong (That's a Beautiful Rack) vs. Samson Cheung (Holy Strokes) Leg 1	2	[{"changed": {"fields": ["home_score", "away_score"]}}]	9	1
+601	2017-07-04 21:11:50.466053+08	7	Holy Strokes (3)	2	[{"changed": {"fields": ["captain"]}}]	4	1
 347	2017-03-12 00:08:24.025+08	154	2017-03-01 Wilson Kong (That's a Beautiful Rack) vs. Samson Cheung (Holy Strokes) Leg 2	2	[{"changed": {"fields": ["home_score", "away_score"]}}]	9	1
 348	2017-03-12 00:08:37.655+08	155	2017-03-01 Catherine Fu (That's a Beautiful Rack) vs. Annie Hsieh (Holy Strokes) Leg 1	2	[{"changed": {"fields": ["home_score", "away_score"]}}]	9	1
 349	2017-03-12 00:09:12.743+08	156	2017-03-01 Catherine Fu (That's a Beautiful Rack) vs. Annie Hsieh (Holy Strokes) Leg 2	2	[{"changed": {"fields": ["home_score", "away_score"]}}]	9	1
@@ -2212,6 +2308,7 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 540	2017-05-31 22:58:15.136008+08	108	2017-05-31 The Abangers (6) vs. Pink Platypuses (1)	2	[{"changed": {"fields": ["handicap"]}}]	7	1
 541	2017-05-31 23:33:01.254742+08	706	2017-05-17 Andrew H (The Meanions) vs. Fiona Chow (Pink Platypuses) 	2	[{"changed": {"fields": ["is_submitted"]}}]	6	1
 542	2017-05-31 23:33:12.844086+08	702	2017-05-17 Nick Fong (The Meanions) vs. Fiona Chow (Pink Platypuses) 	2	[{"changed": {"fields": ["is_submitted"]}}]	6	1
+602	2017-07-04 21:12:11.769155+08	8	The Meanions (2)	2	[{"changed": {"fields": ["captain"]}}]	4	1
 543	2017-05-31 23:33:32.466477+08	698	2017-05-17 Clara Szeto (The Meanions) vs. Fiona Chow (Pink Platypuses) 	2	[{"changed": {"fields": ["is_submitted"]}}]	6	1
 544	2017-05-31 23:34:09.5536+08	69	Andrew H (The Meanions)	2	[{"changed": {"fields": ["raw_points", "total_matches_played", "total_matches_won", "season_matches_played", "season_matches_won"]}}]	5	1
 545	2017-05-31 23:34:33.524935+08	61	Clara Szeto (The Meanions)	2	[{"changed": {"fields": ["raw_points", "total_matches_played", "total_matches_won", "season_matches_played", "season_matches_won"]}}]	5	1
@@ -2264,7 +2361,13 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 592	2017-07-04 20:39:53.144569+08	6	bradt	1	[{"added": {}}]	15	1
 593	2017-07-04 20:40:18.232283+08	2	Brad Tsui	2	[{"changed": {"fields": ["user"]}}]	3	1
 594	2017-07-04 20:40:39.294477+08	6	bradt	2	[{"changed": {"fields": ["first_name", "last_name"]}}]	15	1
-595	2017-07-04 20:46:14.754742+08	113	2017-07-05 Anything is Fine (8) vs. Holy Strokes (3)	1	[{"added": {}}]	7	1
+595	2017-07-04 21:09:40.814152+08	1	That's a Beautiful Rack (7)	2	[{"changed": {"fields": ["captain"]}}]	4	1
+596	2017-07-04 21:10:01.524081+08	2	Just the Tip (4)	2	[{"changed": {"fields": ["captain"]}}]	4	1
+597	2017-07-04 21:10:25.948391+08	3	Anything is Fine (8)	2	[{"changed": {"fields": ["captain"]}}]	4	1
+598	2017-07-04 21:10:46.126297+08	4	Pink Platypuses (1)	2	[{"changed": {"fields": ["captain"]}}]	4	1
+599	2017-07-04 21:11:08.339862+08	5	The Abangers (6)	2	[{"changed": {"fields": ["captain"]}}]	4	1
+600	2017-07-04 21:11:22.611667+08	6	Dram Good Shots (5)	2	[{"changed": {"fields": ["captain"]}}]	4	1
+603	2017-07-04 22:07:32.530848+08	113	2017-07-07 Anything is Fine (8) vs. Holy Strokes (3)	1	[{"added": {}}]	7	1
 \.
 
 
@@ -2272,7 +2375,7 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('django_admin_log_id_seq', 595, true);
+SELECT pg_catalog.setval('django_admin_log_id_seq', 603, true);
 
 
 --
@@ -2357,6 +2460,8 @@ COPY django_content_type (id, app_label, model) FROM stdin;
 22	administration	teamseasonal
 23	stats	playerranking
 24	stats	teamranking
+25	guardian	groupobjectpermission
+26	guardian	userobjectpermission
 \.
 
 
@@ -2364,7 +2469,7 @@ COPY django_content_type (id, app_label, model) FROM stdin;
 -- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('django_content_type_id_seq', 24, true);
+SELECT pg_catalog.setval('django_content_type_id_seq', 26, true);
 
 
 --
@@ -2429,6 +2534,9 @@ COPY django_migrations (id, app, name, applied) FROM stdin;
 55	stats	0006_auto_20170627_2142	2017-06-27 21:42:14.700872+08
 56	administration	0017_auto_20170627_2143	2017-06-27 21:44:04.988598+08
 57	stats	0007_auto_20170627_2148	2017-06-27 21:48:12.77228+08
+58	recording	0015_auto_20170704_2101	2017-07-04 21:01:23.771007+08
+59	administration	0018_auto_20170704_2108	2017-07-04 21:08:47.67901+08
+60	guardian	0001_initial	2017-07-04 22:18:09.58723+08
 \.
 
 
@@ -2436,7 +2544,7 @@ COPY django_migrations (id, app, name, applied) FROM stdin;
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('django_migrations_id_seq', 57, true);
+SELECT pg_catalog.setval('django_migrations_id_seq', 60, true);
 
 
 --
@@ -2463,8 +2571,41 @@ x0ym7r3igodgwah17yr4cxts5l1issp9	MzUwMmEyNTQ4MTUxYmM2MTIyNjViOTMwOWVlNjdhNGY1NjR
 7tsyfdmuul5vgtq47k16qov7a4bp0lqs	ZGI1NDk1YmViN2MyNDc4MTc0NmE2YjZmMzZhOTcyNGMyZWQyNzg1ZDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiJjMGVhYmJkMDJiYzE3YTZkYmUyYWQ0NzBmMjAyNTYyZGYwOGQ5ZDg1In0=	2017-06-20 09:30:10.545498+08
 1o05suxetraau1qi6t4gqz8b13blvmnm	MzU2MzM1NGE0MTE0YWJmODRlN2Y4ZDc0YzEyOGZlYjAxNDA0NGNjMTp7Il9hdXRoX3VzZXJfaGFzaCI6IjU1MWI2OTIxY2ZhZTFmNTk0Y2Q2YTg5NjFkZTM0YjhhNmFjNWU1ZWMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-07-02 00:16:56.407234+08
 2cmedk0mjid9hx21wupni5yo2aeihtka	YjYyNzVhYzYzZTYzOGIxNDY0NWI5OTRjODVmNDE1ZGU4MmE2ZGI2Njp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9oYXNoIjoiNTUxYjY5MjFjZmFlMWY1OTRjZDZhODk2MWRlMzRiOGE2YWM1ZTVlYyIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIn0=	2017-07-09 01:03:09.46893+08
-l2chale86u9o4b9rt3p1bp0qjezs8v53	ODU0ODM4MWYwYTVkMTlkYTc1MTIxMGNjYWMzYTgyZGVmMjA4Y2QwNzp7Il9hdXRoX3VzZXJfaGFzaCI6IjEwYWM1NmFlOTZlNjg2YjUwMjBjNGU3ZTc1NDZlZTA3YTQ2MTAwZjciLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiI1In0=	2017-07-18 20:55:50.146071+08
+qk142lk0ayenaaoyx3yyndegvfmwq6z8	MzU2MzM1NGE0MTE0YWJmODRlN2Y4ZDc0YzEyOGZlYjAxNDA0NGNjMTp7Il9hdXRoX3VzZXJfaGFzaCI6IjU1MWI2OTIxY2ZhZTFmNTk0Y2Q2YTg5NjFkZTM0YjhhNmFjNWU1ZWMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-07-09 14:19:15.213145+08
+gpyt3uswt3js1f20si8g4gyxb3xbqqdl	ODU0ODM4MWYwYTVkMTlkYTc1MTIxMGNjYWMzYTgyZGVmMjA4Y2QwNzp7Il9hdXRoX3VzZXJfaGFzaCI6IjEwYWM1NmFlOTZlNjg2YjUwMjBjNGU3ZTc1NDZlZTA3YTQ2MTAwZjciLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiI1In0=	2017-09-03 22:54:18.95858+08
 \.
+
+
+--
+-- Data for Name: guardian_groupobjectpermission; Type: TABLE DATA; Schema: public; Owner: qijiec
+--
+
+COPY guardian_groupobjectpermission (id, object_pk, content_type_id, group_id, permission_id) FROM stdin;
+\.
+
+
+--
+-- Name: guardian_groupobjectpermission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
+--
+
+SELECT pg_catalog.setval('guardian_groupobjectpermission_id_seq', 1, false);
+
+
+--
+-- Data for Name: guardian_userobjectpermission; Type: TABLE DATA; Schema: public; Owner: qijiec
+--
+
+COPY guardian_userobjectpermission (id, object_pk, content_type_id, permission_id, user_id) FROM stdin;
+1	113	7	80	6
+2	113	7	80	5
+\.
+
+
+--
+-- Name: guardian_userobjectpermission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
+--
+
+SELECT pg_catalog.setval('guardian_userobjectpermission_id_seq', 2, true);
 
 
 --
@@ -5950,7 +6091,7 @@ COPY recording_leaguematch (id, venue, match_date, number_frames, table_size, is
 106	Billidart	2017-05-31 20:00:00+08	0	9	t	t	8-Ball	P	1	6	211	260	6	6	2	6	13	2	t	84_72_2_75_73	53_55_54_57_52	A	1	1
 105	Racks	2017-05-30 20:00:00+08	0	9	t	t	8-Ball	P	1	6	227	260	6	5	3	8	13	3	t	42_44_43_45_41	63_69_61_62_105	A	1	1
 110	Racks	2017-06-06 20:00:00+08	0	9	t	t	8-Ball	P	4	3	242	228	6	4	7	6	14	6	t	7_6_81_89_90	57_58_54_53_55	A	1	1
-113	\N	2017-07-05 20:45:35+08	0	9	f	f	8-Ball	F	0	0	0	0	6	0	7	3	\N	\N	f	\N	\N	A	\N	\N
+113	\N	2017-07-07 22:06:57+08	0	9	f	f	8-Ball	F	0	0	0	0	6	0	7	3	\N	\N	f	\N	\N	W	\N	1
 \.
 
 
@@ -8133,6 +8274,38 @@ ALTER TABLE ONLY django_session
 
 
 --
+-- Name: guardian_groupobjectpermission guardian_groupobjectperm_group_id_permission_id_o_3f189f7c_uniq; Type: CONSTRAINT; Schema: public; Owner: qijiec
+--
+
+ALTER TABLE ONLY guardian_groupobjectpermission
+    ADD CONSTRAINT guardian_groupobjectperm_group_id_permission_id_o_3f189f7c_uniq UNIQUE (group_id, permission_id, object_pk);
+
+
+--
+-- Name: guardian_groupobjectpermission guardian_groupobjectpermission_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
+--
+
+ALTER TABLE ONLY guardian_groupobjectpermission
+    ADD CONSTRAINT guardian_groupobjectpermission_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: guardian_userobjectpermission guardian_userobjectpermi_user_id_permission_id_ob_b0b3d2fc_uniq; Type: CONSTRAINT; Schema: public; Owner: qijiec
+--
+
+ALTER TABLE ONLY guardian_userobjectpermission
+    ADD CONSTRAINT guardian_userobjectpermi_user_id_permission_id_ob_b0b3d2fc_uniq UNIQUE (user_id, permission_id, object_pk);
+
+
+--
+-- Name: guardian_userobjectpermission guardian_userobjectpermission_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
+--
+
+ALTER TABLE ONLY guardian_userobjectpermission
+    ADD CONSTRAINT guardian_userobjectpermission_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: recording_frame recording_frame_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
@@ -8218,10 +8391,10 @@ CREATE INDEX administration_team_a07ab3f8 ON administration_team USING btree (le
 
 
 --
--- Name: administration_team_ef68adea; Type: INDEX; Schema: public; Owner: qijiec
+-- Name: administration_team_captain_id_173a4b16; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX administration_team_ef68adea ON administration_team USING btree (capitain_id);
+CREATE INDEX administration_team_captain_id_173a4b16 ON administration_team USING btree (captain_id);
 
 
 --
@@ -8348,6 +8521,48 @@ CREATE INDEX django_session_de54fa62 ON django_session USING btree (expire_date)
 --
 
 CREATE INDEX django_session_session_key_c0390e0f_like ON django_session USING btree (session_key varchar_pattern_ops);
+
+
+--
+-- Name: guardian_groupobjectpermission_content_type_id_7ade36b8; Type: INDEX; Schema: public; Owner: qijiec
+--
+
+CREATE INDEX guardian_groupobjectpermission_content_type_id_7ade36b8 ON guardian_groupobjectpermission USING btree (content_type_id);
+
+
+--
+-- Name: guardian_groupobjectpermission_group_id_4bbbfb62; Type: INDEX; Schema: public; Owner: qijiec
+--
+
+CREATE INDEX guardian_groupobjectpermission_group_id_4bbbfb62 ON guardian_groupobjectpermission USING btree (group_id);
+
+
+--
+-- Name: guardian_groupobjectpermission_permission_id_36572738; Type: INDEX; Schema: public; Owner: qijiec
+--
+
+CREATE INDEX guardian_groupobjectpermission_permission_id_36572738 ON guardian_groupobjectpermission USING btree (permission_id);
+
+
+--
+-- Name: guardian_userobjectpermission_content_type_id_2e892405; Type: INDEX; Schema: public; Owner: qijiec
+--
+
+CREATE INDEX guardian_userobjectpermission_content_type_id_2e892405 ON guardian_userobjectpermission USING btree (content_type_id);
+
+
+--
+-- Name: guardian_userobjectpermission_permission_id_71807bfc; Type: INDEX; Schema: public; Owner: qijiec
+--
+
+CREATE INDEX guardian_userobjectpermission_permission_id_71807bfc ON guardian_userobjectpermission USING btree (permission_id);
+
+
+--
+-- Name: guardian_userobjectpermission_user_id_d5c1e964; Type: INDEX; Schema: public; Owner: qijiec
+--
+
+CREATE INDEX guardian_userobjectpermission_user_id_d5c1e964 ON guardian_userobjectpermission USING btree (user_id);
 
 
 --
@@ -8533,14 +8748,6 @@ CREATE INDEX stats_teamranking_weak_id_83d32277 ON stats_teamranking USING btree
 
 
 --
--- Name: administration_team administration_capitain_id_b042477e_fk_administration_player_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
---
-
-ALTER TABLE ONLY administration_team
-    ADD CONSTRAINT administration_capitain_id_b042477e_fk_administration_player_id FOREIGN KEY (capitain_id) REFERENCES administration_player(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
 -- Name: administration_team administration_group_ptr_id_e2167439_fk_administration_group_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
@@ -8578,6 +8785,14 @@ ALTER TABLE ONLY administration_player
 
 ALTER TABLE ONLY administration_team
     ADD CONSTRAINT administration_t_league_id_7b6cb4c2_fk_administration_league_id FOREIGN KEY (league_id) REFERENCES administration_league(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: administration_team administration_team_captain_id_173a4b16_fk_administr; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
+--
+
+ALTER TABLE ONLY administration_team
+    ADD CONSTRAINT administration_team_captain_id_173a4b16_fk_administr FOREIGN KEY (captain_id) REFERENCES administration_member(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -8674,6 +8889,54 @@ ALTER TABLE ONLY django_admin_log
 
 ALTER TABLE ONLY django_admin_log
     ADD CONSTRAINT django_admin_log_user_id_c564eba6_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: guardian_groupobjectpermission guardian_groupobject_content_type_id_7ade36b8_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
+--
+
+ALTER TABLE ONLY guardian_groupobjectpermission
+    ADD CONSTRAINT guardian_groupobject_content_type_id_7ade36b8_fk_django_co FOREIGN KEY (content_type_id) REFERENCES django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: guardian_groupobjectpermission guardian_groupobject_group_id_4bbbfb62_fk_auth_grou; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
+--
+
+ALTER TABLE ONLY guardian_groupobjectpermission
+    ADD CONSTRAINT guardian_groupobject_group_id_4bbbfb62_fk_auth_grou FOREIGN KEY (group_id) REFERENCES auth_group(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: guardian_groupobjectpermission guardian_groupobject_permission_id_36572738_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
+--
+
+ALTER TABLE ONLY guardian_groupobjectpermission
+    ADD CONSTRAINT guardian_groupobject_permission_id_36572738_fk_auth_perm FOREIGN KEY (permission_id) REFERENCES auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: guardian_userobjectpermission guardian_userobjectp_content_type_id_2e892405_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
+--
+
+ALTER TABLE ONLY guardian_userobjectpermission
+    ADD CONSTRAINT guardian_userobjectp_content_type_id_2e892405_fk_django_co FOREIGN KEY (content_type_id) REFERENCES django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: guardian_userobjectpermission guardian_userobjectp_permission_id_71807bfc_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
+--
+
+ALTER TABLE ONLY guardian_userobjectpermission
+    ADD CONSTRAINT guardian_userobjectp_permission_id_71807bfc_fk_auth_perm FOREIGN KEY (permission_id) REFERENCES auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: guardian_userobjectpermission guardian_userobjectpermission_user_id_d5c1e964_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
+--
+
+ALTER TABLE ONLY guardian_userobjectpermission
+    ADD CONSTRAINT guardian_userobjectpermission_user_id_d5c1e964_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --

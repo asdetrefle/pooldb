@@ -13,11 +13,9 @@ import numpy as np
 # Create your models here.
 
 class AbstractMatch(models.Model):
-    POINTS = 'P'
-    FRAMES = 'F'
     SCORE_SYSTEM_CHOICES = (
-        (POINTS, 'Points'),
-        (FRAMES, 'Frames'),
+        ('P', 'Points'),
+        ('F', 'Frames'),
     )
     BREAK_TYPE_CHOICES = (
         ('W', 'Winner Break'),

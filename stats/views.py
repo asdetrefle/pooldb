@@ -4,7 +4,7 @@ from operator import itemgetter
 import json
 from .models import PlayerRanking
 from django.contrib.auth.decorators import login_required, permission_required as _need_perm
-from utils import local_date
+from utils import local_date, default_season
 
 
 _need_login = login_required(login_url='/login/')
@@ -15,7 +15,7 @@ def index(request):
     return render(request, 'stats.html')
 
 
-def ranking_players(request, league_name='Poke n Hope HK 8-Ball', rankby='points'):
+def ranking_players(request, s=default_season(), league_name='Poke n Hope HK 8-Ball'):
     # TODO: now view_match and add_frame are using the same frame; maybe separate them for clarity
     # TODO: use django form and add validation
     lg = League.objects.get(name=league_name)
@@ -43,7 +43,7 @@ def ranking_players(request, league_name='Poke n Hope HK 8-Ball', rankby='points
     return render(request, 'ranking.html', {'ranking': ranking, 'last_update': lg.last_update})
 
 
-def ranking_teams(request, league_name='Poke n Hope HK 8-Ball', rankby='points'):
+def ranking_teams(request, s=default_season(), league_name='Poke n Hope HK 8-Ball'):
     # TODO: now view_match and add_frame are using the same frame; maybe separate them for clarity
     # TODO: use django form and add validation
     lg = League.objects.get(name=league_name)
@@ -53,7 +53,7 @@ def ranking_teams(request, league_name='Poke n Hope HK 8-Ball', rankby='points')
     summary = {}
     for t in ranking:
         summary[t.pk] = t.stats_summary()
-    #print tr
+    print summary
     return render(request, 'team_ranking.html', {'ranking': ranking, 'summary': summary, 'last_update': lg.last_update})
 
 

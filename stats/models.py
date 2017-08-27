@@ -23,12 +23,16 @@ class PlayerRanking(models.Model):
     serial_id = models.IntegerField()
     ranking = models.IntegerField()
     elo_points = models.FloatField(blank=True, null=True)
-    raw_points = models.IntegerField(blank=True, null=True)
     handicap = models.FloatField(blank=True, null=True)
 
-    matches_played = models.IntegerField(default=0)
-    matches_won  = models.IntegerField(default=0)
-    clearances = models.IntegerField(default=0)
+    season_points = models.IntegerField(blank=True, null=True)
+    total_points = models.IntegerField(blank=True, null=True)
+    season_clearances   = models.IntegerField(default=0)
+    total_clearances    = models.IntegerField(default=0)
+    season_matches_played = models.IntegerField(default=0)
+    total_matches_played= models.IntegerField(default=0)
+    season_matches_won  = models.IntegerField(default=0)
+    total_matches_won   = models.IntegerField(default=0)
 
     def __str__(self):
         return str(self.player) + ' R' + str(self.serial_id)
@@ -44,14 +48,21 @@ class TeamRanking(models.Model):
     serial_id = models.IntegerField()
     ranking = models.IntegerField()
     elo_points = models.FloatField(blank=True, null=True)
-    raw_points = models.IntegerField(blank=True, null=True)
     handicap = models.FloatField(blank=True, null=True)
 
-    clearances = models.IntegerField(default=0)
-    matches_played= models.IntegerField(default=0)
-    matches_won   = models.IntegerField(default=0)
-    legs_played  = models.IntegerField(default=0)
-    legs_won     = models.IntegerField(default=0)
+    season_points = models.IntegerField(blank=True, null=True)
+    total_points = models.IntegerField(blank=True, null=True)
+    season_clearances = models.IntegerField(default=0)
+    total_clearances = models.IntegerField(default=0)
+    season_matches_played= models.IntegerField(default=0)
+    total_matches_played= models.IntegerField(default=0)
+    season_matches_won   = models.IntegerField(default=0)
+    total_matches_won   = models.IntegerField(default=0)
+    season_legs_played  = models.IntegerField(default=0)
+    total_legs_played   = models.IntegerField(default=0)
+    season_legs_won     = models.IntegerField(default=0)
+    total_legs_won      = models.IntegerField(default=0)
 
     def __str__(self):
         return str(self.team) + ' R' + str(self.serial_id)
+

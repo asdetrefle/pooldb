@@ -55,3 +55,46 @@ week,date,venue,away,home
 14,2017-05-31,Billidart,Pink Platypuses,Anything is Fine
 14,2017-05-31,Billidart,The Minions,That's a Beautiful Rack
 14,2017-05-31,Racks,The Abangers,Just the Tip
+
+
+    handicap = models.FloatField(blank=True, null=True)
+
+    matches_played = models.IntegerField(default=0)
+    matches_won  = models.IntegerField(default=0)
+    clearances = models.IntegerField(default=0)
+    season_points = models.IntegerField(blank=True, null=True)
+    total_points = models.IntegerField(blank=True, null=True)
+    season_clearances = models.IntegerField(default=0)
+    total_clearances = models.IntegerField(default=0)
+    season_matches_played = models.IntegerField(default=0)
+    total_matches_played= models.IntegerField(default=0)
+    season_matches_won   = models.IntegerField(default=0)
+    total_matches_won   = models.IntegerField(default=0)
+    def __str__(self):
+        return str(self.player) + ' R' + str(self.serial_id)
+
+
+class TeamRanking(models.Model):
+
+    league = models.ForeignKey(League, models.CASCADE)
+    team = models.ForeignKey(Team, models.CASCADE)
+    season = models.ForeignKey(Season, models.CASCADE)
+    week = models.ForeignKey(MatchWeek, models.CASCADE)
+    date = models.DateTimeField('Current ranking date', default=timezone.now)
+    serial_id = models.IntegerField()
+    ranking = models.IntegerField()
+    elo_points = models.FloatField(blank=True, null=True)
+    handicap = models.FloatField(blank=True, null=True)
+
+    season_points = models.IntegerField(blank=True, null=True)
+    total_points = models.IntegerField(blank=True, null=True)
+    season_clearances = models.IntegerField(default=0)
+    total_clearances = models.IntegerField(default=0)
+    season_matches_played = models.IntegerField(default=0)
+    total_matches_played= models.IntegerField(default=0)
+    season_matches_won   = models.IntegerField(default=0)
+    total_matches_won   = models.IntegerField(default=0)
+    season_legs_played  = models.IntegerField(default=0)
+    total_legs_played   = models.IntegerField(default=0)
+    season_legs_won     = models.IntegerField(default=0)
+    total_legs_won      = models.IntegerField(default=0)

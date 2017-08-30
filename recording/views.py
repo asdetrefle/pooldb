@@ -136,16 +136,17 @@ def initialize(request, match_id, type_):
 
                 Team %s has just submitted their roster for this week's match!
 
-                The roster needed to be submitted before 7pm of D-Day. If you have any technical difficulty, Please contact the admin.
+                The roster needs to be submitted before 7pm of D-Day. If you have any technical difficulty, Please contact the admin.
 
                 Ignore this mail if you have already done so.
 
                 Thanks,
                 Poke n Hope
                 """ % getattr(match, side[:4])
+
                 m = MailManager(subject="Team %s successfully submitted the roster" % getattr(match, side[:4]), content=msg)
                 #print match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email
-                #m.add_bcc(match.home.captain.email, match.away.captain.email, p.email)
+                m.add_bcc(match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email)
                 m.add_bcc('qjchv@protonmail.ch')
                 m.send()
 

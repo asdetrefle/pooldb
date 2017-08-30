@@ -8,6 +8,7 @@ from django.contrib import messages
 import re, ast
 from utils import end_of_week
 from django.contrib.auth.decorators import login_required, permission_required as _need_perm
+from mail import MailManager
 
 
 _need_login = login_required(login_url='/login/')
@@ -59,6 +60,7 @@ def listlive(request, type_='LeagueMatch'):
         matches = Match.objects.filter(is_completed=False).order_by('match_date')
     elif type_=='LeagueMatch':
         matches = LeagueMatch.objects.filter(is_completed=False, match_date__lte=eow).order_by('match_date')
+        #matches = LeagueMatch.objects.filter(is_completed=False).order_by('match_date')
 
     if matches:
         return render(request, 'listmatch.html', {'content': 'Bonjour Les Amis.', 'matches': matches, 'type_': type_})
@@ -73,25 +75,35 @@ def initialize(request, match_id, type_):
     # We know all matchs ahead but will only know players before the Match
     # TODO: use django model form; add validation; how to represent properly the lists of players via POST?
     if type_ == 'LeagueMatch':
-        match = get_object_or_404(LeagueMatch.objects.select_related("home__captain__player"), pk=match_id)
+        match = get_object_or_404(LeagueMatch.objects.select_related("home__captain__player__user", "away__captain__player__user"), pk=match_id)
         if not request.user.has_perm('recording.init_leaguematch', match):
             return render(request, 'base_site.html', {'content': 'Permission denied.'})
 
         if match.is_initialized:
             return redirect('match_view', type_=type_, match_id=match_id)
 
-        if match.match_date>=end_of_week():
-            raise Http404
-
-        if request.method == 'POST':
-            pass
+        #if match.match_date>=end_of_week():
+        #    raise Http404
 
         home_players = match.home.member_set.all().order_by('-season_matches_played')
         away_players = match.away.member_set.all().order_by('-season_matches_played')
+
+        _submitted = match._get_ordered_players()
         nb_selected_players = 5
 
-        if request.user.is_staff:
+        side = None
 
+        if 'home' in _submitted:
+            home_players_map = {p.id : p for p in home_players}
+            rest = set(home_players_map.keys()) - set(_submitted['home'])
+            home_players = [home_players_map[pk] for pk in list(_submitted['home'])+list(rest)]
+
+        if 'away' in _submitted:
+            away_players_map = {p.id : p for p in away_players}
+            rest = set(away_players_map.keys()) - set(_submitted['away'])
+            away_players = [away_players_map[pk] for pk in list(_submitted['away'])+list(rest)]
+
+        if request.user.is_staff:
             return render(request, 'initialize_match.html', {'match': match,
                                                                 'home_players': home_players,
                                                                 'away_players': away_players,
@@ -100,26 +112,72 @@ def initialize(request, match_id, type_):
         else:
             p = request.user.player
 
-            if p == match.home.captain.player:
+            if 'home' in _submitted and 'away' in _submitted:
+                return render(request, 'base_site.html', {'content': 'Both teams have already submitted. You are no longer able to modify team roster.'})
+
+            if p in {p.player for p in home_players}:
+                side = 'home_players'
+            elif p in {p.player for p in away_players}:
+                side = 'away_players'
+            else:
+                return render(request, 'base_site.html', {'content': 'Successfully submitted.'})
+
+            if request.method == 'POST':
+                print "toto"
+                selected_players = []
+                for i in range(nb_selected_players):
+                    selected_players.append(int(request.POST['player{}'.format(i)]))
+
+                kwargs = {side: selected_players}
+                match._create_ordered_players(**kwargs)
+
+                msg = """
+                Hello,
+
+                Team %s has just submitted their roster for this week's match!
+
+                The roster needed to be submitted before 7pm of D-Day. If you have any technical difficulty, Please contact the admin.
+
+                Ignore this mail if you have already done so.
+
+                Thanks,
+                Poke n Hope
+                """ % getattr(match, side[:4])
+                m = MailManager(subject="Team %s successfully submitted the roster" % getattr(match, side[:4]), content=msg)
+                #print match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email
+                #m.add_bcc(match.home.captain.email, match.away.captain.email, p.email)
+                m.add_bcc('qjchv@protonmail.ch')
+                m.send()
+
+                return render(request, 'base_site.html', {'content': 'Successfully submitted.'})
+
+            if side == 'home_players':
+                is_opponent_sub = ('away' in _submitted)
                 team = match.home
                 players = home_players
-            elif p == match.away.captain.player:
+                side = 'home_players'
+            elif side == 'away_players':
+                is_opponent_sub = ('home' in _submitted)
                 team = match.away
                 players = away_players
+                side = 'away_players'
             else:
-                print "This is a bug. Please report."
-                raise Http404
+                return render(request, 'base_site.html', {'content': 'Permission Denied'})
+
             return render(request, 'submit_players.html', {'match_id': match.id,
-                                                            'team': team,
-                                                            'players': players,
-                                                            'nb_selected_players': nb_selected_players,
-                                                            'inds': list(range(nb_selected_players))})
+                                                           'team': team,
+                                                           'is_opponent_sub': is_opponent_sub,
+                                                           'side': side,
+                                                           'players': players,
+                                                           'nb_selected_players': nb_selected_players,
+                                                           'inds': list(range(nb_selected_players))})
     else:
         raise Http404
 
 
+"""
 @_need_login
-def submit_players(request, type_, match_id, team_id):
+def submit_players(request, type_, match_id, team_id, side):
     # TODO: more proper way to edit; add validation; maybe use form/formset again
     # TODO:it may be slow to update DB for each input; instead, we should update all the fields of a frame and then do frame.save()
     # TODO: after each edit, the league match view is loaded again: this makes it inconvenient to go back to match list
@@ -135,11 +193,12 @@ def submit_players(request, type_, match_id, team_id):
         for i in range(nb_selected_players):
             selected_players.append(int(request.POST['player{}'.format(i)]))
 
-        print selected_players
-        match._create_ordered_players(selected_players)
+        kwargs = {side: selected_players}
+        match._create_ordered_players(**kwargs)
         return render(request, 'base_site.html', {'content': 'Successfully submitted.'})
     else:
         raise Http404
+"""
 
 
 @_need_login
@@ -170,6 +229,7 @@ def match_view(request, type_, match_id):
     if type_ == 'LeagueMatch':
         match = get_object_or_404(LeagueMatch.objects.select_related('home', 'away', 'season'), pk=match_id)
         if not match.is_initialized:
+            print "toto"
             return redirect('match_initialize', type_=type_, match_id=match_id)
         # show match
         if request.method=='POST':

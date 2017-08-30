@@ -11,9 +11,9 @@ class MailManager(object):
         self.personalization.add_to(Email('poke.n.hope.hk@gmail.com'))
         #self.personalization.add_to(Email('lionet0621@gmail.com'))
 
-        self.mail.from_email = Email(kwargs.get('sender', 'admin@poke-n-hope.com'))
+        self.mail.from_email = Email(kwargs.get('sender', 'noreply@poke-n-hope.com'))
         self.mail.subject = kwargs.pop('subject')
-        self.mail.add_content(Content("text/plain", "Coucou"))
+        self.mail.add_content(Content("text/plain", kwargs.get('content',"")))
 
     def add_to(self, *args):
         for r in args:

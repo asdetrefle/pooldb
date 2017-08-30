@@ -11,7 +11,7 @@ def local_date(dt):
 def default_season():
     #n = timezone.now()
     #season_date = n + relativedelta.relativedelta(months=-1)
-    return 3
+    return 4
 
 
 def calc_elo(result, opp, sef):

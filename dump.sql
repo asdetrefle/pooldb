@@ -213,7 +213,9 @@ CREATE TABLE administration_team (
     season_matches_won integer NOT NULL,
     season_clearances integer NOT NULL,
     season_points integer NOT NULL,
-    captain_id integer
+    captain_id integer,
+    season_leg_average double precision NOT NULL,
+    season_median double precision NOT NULL
 );
 
 
@@ -234,7 +236,9 @@ CREATE TABLE administration_teamseasonal (
     legs_played integer NOT NULL,
     legs_won integer NOT NULL,
     season_id integer NOT NULL,
-    team_id integer NOT NULL
+    team_id integer NOT NULL,
+    leg_average double precision NOT NULL,
+    median double precision NOT NULL
 );
 
 
@@ -1040,15 +1044,19 @@ CREATE TABLE stats_playerranking (
     serial_id integer NOT NULL,
     ranking integer NOT NULL,
     elo_points double precision,
-    raw_points integer,
+    total_points integer,
     handicap double precision,
-    matches_played integer NOT NULL,
-    matches_won integer NOT NULL,
-    clearances integer NOT NULL,
+    season_matches_played integer NOT NULL,
+    season_matches_won integer NOT NULL,
+    season_clearances integer NOT NULL,
     player_id integer NOT NULL,
     league_id integer NOT NULL,
     week_id integer NOT NULL,
-    season_id integer NOT NULL
+    season_id integer NOT NULL,
+    season_points integer,
+    total_clearances integer NOT NULL,
+    total_matches_played integer NOT NULL,
+    total_matches_won integer NOT NULL
 );
 
 
@@ -1085,17 +1093,23 @@ CREATE TABLE stats_teamranking (
     serial_id integer NOT NULL,
     ranking integer NOT NULL,
     elo_points double precision,
-    raw_points integer,
+    total_points integer,
     handicap double precision,
-    clearances integer NOT NULL,
-    matches_played integer NOT NULL,
-    matches_won integer NOT NULL,
-    legs_played integer NOT NULL,
-    legs_won integer NOT NULL,
+    season_clearances integer NOT NULL,
+    season_matches_played integer NOT NULL,
+    season_matches_won integer NOT NULL,
+    season_legs_played integer NOT NULL,
+    season_legs_won integer NOT NULL,
     league_id integer NOT NULL,
     season_id integer NOT NULL,
     team_id integer NOT NULL,
-    week_id integer NOT NULL
+    week_id integer NOT NULL,
+    season_points integer,
+    total_clearances integer NOT NULL,
+    total_legs_played integer NOT NULL,
+    total_legs_won integer NOT NULL,
+    total_matches_played integer NOT NULL,
+    total_matches_won integer NOT NULL
 );
 
 
@@ -1310,14 +1324,15 @@ ALTER TABLE ONLY stats_teamranking ALTER COLUMN id SET DEFAULT nextval('stats_te
 
 COPY administration_group (id, name, size, create_date, close_date, logo) FROM stdin;
 9	Les Trois Mousquetaires	0	2017-03-12 12:11:01+08	\N	\N
+4	Pink Platypuses	0	2017-02-08 22:32:23+08	2017-08-22 23:59:59+08	male_YVlC1q2.png
 1	That's a Beautiful Rack	0	2017-02-07 21:31:15+08	\N	male_VZwTyJq.png
 2	Just the Tip	0	2017-02-07 21:32:04+08	\N	male_H6KLx5T.png
-3	Anything is Fine	0	2017-02-07 21:32:25+08	\N	male_4nE01Bo.png
-4	Pink Platypuses	0	2017-02-08 22:32:23+08	\N	male_YVlC1q2.png
 5	The Abangers	0	2017-02-08 22:36:19+08	\N	male.png
-6	Dram Good Shots	0	2017-02-08 22:38:27+08	\N	male_EdeiTIm.png
 7	Holy Strokes	0	2017-02-08 22:38:40+08	\N	hs_color.png
 8	The Meanions	0	2017-02-08 22:39:07+08	\N	male_aO7fFLn.png
+6	Dram Good Shots	0	2017-02-08 22:38:27+08	\N	dram.png
+3	Anything is Fine	0	2017-02-07 21:32:25+08	\N	anything.png
+10	The Blazers	0	2017-08-23 00:00:00+08	\N	blazers.png
 \.
 
 
@@ -1325,7 +1340,7 @@ COPY administration_group (id, name, size, create_date, close_date, logo) FROM s
 -- Name: administration_group_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('administration_group_id_seq', 9, true);
+SELECT pg_catalog.setval('administration_group_id_seq', 10, true);
 
 
 --
@@ -1354,7 +1369,6 @@ COPY administration_member (id, create_date, cancel_date, points, ranking, _poin
 41	2017-02-26 22:05:05+08	\N	251.160682939866007	5	0	42	29	6	42	29	6	3	11	720	8.5714285714285694
 93	2017-03-05 10:22:51.795+08	\N	215.526701477234013	25	0	18	6	2	18	6	2	7	61	263	7.3055555555555598
 86	2017-03-05 10:22:51.721+08	\N	200	0	0	0	0	0	0	0	0	6	54	0	-1
-61	2017-02-26 22:05:05+08	\N	139.418706609581989	68	0	30	5	0	30	5	0	8	9	364	6.06666666666666998
 113	2017-05-13 16:07:55+08	\N	201.289365747165988	37	0	6	3	0	6	3	0	8	79	87	7.25
 72	2017-03-05 10:22:51.503+08	\N	226.041765439247996	20	0	27	17	2	27	17	2	2	40	444	8.22222222222221966
 104	2017-03-17 22:39:33+08	\N	236.82566247031599	12	0	18	13	0	18	13	0	2	70	320	8.88888888888888928
@@ -1363,21 +1377,17 @@ COPY administration_member (id, create_date, cancel_date, points, ranking, _poin
 45	2017-02-26 22:05:05.609+08	\N	220.324517467291997	23	0	21	8	3	21	8	3	3	15	313	7.45238095238094989
 74	2017-03-05 10:22:51.536+08	\N	220.33486986064699	22	0	30	17	1	30	17	1	2	42	483	8.05000000000000071
 54	2017-02-26 22:05:05.689+08	\N	97.3262783579581026	70	0	36	2	0	36	2	0	6	23	332	4.61111111111110983
-110	2017-04-29 19:12:58+08	\N	169.828091717569009	56	0	18	5	1	18	5	1	4	76	231	6.41666666666666963
 66	2017-02-26 22:05:05.779+08	\N	154.619020194802005	63	0	18	3	0	18	3	0	8	33	215	5.97222222222221966
 71	2017-03-05 10:22:51.489+08	\N	237.342424035356004	11	0	36	24	8	36	24	8	5	39	582	8.08333333333333037
-51	2017-02-26 22:05:05.669+08	\N	200	0	0	0	0	0	0	0	0	4	21	0	-1
 103	2017-03-14 23:44:26+08	\N	187.202829948345993	47	0	3	0	0	3	0	0	5	69	35	5.83333333333333037
 106	2017-03-23 23:50:17+08	\N	168.257256379800992	57	0	3	0	0	3	0	0	6	72	12	2
 90	2017-03-05 10:22:51.766+08	\N	194.774953264662997	39	0	39	18	0	39	18	0	7	58	575	7.37179487179486959
-46	2017-02-26 22:05:05.62+08	\N	227.890818715684986	18	0	39	24	7	39	24	7	4	16	612	7.84615384615385025
 64	2017-02-26 22:05:05.76+08	\N	172.847325496958007	54	0	12	3	0	12	3	0	8	31	151	6.29166666666666963
 62	2017-02-26 22:05:05.747+08	\N	195.297450588380002	38	0	15	5	1	15	5	1	8	29	216	7.20000000000000018
 100	2017-03-11 23:24:10+08	\N	189.098847619715997	44	0	6	2	0	6	2	0	6	68	81	6.75
 3	2017-02-07 21:33:36+08	\N	203.860668471162995	33	0	21	9	0	21	9	0	3	2	319	7.59523809523808957
 82	2017-03-05 10:22:51.668+08	\N	203.987771667778986	32	0	9	4	0	9	4	0	5	50	141	7.83333333333333037
 52	2017-02-26 22:05:05.676+08	\N	207.756897750472007	31	0	15	9	2	15	9	2	6	8	222	7.40000000000000036
-48	2017-02-26 22:05:05.645+08	\N	177.284844463995	50	0	18	5	0	18	5	0	4	18	246	6.83333333333333037
 60	2017-02-26 22:05:05.735+08	\N	201.715960059383008	35	0	3	1	0	3	1	0	6	28	51	8.5
 40	2017-02-26 22:05:05.559+08	\N	265.974422849967993	1	0	30	24	7	30	24	7	3	10	538	8.96666666666667034
 58	2017-02-26 22:05:05.72+08	\N	231.279909083250004	15	0	21	13	5	21	13	5	6	26	340	8.09523809523808957
@@ -1394,13 +1404,9 @@ COPY administration_member (id, create_date, cancel_date, points, ranking, _poin
 77	2017-03-05 10:22:51.584+08	\N	247.504948877276007	8	0	27	18	0	27	18	0	5	45	460	8.51851851851852082
 67	2017-02-26 22:05:05.785+08	\N	144.198255338578008	67	0	18	5	0	18	5	0	8	34	202	5.61111111111110983
 112	2017-05-13 01:44:45+08	\N	201.47926961475099	36	0	3	3	0	3	3	0	7	78	50	8.33333333333333037
-59	2017-02-26 22:05:05.729+08	\N	222.645349614552998	21	0	12	8	2	12	8	2	6	27	191	7.95833333333333037
-50	2017-02-26 22:05:05.663+08	\N	200	0	0	0	0	0	0	0	0	4	20	0	-1
 55	2017-02-26 22:05:05.695+08	\N	188.466037156292998	45	0	39	10	0	39	10	0	6	24	531	6.80769230769231015
 73	2017-03-05 10:22:51.514+08	\N	239.038249774119009	10	0	33	19	4	33	19	4	2	41	525	7.9545454545454497
 56	2017-02-26 22:05:05+08	\N	194.728281835911986	40	0	12	5	1	12	5	1	6	25	179	7.45833333333333037
-53	2017-02-26 22:05:05.683+08	\N	192.328447971439999	42	0	36	15	0	36	15	0	6	22	533	7.40277777777778034
-70	2017-03-01 21:45:00+08	\N	240.715223885877009	9	0	36	20	5	36	20	5	4	37	587	8.15277777777778034
 75	2017-03-05 10:22:51.555+08	\N	249.183101431545992	7	0	21	14	5	21	14	5	2	43	354	8.4285714285714306
 111	2017-04-30 12:27:39+08	\N	191.85998403855001	43	0	3	1	0	3	1	0	7	77	34	5.66666666666666963
 43	2017-02-26 22:05:05.587+08	\N	187.28356281525501	46	0	42	18	1	42	18	1	3	13	619	7.3690476190476204
@@ -1412,9 +1418,16 @@ COPY administration_member (id, create_date, cancel_date, points, ranking, _poin
 84	2017-03-05 10:22:51.689+08	\N	230.954739813550987	16	0	39	27	1	39	27	1	2	52	626	8.02564102564103088
 92	2017-03-05 10:22:51.785+08	\N	216.306071405143001	24	0	15	8	2	15	8	2	5	60	239	7.96666666666667034
 76	2017-03-05 10:22:51.568+08	\N	234.924860686735002	13	0	39	24	3	39	24	3	5	44	647	8.29487179487179915
-4	2017-01-07 07:07:07+08	\N	214.870328025585991	27	0	21	14	0	21	14	0	4	4	328	7.8095238095238102
-47	2017-02-26 22:05:05.628+08	\N	158.255552712836987	60	0	39	10	0	39	10	0	4	17	501	6.4230769230769198
-49	2017-02-26 22:05:05.653+08	\N	156.606445045279997	62	0	36	8	0	36	8	0	4	19	464	6.4444444444444402
+51	2017-02-26 22:05:05.669+08	2017-08-22 23:59:59+08	200	0	0	0	0	0	0	0	0	4	21	0	-1
+46	2017-02-26 22:05:05.62+08	2017-08-22 23:59:59+08	227.890818715684986	18	0	39	24	7	39	24	7	4	16	612	7.84615384615385025
+48	2017-02-26 22:05:05.645+08	2017-08-22 23:59:59+08	177.284844463995	50	0	18	5	0	18	5	0	4	18	246	6.83333333333333037
+50	2017-02-26 22:05:05.663+08	2017-08-22 23:59:59+08	200	0	0	0	0	0	0	0	0	4	20	0	-1
+70	2017-03-01 21:45:00+08	2017-08-22 23:59:59+08	240.715223885877009	9	0	36	20	5	36	20	5	4	37	587	8.15277777777778034
+4	2017-01-07 07:07:07+08	2017-08-22 23:59:59+08	214.870328025585991	27	0	21	14	0	21	14	0	4	4	328	7.8095238095238102
+47	2017-02-26 22:05:05.628+08	2017-08-22 23:59:59+08	158.255552712836987	60	0	39	10	0	39	10	0	4	17	501	6.4230769230769198
+59	2017-02-26 22:05:05+08	2017-08-22 23:59:59+08	222.645349614999986	21	0	12	8	2	12	8	2	6	27	191	7.9583333333299997
+61	2017-02-26 22:05:05+08	2017-08-22 23:59:59+08	139.418706609999987	68	0	30	5	0	30	5	0	8	9	364	6.06666666666999976
+53	2017-02-26 22:05:05+08	2017-08-22 23:59:59+08	192.328447971000003	42	0	36	15	0	36	15	0	6	22	533	7.4027777777799999
 109	2017-03-30 22:47:14+08	\N	179.816144842987001	49	0	18	2	0	18	2	0	1	75	233	6.47222222222221966
 83	2017-03-05 10:22:51.679+08	\N	144.493875610859988	66	0	21	4	0	21	4	0	1	51	242	5.76190476190476009
 108	2017-03-30 22:44:28+08	\N	183.698842011192994	48	0	12	3	0	12	3	0	1	74	160	6.66666666666666963
@@ -1429,6 +1442,20 @@ COPY administration_member (id, create_date, cancel_date, points, ranking, _poin
 81	2017-03-05 10:22:51.653+08	\N	153.427201907779988	65	0	42	10	1	42	10	1	7	49	537	6.39285714285713969
 89	2017-03-05 10:22:51.754+08	\N	233.845327520599994	14	0	27	17	2	27	17	2	7	57	440	8.14814814814815058
 7	2017-01-07 07:07:07+08	\N	250.66666654497601	6	0	39	25	6	39	25	6	7	7	647	8.29487179487179915
+110	2017-04-29 19:12:58+08	2017-08-22 23:59:59+08	169.828091717569009	56	0	18	5	1	18	5	1	4	76	231	6.41666666666666963
+49	2017-02-26 22:05:05.653+08	2017-08-22 23:59:59+08	156.606445045279997	62	0	36	8	0	36	8	0	4	19	464	6.4444444444444402
+114	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	10	37	0	-1
+115	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	10	17	0	-1
+116	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	10	16	0	-1
+117	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	10	19	0	-1
+118	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	10	18	0	-1
+119	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	10	21	0	-1
+120	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	10	20	0	-1
+121	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	10	80	0	-1
+122	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	10	81	0	-1
+123	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	7	9	0	-1
+124	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	2	27	0	-1
+125	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	2	22	0	-1
 \.
 
 
@@ -1436,7 +1463,7 @@ COPY administration_member (id, create_date, cancel_date, points, ranking, _poin
 -- Name: administration_member_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('administration_member_id_seq', 113, true);
+SELECT pg_catalog.setval('administration_member_id_seq', 125, true);
 
 
 --
@@ -1444,11 +1471,8 @@ SELECT pg_catalog.setval('administration_member_id_seq', 113, true);
 --
 
 COPY administration_player (id, name, username, sex, phone, email, nb_groups, user_id) FROM stdin;
-1	Mancy Howe	mancyh	F			0	\N
 4	Jay Gonzalez	jayg	M			0	\N
 5	Henrik Pedersen	henrikp	M			0	\N
-6	Lito Labra	litol	M			0	\N
-8	Jhun Jimeno	jhunj	M			0	\N
 9	Clara Szeto	claras	F			0	\N
 10	Alvaro Monteiro	alvarom	M	\N	\N	0	\N
 11	Yuri Aguilar	yuria	M	\N	\N	0	\N
@@ -1475,7 +1499,6 @@ COPY administration_player (id, name, username, sex, phone, email, nb_groups, us
 33	Louis Poon	louisp	M	\N	\N	0	\N
 34	Olive Lai	olivel	F			0	\N
 35	Tim Newton	timn	M	\N	\N	0	\N
-37	Clarence Yung	clarencey	M			0	\N
 38	Jon Somers	jonso	M			0	\N
 39	Levis Santos	leviss	M	\N	\N	0	\N
 40	Safee Shah	safees	M	\N	\N	0	\N
@@ -1486,7 +1509,6 @@ COPY administration_player (id, name, username, sex, phone, email, nb_groups, us
 45	Mark Morillo	markm	M	\N	\N	0	\N
 46	Bertha Yeung	berthay	F	\N	\N	0	\N
 47	Wilson Kong	wilsonk	M	\N	\N	0	\N
-48	Catherine Fu	catherinef	F			0	\N
 49	Annie Hsieh	annieh	F	\N	\N	0	\N
 50	Michael Dabao	michaeld	M	\N	\N	0	\N
 51	David Tse	davidt	M	\N	\N	0	\N
@@ -1516,12 +1538,19 @@ COPY administration_player (id, name, username, sex, phone, email, nb_groups, us
 77	Ryan Leung	ryanl	M			0	\N
 78	Michael Chang	michaelc	M			0	\N
 79	Stanley Wong	stanleyw	M			0	\N
-36	Andrew H	andrewh	M			0	\N
 32	Don Kripalani	donk	M			0	\N
 58	Kawang Lau	kawangl	M	\N	\N	0	\N
 7	Arthur Chu	arthurc	M	\N	\N	0	3
 3	Deep Vaswani	deepv	M	\N	\N	0	5
 2	Brad Tsui	bradt	M	\N	\N	0	6
+1	Mancy Howe	mancyh	F	\N	\N	0	8
+6	Lito Labra	litol	M	\N	\N	0	10
+8	Jhun Jimeno	jhunj	M	\N	\N	0	9
+36	Andrew H	andrewh	M	\N	\N	0	12
+37	Clarence Yung	clarencey	M	\N	\N	0	13
+48	Catherine Fu	catherinef	F	\N	\N	0	11
+80	Anthony Chu	anthonyc	M	\N	\N	0	\N
+81	Jessica Wong	jessicaw	F	\N	\N	0	\N
 \.
 
 
@@ -1529,22 +1558,23 @@ COPY administration_player (id, name, username, sex, phone, email, nb_groups, us
 -- Name: administration_player_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('administration_player_id_seq', 79, true);
+SELECT pg_catalog.setval('administration_player_id_seq', 81, true);
 
 
 --
 -- Data for Name: administration_team; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY administration_team (group_ptr_id, ranking, total_legs_played, total_legs_won, season_legs_played, season_legs_won, league_id, team_number, total_matches_played, total_matches_won, season_matches_played, season_matches_won, season_clearances, season_points, captain_id) FROM stdin;
-1	8	98	29	98	29	1	7	14	3	14	3	5	3054	80
-2	2	98	62	98	62	1	4	14	9	14	9	13	3447	2
-3	1	98	72	98	72	1	8	14	13	14	13	23	3432	3
-4	5	98	44	98	44	1	1	14	6	14	6	13	3155	4
-5	3	98	56	98	56	1	6	14	8	14	8	22	3346	5
-6	6	98	43	98	43	1	5	14	5	14	5	13	3196	52
-7	4	98	55	98	55	1	3	14	8	14	8	15	3266	6
-8	7	98	31	98	31	1	2	14	4	14	4	4	3067	69
+COPY administration_team (group_ptr_id, ranking, total_legs_played, total_legs_won, season_legs_played, season_legs_won, league_id, team_number, total_matches_played, total_matches_won, season_matches_played, season_matches_won, season_clearances, season_points, captain_id, season_leg_average, season_median) FROM stdin;
+4	5	98	44	98	44	1	1	14	6	14	6	13	3155	4	0	0
+1	0	98	29	0	0	1	5	14	3	0	0	0	0	80	0	0
+2	0	98	62	0	0	1	4	14	9	0	0	0	0	2	0	0
+5	0	98	56	0	0	1	6	14	8	0	0	0	0	5	0	0
+7	0	98	55	0	0	1	2	14	8	0	0	0	0	6	0	0
+8	0	98	31	0	0	1	7	14	4	0	0	0	0	69	0	0
+6	0	98	43	0	0	1	3	14	5	0	0	0	0	52	0	0
+3	0	98	72	0	0	1	8	14	13	0	0	0	0	3	0	0
+10	0	0	0	0	0	1	1	0	0	0	0	0	0	114	0	0
 \.
 
 
@@ -1552,15 +1582,23 @@ COPY administration_team (group_ptr_id, ranking, total_legs_played, total_legs_w
 -- Data for Name: administration_teamseasonal; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY administration_teamseasonal (id, team_number, ranking, points, clearances, matches_played, matches_won, legs_played, legs_won, season_id, team_id) FROM stdin;
-1	7	8	3054	5	14	3	98	29	1	1
-2	4	2	3447	13	14	9	98	62	1	2
-3	8	1	3432	23	14	13	98	72	1	3
-4	1	5	3155	13	14	6	98	44	1	4
-5	6	3	3346	22	14	8	98	56	1	5
-6	5	6	3196	13	14	5	98	43	1	6
-7	3	4	3266	15	14	8	98	55	1	7
-8	2	7	3067	4	14	4	98	31	1	8
+COPY administration_teamseasonal (id, team_number, ranking, points, clearances, matches_played, matches_won, legs_played, legs_won, season_id, team_id, leg_average, median) FROM stdin;
+9	5	0	0	0	0	0	0	0	2	1	0	0
+10	4	0	0	0	0	0	0	0	2	2	0	0
+11	8	0	0	0	0	0	0	0	2	3	0	0
+12	6	0	0	0	0	0	0	0	2	5	0	0
+13	3	0	0	0	0	0	0	0	2	6	0	0
+14	2	0	0	0	0	0	0	0	2	7	0	0
+15	7	0	0	0	0	0	0	0	2	8	0	0
+16	1	0	0	0	0	0	0	0	2	10	0	0
+1	7	8	3054	5	14	3	98	29	1	1	33.5	6.48611111110999961
+2	4	2	3447	13	14	9	98	62	1	2	40.8928571428999987	8.13095238094999928
+3	8	1	3432	23	14	13	98	72	1	3	40.7142857142999972	8.13333333333000041
+4	1	5	3155	13	14	6	98	44	1	4	35.3452380952000027	6.8333333333299997
+5	6	3	3346	22	14	8	98	56	1	5	39.4761904762000029	8.0833333333299997
+6	5	6	3196	13	14	5	98	43	1	6	34.4761904762000029	7.4027777777799999
+7	3	4	3266	15	14	8	98	55	1	7	37.5238095237999971	7.5705128205100003
+8	2	7	3067	4	14	4	98	31	1	8	33.5119047618999986	6.36666666666999959
 \.
 
 
@@ -1568,7 +1606,7 @@ COPY administration_teamseasonal (id, team_number, ranking, points, clearances, 
 -- Name: administration_teamseasonal_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('administration_teamseasonal_id_seq', 8, true);
+SELECT pg_catalog.setval('administration_teamseasonal_id_seq', 16, true);
 
 
 --
@@ -1709,11 +1747,17 @@ SELECT pg_catalog.setval('auth_permission_id_seq', 86, true);
 COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
 3	pbkdf2_sha256$36000$pMsLyFM21O1v$f2UW4aH73gJd6yEI24m60QBlCeHpdY3XxWGB1GjPj64=	2017-06-17 16:41:08+08	t	asdetrefle	Qj	Chv	qjchv@protonmail.ch	t	t	2017-06-17 16:38:01+08
 2	pbkdf2_sha256$30000$qqNZ3YwKlCB1$usTEYFKh0glaZuPPpVgBbnr4Hwfnw3NpjVuqAcorn5w=	2017-05-30 10:59:15+08	f	scorer				f	t	2017-05-30 10:56:11+08
-7	!UUVp6VLhoU26QMrBHo13CUJ5Gpfllh3jQqrah6JW	\N	f	AnonymousUser				f	t	2017-07-04 22:18:09.687621+08
-1	pbkdf2_sha256$36000$6dyXjCgP2DuE$UMqKctZVwQdQuOSliAD8mfSE6y31cFFrv3BQR6paavg=	2017-07-05 00:07:01.582127+08	t	admin			admin@hkpl.com	t	t	2017-02-07 21:18:36.653+08
-4	pbkdf2_sha256$36000$NSLSkC9BRwhz$GnNyafwV1TGgR+zkQc+x+jTksNqUNrTOsIfeRCNC2ZQ=	2017-07-05 00:07:34.826518+08	f	kawangl	Kawang	Lau		f	t	2017-06-17 16:44:44+08
-6	pbkdf2_sha256$36000$wHBdGlKjHdJI$E8vGYD20s3h+8jKi5E0qbs/bdKCBPV0buyKbQg8GrAE=	2017-07-06 19:04:14.898281+08	f	bradt	Brad	Tsui		f	t	2017-07-04 20:39:53+08
-5	pbkdf2_sha256$36000$QeZ0gMBBBnzv$mbuEpsnNDr2Ak6OQke9Gjaxup/tooGVap6BRDfsI+PQ=	2017-08-20 22:54:18.954111+08	f	deepv	Deep	Vaswani		f	t	2017-07-04 19:56:51+08
+4	pbkdf2_sha256$36000$NSLSkC9BRwhz$GnNyafwV1TGgR+zkQc+x+jTksNqUNrTOsIfeRCNC2ZQ=	2017-06-17 16:52:21.10197+08	f	kawangl	Kawang	Lau		f	t	2017-06-17 16:44:44+08
+7	!VktNRiQTeiJfXONLtVYQ3V27wWxmxy154sE3Es4L	\N	f	AnonymousUser				f	t	2017-08-23 11:48:01.348948+08
+1	pbkdf2_sha256$36000$6dyXjCgP2DuE$UMqKctZVwQdQuOSliAD8mfSE6y31cFFrv3BQR6paavg=	2017-08-26 23:43:05.074375+08	t	admin			admin@hkpl.com	t	t	2017-02-07 21:18:36.653+08
+6	pbkdf2_sha256$36000$wHBdGlKjHdJI$E8vGYD20s3h+8jKi5E0qbs/bdKCBPV0buyKbQg8GrAE=	\N	f	bradt	Brad	Tsui	bradleytsui@gmail.com	f	t	2017-07-04 20:39:53+08
+5	pbkdf2_sha256$36000$QeZ0gMBBBnzv$mbuEpsnNDr2Ak6OQke9Gjaxup/tooGVap6BRDfsI+PQ=	\N	f	deepv	Deep	Vaswani	deepvaswani@gmail.com	f	t	2017-07-04 19:56:51+08
+8	pbkdf2_sha256$36000$FbhINbusgBFW$pzW3jqWV5S5cDWxDqFzgMSySqjTcAxMfZtsaOUmOa0Q=	\N	f	mancyh	Mancy	Howe	mancy312@hotmail.com	f	t	2017-08-26 23:46:37+08
+9	pbkdf2_sha256$36000$CD7GFDtY2POE$3AROVbqYNM+afosntJzO9Nn6AV/IAmuB359/sDpf/vI=	\N	f	jhunj	Jhun	Jimeno	emjimeno@gmail.com	f	t	2017-08-26 23:48:54+08
+10	pbkdf2_sha256$36000$UH2fxxYDnFHG$Mfv331OpQtRQGAZNQISe0WKx4sNAtcSGFwUMHqC+L1E=	\N	f	litol	Lito	Labra	labrapro@yahoo.com	f	t	2017-08-26 23:49:49+08
+11	pbkdf2_sha256$36000$1elopmEDXrUn$Lh33++TzlvYqvAIE/i3c+Nsc4FWMVS7hfM3cKMI8HdA=	\N	f	catherinef	Catherine	Fu	catherinefu217@hotmail.com	f	t	2017-08-26 23:50:53+08
+12	pbkdf2_sha256$36000$QUOxvaCp0K6a$+i+2QTk2U6CzPkq+gg7YUAKdw4uCMnF15TCXY4n068g=	\N	f	andrewh	Andrew	H	eclipsehk@ymail.com	f	t	2017-08-26 23:52:14+08
+13	pbkdf2_sha256$36000$9CWsWGmnJNVU$BxQ+V+D/ffrxLQ2JspwBREmClPMIv6J+XEl+qZRvYLk=	\N	f	clarencey	Clarence	Yung	clarencey32@gmail.com	f	t	2017-08-26 23:53:06+08
 \.
 
 
@@ -1736,7 +1780,7 @@ SELECT pg_catalog.setval('auth_user_groups_id_seq', 1, false);
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('auth_user_id_seq', 7, true);
+SELECT pg_catalog.setval('auth_user_id_seq', 13, true);
 
 
 --
@@ -2155,6 +2199,7 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 387	2017-03-12 19:20:19.381+08	93	2017-03-12 Qijie Chu (Les Trois Mousquetaires) vs. Ka Wang Lau (Les Trois Mousquetaires) 	1	[{"added": {}}]	6	1
 388	2017-03-12 19:49:52.849+08	197	2017-03-12 Qijie Chu (Les Trois Mousquetaires) vs. Ka Wang Lau (Les Trois Mousquetaires)  - Frame 4	2	[{"changed": {"fields": ["break_player"]}}]	8	1
 389	2017-03-12 20:54:07.945+08	205	2017-03-12 Qijie Chu (Les Trois Mousquetaires) vs. Ka Wang Lau (Les Trois Mousquetaires)  - Frame 12	2	[{"changed": {"fields": ["home_score", "away_score"]}}]	8	1
+603	2017-08-23 12:01:00.499436+08	10	The Blazers (0)	1	[{"added": {}}]	4	1
 390	2017-03-12 20:55:11.622+08	94	2017-03-12 Ka Wang Lau (Les Trois Mousquetaires) vs. Qijie Chu (Les Trois Mousquetaires) 	1	[{"added": {}}]	6	1
 391	2017-03-12 23:02:08.63+08	94	2017-03-12 Ka Wang Lau (Les Trois Mousquetaires) vs. Qijie Chu (Les Trois Mousquetaires) 	3		6	1
 392	2017-03-12 23:40:23.54+08	112	2017-05-31 The Abangers vs. Just the Tip	2	[{"changed": {"fields": ["score_type"]}}]	7	1
@@ -2209,6 +2254,7 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 441	2017-03-19 10:54:14.088+08	1	Week 1 Feb 26, 2017-Mar 12, 2017	2	[{"changed": {"fields": ["end_date"]}}]	11	1
 442	2017-03-19 15:29:02.873+08	92	2017-03-12 Ka Wang Lau (Les Trois Mousquetaires) vs. Qijie Chu (Les Trois Mousquetaires) 	2	[{"changed": {"fields": ["break_type"]}}]	6	1
 443	2017-03-19 15:29:20.558+08	93	2017-03-12 Qijie Chu (Les Trois Mousquetaires) vs. Ka Wang Lau (Les Trois Mousquetaires) 	2	[{"changed": {"fields": ["break_type"]}}]	6	1
+604	2017-08-23 12:34:32.606051+08	2	Season 4 - 2017 Autumn	1	[{"added": {}}]	10	1
 444	2017-03-19 15:53:14.518+08	155	2017-03-19 Ka Wang Lau (Les Trois Mousquetaires) vs. Qijie Chu (Les Trois Mousquetaires) 	1	[{"added": {}}]	6	1
 445	2017-03-19 16:15:28.137+08	327	2017-03-19 Ka Wang Lau (Les Trois Mousquetaires) vs. Qijie Chu (Les Trois Mousquetaires)  - Frame 1	3		8	1
 446	2017-03-19 17:16:33.658+08	155	2017-03-19 Ka Wang Lau (Les Trois Mousquetaires) vs. Qijie Chu (Les Trois Mousquetaires) 	2	[{"changed": {"fields": ["number_frames"]}}]	6	1
@@ -2367,7 +2413,59 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 598	2017-07-04 21:10:46.126297+08	4	Pink Platypuses (1)	2	[{"changed": {"fields": ["captain"]}}]	4	1
 599	2017-07-04 21:11:08.339862+08	5	The Abangers (6)	2	[{"changed": {"fields": ["captain"]}}]	4	1
 600	2017-07-04 21:11:22.611667+08	6	Dram Good Shots (5)	2	[{"changed": {"fields": ["captain"]}}]	4	1
-603	2017-07-04 22:07:32.530848+08	113	2017-07-07 Anything is Fine (8) vs. Holy Strokes (3)	1	[{"added": {}}]	7	1
+605	2017-08-23 12:43:43.657717+08	4	Pink Platypuses (1)	2	[{"changed": {"fields": ["close_date"]}}]	4	1
+606	2017-08-23 16:20:10.438853+08	1	Season Season 3 - 2017 Spring - Team That's a Beautiful Rack	2	[{"changed": {"fields": ["leg_average"]}}]	22	1
+607	2017-08-23 16:22:15.737053+08	1	Season Season 3 - 2017 Spring - Team That's a Beautiful Rack	2	[{"changed": {"fields": ["median"]}}]	22	1
+608	2017-08-23 16:22:37.446964+08	2	Season Season 3 - 2017 Spring - Team Just the Tip	2	[{"changed": {"fields": ["leg_average", "median"]}}]	22	1
+609	2017-08-23 16:22:57.384539+08	3	Season Season 3 - 2017 Spring - Team Anything is Fine	2	[{"changed": {"fields": ["leg_average", "median"]}}]	22	1
+610	2017-08-23 16:23:25.371778+08	4	Season Season 3 - 2017 Spring - Team Pink Platypuses	2	[{"changed": {"fields": ["leg_average", "median"]}}]	22	1
+611	2017-08-23 16:23:49.201981+08	5	Season Season 3 - 2017 Spring - Team The Abangers	2	[{"changed": {"fields": ["leg_average", "median"]}}]	22	1
+612	2017-08-23 16:24:08.555238+08	6	Season Season 3 - 2017 Spring - Team Dram Good Shots	2	[{"changed": {"fields": ["leg_average", "median"]}}]	22	1
+613	2017-08-23 16:24:31.527748+08	7	Season Season 3 - 2017 Spring - Team Holy Strokes	2	[{"changed": {"fields": ["leg_average", "median"]}}]	22	1
+614	2017-08-23 16:24:46.203494+08	8	Season Season 3 - 2017 Spring - Team The Meanions	2	[{"changed": {"fields": ["leg_average", "median"]}}]	22	1
+615	2017-08-23 17:09:51.91422+08	10	The Blazers	2	[{"changed": {"fields": ["logo"]}}]	4	1
+616	2017-08-23 17:10:10.521678+08	6	Dram Good Shots	2	[{"changed": {"fields": ["logo"]}}]	4	1
+617	2017-08-23 17:10:26.614519+08	3	Anything is Fine	2	[{"changed": {"fields": ["logo"]}}]	4	1
+618	2017-08-26 23:44:06.481942+08	6	bradt	2	[{"changed": {"fields": ["email"]}}]	15	1
+619	2017-08-26 23:44:23.463182+08	5	deepv	2	[{"changed": {"fields": ["email"]}}]	15	1
+620	2017-08-26 23:46:37.581783+08	8	mancyh	1	[{"added": {}}]	15	1
+621	2017-08-26 23:47:27.273663+08	8	mancyh	2	[{"changed": {"fields": ["first_name", "email"]}}]	15	1
+622	2017-08-26 23:47:50.049856+08	1	Mancy Howe	2	[{"changed": {"fields": ["user"]}}]	3	1
+623	2017-08-26 23:48:07.223124+08	8	mancyh	2	[{"changed": {"fields": ["last_name"]}}]	15	1
+624	2017-08-26 23:48:54.79503+08	9	jhunj	1	[{"added": {}}]	15	1
+625	2017-08-26 23:49:19.088981+08	9	jhunj	2	[{"changed": {"fields": ["first_name", "last_name", "email"]}}]	15	1
+626	2017-08-26 23:49:49.409227+08	10	litol	1	[{"added": {}}]	15	1
+627	2017-08-26 23:50:18.696845+08	10	litol	2	[{"changed": {"fields": ["first_name", "last_name", "email"]}}]	15	1
+628	2017-08-26 23:50:53.603172+08	11	catherinef	1	[{"added": {}}]	15	1
+629	2017-08-26 23:51:24.602453+08	11	catherinef	2	[{"changed": {"fields": ["first_name", "last_name", "email"]}}]	15	1
+630	2017-08-26 23:52:14.586226+08	12	andrewh	1	[{"added": {}}]	15	1
+631	2017-08-26 23:52:26.27349+08	12	andrewh	2	[{"changed": {"fields": ["first_name", "last_name", "email"]}}]	15	1
+632	2017-08-26 23:53:06.774283+08	13	clarencey	1	[{"added": {}}]	15	1
+633	2017-08-26 23:53:39.731069+08	13	clarencey	2	[{"changed": {"fields": ["first_name", "last_name", "email"]}}]	15	1
+634	2017-08-27 00:52:45.617006+08	6	Lito Labra	2	[{"changed": {"fields": ["user"]}}]	3	1
+635	2017-08-27 00:52:55.628569+08	8	Jhun Jimeno	2	[{"changed": {"fields": ["user"]}}]	3	1
+636	2017-08-27 00:53:21.811338+08	36	Andrew H	2	[{"changed": {"fields": ["user"]}}]	3	1
+637	2017-08-27 00:53:38.174034+08	37	Clarence Yung	2	[{"changed": {"fields": ["user"]}}]	3	1
+638	2017-08-27 00:54:13.185144+08	48	Catherine Fu	2	[{"changed": {"fields": ["user"]}}]	3	1
+639	2017-08-27 16:02:52.571162+08	114	Clarence Yung (The Blazers)	1	[{"added": {}}]	5	1
+640	2017-08-27 16:03:58.026419+08	115	Fiona Chow (The Blazers)	1	[{"added": {}}]	5	1
+641	2017-08-27 16:06:02.20476+08	116	Alex Wang (The Blazers)	1	[{"added": {}}]	5	1
+642	2017-08-27 16:06:23.008204+08	117	Coleman Yip (The Blazers)	1	[{"added": {}}]	5	1
+643	2017-08-27 16:07:50.642735+08	118	Jon Sze (The Blazers)	1	[{"added": {}}]	5	1
+644	2017-08-27 16:08:46.760574+08	80	Anthony Chu	1	[{"added": {}}]	3	1
+645	2017-08-27 16:09:20.887056+08	119	Ricky Ying (The Blazers)	1	[{"added": {}}]	5	1
+646	2017-08-27 16:09:49.976878+08	120	Julian Tung (The Blazers)	1	[{"added": {}}]	5	1
+647	2017-08-27 16:10:14.16057+08	121	Anthony Chu (The Blazers)	1	[{"added": {}}]	5	1
+648	2017-08-27 16:10:55.113927+08	81	Jessica Wong	1	[{"added": {}}]	3	1
+649	2017-08-27 16:11:15.165067+08	122	Jessica Wong (The Blazers)	1	[{"added": {}}]	5	1
+650	2017-08-27 16:12:32.37459+08	10	The Blazers	2	[{"changed": {"fields": ["create_date", "captain"]}}]	4	1
+651	2017-08-27 16:13:06.221312+08	53	Kuro Kawamura (Dram Good Shots)	2	[{"changed": {"fields": ["cancel_date", "points", "handicap"]}}]	5	1
+652	2017-08-27 16:13:26.153356+08	61	Clara Szeto (The Meanions)	2	[{"changed": {"fields": ["cancel_date", "points", "handicap"]}}]	5	1
+653	2017-08-27 16:13:35.916542+08	53	Kuro Kawamura (Dram Good Shots)	2	[{"changed": {"fields": ["cancel_date"]}}]	5	1
+654	2017-08-27 16:13:49.58724+08	59	James Law (Dram Good Shots)	2	[{"changed": {"fields": ["cancel_date", "points", "handicap"]}}]	5	1
+655	2017-08-27 16:14:13.821904+08	123	Clara Szeto (Holy Strokes)	1	[{"added": {}}]	5	1
+656	2017-08-27 16:14:52.93904+08	124	James Law (Just the Tip)	1	[{"added": {}}]	5	1
+657	2017-08-27 16:15:08.417938+08	125	Kuro Kawamura (Just the Tip)	1	[{"added": {}}]	5	1
 \.
 
 
@@ -2375,7 +2473,7 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('django_admin_log_id_seq', 603, true);
+SELECT pg_catalog.setval('django_admin_log_id_seq', 657, true);
 
 
 --
@@ -2536,7 +2634,15 @@ COPY django_migrations (id, app, name, applied) FROM stdin;
 57	stats	0007_auto_20170627_2148	2017-06-27 21:48:12.77228+08
 58	recording	0015_auto_20170704_2101	2017-07-04 21:01:23.771007+08
 59	administration	0018_auto_20170704_2108	2017-07-04 21:08:47.67901+08
-60	guardian	0001_initial	2017-07-04 22:18:09.58723+08
+60	guardian	0001_initial	2017-08-23 11:48:01.248902+08
+61	administration	0019_auto_20170823_1616	2017-08-23 16:16:58.472653+08
+62	administration	0020_auto_20170823_1619	2017-08-23 16:20:01.963196+08
+63	administration	0021_auto_20170823_1619	2017-08-23 16:20:02.002016+08
+64	administration	0022_auto_20170823_1650	2017-08-23 16:50:12.230597+08
+65	stats	0008_auto_20170827_1245	2017-08-27 12:45:58.675945+08
+66	stats	0009_auto_20170827_1324	2017-08-27 13:25:42.797442+08
+67	stats	0010_auto_20170827_1327	2017-08-27 13:27:27.45761+08
+68	stats	0011_auto_20170827_1330	2017-08-27 13:30:18.853658+08
 \.
 
 
@@ -2544,7 +2650,7 @@ COPY django_migrations (id, app, name, applied) FROM stdin;
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('django_migrations_id_seq', 60, true);
+SELECT pg_catalog.setval('django_migrations_id_seq', 68, true);
 
 
 --
@@ -2572,7 +2678,9 @@ x0ym7r3igodgwah17yr4cxts5l1issp9	MzUwMmEyNTQ4MTUxYmM2MTIyNjViOTMwOWVlNjdhNGY1NjR
 1o05suxetraau1qi6t4gqz8b13blvmnm	MzU2MzM1NGE0MTE0YWJmODRlN2Y4ZDc0YzEyOGZlYjAxNDA0NGNjMTp7Il9hdXRoX3VzZXJfaGFzaCI6IjU1MWI2OTIxY2ZhZTFmNTk0Y2Q2YTg5NjFkZTM0YjhhNmFjNWU1ZWMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-07-02 00:16:56.407234+08
 2cmedk0mjid9hx21wupni5yo2aeihtka	YjYyNzVhYzYzZTYzOGIxNDY0NWI5OTRjODVmNDE1ZGU4MmE2ZGI2Njp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9oYXNoIjoiNTUxYjY5MjFjZmFlMWY1OTRjZDZhODk2MWRlMzRiOGE2YWM1ZTVlYyIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIn0=	2017-07-09 01:03:09.46893+08
 qk142lk0ayenaaoyx3yyndegvfmwq6z8	MzU2MzM1NGE0MTE0YWJmODRlN2Y4ZDc0YzEyOGZlYjAxNDA0NGNjMTp7Il9hdXRoX3VzZXJfaGFzaCI6IjU1MWI2OTIxY2ZhZTFmNTk0Y2Q2YTg5NjFkZTM0YjhhNmFjNWU1ZWMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-07-09 14:19:15.213145+08
-gpyt3uswt3js1f20si8g4gyxb3xbqqdl	ODU0ODM4MWYwYTVkMTlkYTc1MTIxMGNjYWMzYTgyZGVmMjA4Y2QwNzp7Il9hdXRoX3VzZXJfaGFzaCI6IjEwYWM1NmFlOTZlNjg2YjUwMjBjNGU3ZTc1NDZlZTA3YTQ2MTAwZjciLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiI1In0=	2017-09-03 22:54:18.95858+08
+leg7bsv3qxvwl40nbf78fppdtwt215ge	MzU2MzM1NGE0MTE0YWJmODRlN2Y4ZDc0YzEyOGZlYjAxNDA0NGNjMTp7Il9hdXRoX3VzZXJfaGFzaCI6IjU1MWI2OTIxY2ZhZTFmNTk0Y2Q2YTg5NjFkZTM0YjhhNmFjNWU1ZWMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-07-18 21:02:04.130452+08
+w31bk6r90l61c3hjg6qc38zq7zerr4tg	MzU2MzM1NGE0MTE0YWJmODRlN2Y4ZDc0YzEyOGZlYjAxNDA0NGNjMTp7Il9hdXRoX3VzZXJfaGFzaCI6IjU1MWI2OTIxY2ZhZTFmNTk0Y2Q2YTg5NjFkZTM0YjhhNmFjNWU1ZWMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-09-06 11:55:36.263575+08
+xt7xdngmvl7e1j5r6lzyvd0aedh48aul	MzU2MzM1NGE0MTE0YWJmODRlN2Y4ZDc0YzEyOGZlYjAxNDA0NGNjMTp7Il9hdXRoX3VzZXJfaGFzaCI6IjU1MWI2OTIxY2ZhZTFmNTk0Y2Q2YTg5NjFkZTM0YjhhNmFjNWU1ZWMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-09-09 23:43:05.080377+08
 \.
 
 
@@ -2596,8 +2704,6 @@ SELECT pg_catalog.setval('guardian_groupobjectpermission_id_seq', 1, false);
 --
 
 COPY guardian_userobjectpermission (id, object_pk, content_type_id, permission_id, user_id) FROM stdin;
-1	113	7	80	6
-2	113	7	80	5
 \.
 
 
@@ -2605,7 +2711,7 @@ COPY guardian_userobjectpermission (id, object_pk, content_type_id, permission_i
 -- Name: guardian_userobjectpermission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('guardian_userobjectpermission_id_seq', 2, true);
+SELECT pg_catalog.setval('guardian_userobjectpermission_id_seq', 1, false);
 
 
 --
@@ -4332,6 +4438,36 @@ COPY recording_frame (id, frame_number, home_score, away_score, is_clearance, br
 1810	1	5	10	f	87	\N	890
 1791	2	6	10	f	107	\N	880
 1799	2	10	4	f	107	\N	884
+1812	1	\N	\N	f	114	\N	891
+1813	2	\N	\N	f	41	\N	891
+1814	1	\N	\N	f	116	\N	892
+1815	2	\N	\N	f	40	\N	892
+1816	1	\N	\N	f	115	\N	893
+1817	2	\N	\N	f	43	\N	893
+1818	1	\N	\N	f	118	\N	894
+1819	2	\N	\N	f	42	\N	894
+1820	1	\N	\N	f	117	\N	895
+1821	2	\N	\N	f	44	\N	895
+1822	1	\N	\N	f	114	\N	896
+1823	2	\N	\N	f	40	\N	896
+1824	1	\N	\N	f	116	\N	897
+1825	2	\N	\N	f	43	\N	897
+1826	1	\N	\N	f	115	\N	898
+1827	2	\N	\N	f	42	\N	898
+1828	1	\N	\N	f	118	\N	899
+1829	2	\N	\N	f	44	\N	899
+1830	1	\N	\N	f	117	\N	900
+1831	2	\N	\N	f	41	\N	900
+1832	1	\N	\N	f	114	\N	901
+1833	2	\N	\N	f	43	\N	901
+1834	1	\N	\N	f	116	\N	902
+1835	2	\N	\N	f	42	\N	902
+1836	1	\N	\N	f	115	\N	903
+1837	2	\N	\N	f	44	\N	903
+1838	1	\N	\N	f	118	\N	904
+1839	2	\N	\N	f	41	\N	904
+1840	1	\N	\N	f	117	\N	905
+1841	2	\N	\N	f	40	\N	905
 \.
 
 
@@ -4339,7 +4475,7 @@ COPY recording_frame (id, frame_number, home_score, away_score, is_clearance, br
 -- Name: recording_frame_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('recording_frame_id_seq', 1811, true);
+SELECT pg_catalog.setval('recording_frame_id_seq', 1841, true);
 
 
 --
@@ -6027,6 +6163,36 @@ COPY recording_leagueframe (frame_ptr_id, leg_number, away_player_id, home_playe
 1791	2	107	87	111
 1789	2	66	1	111
 1786	1	61	80	111
+1812	1	41	114	113
+1813	2	41	114	113
+1814	1	40	116	113
+1815	2	40	116	113
+1816	1	43	115	113
+1817	2	43	115	113
+1818	1	42	118	113
+1819	2	42	118	113
+1820	1	44	117	113
+1821	2	44	117	113
+1822	3	40	114	113
+1823	4	40	114	113
+1824	3	43	116	113
+1825	4	43	116	113
+1826	3	42	115	113
+1827	4	42	115	113
+1828	3	44	118	113
+1829	4	44	118	113
+1830	3	41	117	113
+1831	4	41	117	113
+1832	5	43	114	113
+1833	6	43	114	113
+1834	5	42	116	113
+1835	6	42	116	113
+1836	5	44	115	113
+1837	6	44	115	113
+1838	5	41	118	113
+1839	6	41	118	113
+1840	5	40	117	113
+1841	6	40	117	113
 \.
 
 
@@ -6091,7 +6257,62 @@ COPY recording_leaguematch (id, venue, match_date, number_frames, table_size, is
 106	Billidart	2017-05-31 20:00:00+08	0	9	t	t	8-Ball	P	1	6	211	260	6	6	2	6	13	2	t	84_72_2_75_73	53_55_54_57_52	A	1	1
 105	Racks	2017-05-30 20:00:00+08	0	9	t	t	8-Ball	P	1	6	227	260	6	5	3	8	13	3	t	42_44_43_45_41	63_69_61_62_105	A	1	1
 110	Racks	2017-06-06 20:00:00+08	0	9	t	t	8-Ball	P	4	3	242	228	6	4	7	6	14	6	t	7_6_81_89_90	57_58_54_53_55	A	1	1
-113	\N	2017-07-07 22:06:57+08	0	9	f	f	8-Ball	F	0	0	0	0	6	0	7	3	\N	\N	f	\N	\N	W	\N	1
+114	Racks	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	8	1	15	\N	f	\N	\N	A	2	\N
+115	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	5	7	15	\N	f	\N	\N	A	2	\N
+116	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	2	6	15	\N	f	\N	\N	A	2	\N
+117	Racks	2017-09-12 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	6	5	16	\N	f	\N	\N	A	2	\N
+118	Racks	2017-09-13 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	7	2	16	\N	f	\N	\N	A	2	\N
+119	Billidart	2017-09-13 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	1	3	16	\N	f	\N	\N	A	2	\N
+120	Billidart	2017-09-13 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	10	8	16	\N	f	\N	\N	A	2	\N
+121	Racks	2017-09-19 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	8	6	17	\N	f	\N	\N	A	2	\N
+122	Racks	2017-09-20 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	3	7	17	\N	f	\N	\N	A	2	\N
+123	Billidart	2017-09-20 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	1	2	17	\N	f	\N	\N	A	2	\N
+124	Billidart	2017-09-20 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	5	10	17	\N	f	\N	\N	A	2	\N
+125	Racks	2017-09-26 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	2	5	18	\N	f	\N	\N	A	2	\N
+126	Racks	2017-09-27 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	10	1	18	\N	f	\N	\N	A	2	\N
+127	Billidart	2017-09-27 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	6	3	18	\N	f	\N	\N	A	2	\N
+128	Billidart	2017-09-27 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	7	8	18	\N	f	\N	\N	A	2	\N
+129	Racks	2017-10-03 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	6	7	19	\N	f	\N	\N	A	2	\N
+130	Racks	2017-10-04 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	3	8	19	\N	f	\N	\N	A	2	\N
+131	Billidart	2017-10-04 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	5	1	19	\N	f	\N	\N	A	2	\N
+132	Billidart	2017-10-04 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	2	10	19	\N	f	\N	\N	A	2	\N
+133	Racks	2017-10-10 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	7	1	20	\N	f	\N	\N	A	2	\N
+134	Racks	2017-10-11 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	10	6	20	\N	f	\N	\N	A	2	\N
+135	Billidart	2017-10-11 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	5	8	20	\N	f	\N	\N	A	2	\N
+136	Billidart	2017-10-11 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	2	3	20	\N	f	\N	\N	A	2	\N
+137	Racks	2017-10-17 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	8	2	21	\N	f	\N	\N	A	2	\N
+138	Racks	2017-10-18 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	3	5	21	\N	f	\N	\N	A	2	\N
+139	Billidart	2017-10-18 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	7	10	21	\N	f	\N	\N	A	2	\N
+140	Billidart	2017-10-18 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	1	6	21	\N	f	\N	\N	A	2	\N
+141	Racks	2017-10-24 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	8	10	22	\N	f	\N	\N	A	2	\N
+142	Racks	2017-10-25 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	6	1	22	\N	f	\N	\N	A	2	\N
+143	Billidart	2017-10-25 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	5	2	22	\N	f	\N	\N	A	2	\N
+144	Billidart	2017-10-25 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	7	3	22	\N	f	\N	\N	A	2	\N
+145	Racks	2017-10-31 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	3	2	23	\N	f	\N	\N	A	2	\N
+146	Racks	2017-11-01 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	7	5	23	\N	f	\N	\N	A	2	\N
+147	Billidart	2017-11-01 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	1	10	23	\N	f	\N	\N	A	2	\N
+148	Billidart	2017-11-01 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	6	8	23	\N	f	\N	\N	A	2	\N
+149	Racks	2017-11-07 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	8	5	24	\N	f	\N	\N	A	2	\N
+150	Racks	2017-11-08 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	3	1	24	\N	f	\N	\N	A	2	\N
+151	Billidart	2017-11-08 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	6	10	24	\N	f	\N	\N	A	2	\N
+152	Billidart	2017-11-08 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	2	7	24	\N	f	\N	\N	A	2	\N
+153	Racks	2017-11-14 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	10	7	25	\N	f	\N	\N	A	2	\N
+154	Racks	2017-11-15 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	6	2	25	\N	f	\N	\N	A	2	\N
+155	Billidart	2017-11-15 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	5	3	25	\N	f	\N	\N	A	2	\N
+156	Billidart	2017-11-15 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	1	8	25	\N	f	\N	\N	A	2	\N
+157	Racks	2017-11-21 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	1	5	26	\N	f	\N	\N	A	2	\N
+158	Racks	2017-11-22 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	10	2	26	\N	f	\N	\N	A	2	\N
+159	Billidart	2017-11-22 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	7	6	26	\N	f	\N	\N	A	2	\N
+160	Billidart	2017-11-22 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	8	3	26	\N	f	\N	\N	A	2	\N
+161	Racks	2017-11-28 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	3	6	27	\N	f	\N	\N	A	2	\N
+162	Racks	2017-11-29 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	10	5	27	\N	f	\N	\N	A	2	\N
+163	Billidart	2017-11-29 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	2	8	27	\N	f	\N	\N	A	2	\N
+164	Billidart	2017-11-29 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	1	7	27	\N	f	\N	\N	A	2	\N
+165	Racks	2017-12-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	2	1	28	\N	f	\N	\N	A	2	\N
+166	Racks	2017-12-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	8	7	28	\N	f	\N	\N	A	2	\N
+167	Billidart	2017-12-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	10	3	28	\N	f	\N	\N	A	2	\N
+168	Billidart	2017-12-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	5	6	28	\N	f	\N	\N	A	2	\N
+113	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	3	10	15	\N	t	41_40_43_42_44	114_116_115_118_117	A	2	\N
 \.
 
 
@@ -6099,7 +6320,7 @@ COPY recording_leaguematch (id, venue, match_date, number_frames, table_size, is
 -- Name: recording_leaguematch_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('recording_leaguematch_id_seq', 113, true);
+SELECT pg_catalog.setval('recording_leaguematch_id_seq', 168, true);
 
 
 --
@@ -6950,6 +7171,21 @@ COPY recording_match (id, venue, match_date, number_frames, table_size, is_compl
 852	Billidart	2017-06-07 20:00:00+08	2	9	t	t	8-Ball	P	20	8	2	E	47	44	\N	44	f	A	\N
 185	Billidart	2017-03-22 20:00:00+08	2	9	t	t	8-Ball	P	6	20	2	E	44	73	\N	44	f	A	1
 201	Racks	2017-03-22 20:00:00+08	2	9	t	t	8-Ball	P	20	11	2	E	79	69	\N	69	f	A	1
+891	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	41	114	\N	\N	f	A	\N
+892	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	40	116	\N	\N	f	A	\N
+893	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	43	115	\N	\N	f	A	\N
+894	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	42	118	\N	\N	f	A	\N
+895	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	44	117	\N	\N	f	A	\N
+896	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	40	114	\N	\N	f	A	\N
+897	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	43	116	\N	\N	f	A	\N
+898	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	42	115	\N	\N	f	A	\N
+899	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	44	118	\N	\N	f	A	\N
+900	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	41	117	\N	\N	f	A	\N
+901	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	43	114	\N	\N	f	A	\N
+902	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	42	116	\N	\N	f	A	\N
+903	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	44	115	\N	\N	f	A	\N
+904	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	41	118	\N	\N	f	A	\N
+905	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	40	117	\N	\N	f	A	\N
 \.
 
 
@@ -6957,7 +7193,7 @@ COPY recording_match (id, venue, match_date, number_frames, table_size, is_compl
 -- Name: recording_match_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('recording_match_id_seq', 890, true);
+SELECT pg_catalog.setval('recording_match_id_seq', 905, true);
 
 
 --
@@ -6979,6 +7215,20 @@ COPY schedule_matchweek (id, week_number, start_date, end_date, season_id) FROM 
 12	12	2017-05-21 00:00:00+08	2017-05-28 00:00:00+08	1
 13	13	2017-05-28 00:00:00+08	2017-06-04 00:00:00+08	1
 14	14	2017-06-04 00:00:00+08	2017-06-11 00:00:00+08	1
+15	1	2017-09-03 00:00:00+08	2017-09-10 00:00:00+08	2
+16	2	2017-09-10 00:00:00+08	2017-09-17 00:00:00+08	2
+17	3	2017-09-17 00:00:00+08	2017-09-24 00:00:00+08	2
+18	4	2017-09-24 00:00:00+08	2017-10-01 00:00:00+08	2
+19	5	2017-10-01 00:00:00+08	2017-10-08 00:00:00+08	2
+20	6	2017-10-08 00:00:00+08	2017-10-15 00:00:00+08	2
+21	7	2017-10-15 00:00:00+08	2017-10-22 00:00:00+08	2
+22	8	2017-10-22 00:00:00+08	2017-10-29 00:00:00+08	2
+23	9	2017-10-29 00:00:00+08	2017-11-05 00:00:00+08	2
+24	10	2017-11-05 00:00:00+08	2017-11-12 00:00:00+08	2
+25	11	2017-11-12 00:00:00+08	2017-11-19 00:00:00+08	2
+26	12	2017-11-19 00:00:00+08	2017-11-26 00:00:00+08	2
+27	13	2017-11-26 00:00:00+08	2017-12-03 00:00:00+08	2
+28	14	2017-12-03 00:00:00+08	2017-12-10 00:00:00+08	2
 \.
 
 
@@ -6986,7 +7236,7 @@ COPY schedule_matchweek (id, week_number, start_date, end_date, season_id) FROM 
 -- Name: schedule_matchweek_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('schedule_matchweek_id_seq', 14, true);
+SELECT pg_catalog.setval('schedule_matchweek_id_seq', 28, true);
 
 
 --
@@ -6995,6 +7245,7 @@ SELECT pg_catalog.setval('schedule_matchweek_id_seq', 14, true);
 
 COPY schedule_season (id, season, league_id, name) FROM stdin;
 1	3	1	2017 Spring
+2	4	1	2017 Autumn
 \.
 
 
@@ -7002,908 +7253,908 @@ COPY schedule_season (id, season, league_id, name) FROM stdin;
 -- Name: schedule_season_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('schedule_season_id_seq', 1, true);
+SELECT pg_catalog.setval('schedule_season_id_seq', 2, true);
 
 
 --
 -- Data for Name: stats_playerranking; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY stats_playerranking (id, date, serial_id, ranking, elo_points, raw_points, handicap, matches_played, matches_won, clearances, player_id, league_id, week_id, season_id) FROM stdin;
-46	2017-06-27 22:01:15.24172+08	2	20	203.807596953266994	90	7.5	6	3	1	92	1	2	1
-45	2017-06-27 22:01:15.240334+08	2	4	220.954461267576988	109	9.08333333333333037	6	5	0	76	1	2	1
-48	2017-06-27 22:01:15.247147+08	1	14	210.585489538448002	52	8.66666666666666963	3	2	0	93	1	2	1
-47	2017-06-27 22:01:15.24585+08	2	36	193.714285714286007	41	6.83333333333333037	3	0	0	90	1	2	1
-51	2017-06-27 22:01:15.251206+08	2	27	197.84443049751701	91	7.58333333333333037	6	3	0	89	1	2	1
-50	2017-06-27 22:01:15.249776+08	2	39	189.692855389918009	83	6.91666666666666963	6	1	0	81	1	2	1
-49	2017-06-27 22:01:15.248301+08	2	15	210.571433646232009	99	8.25	6	4	2	6	1	2	1
-52	2017-06-27 22:01:15.25276+08	2	18	207.337410718922001	95	7.91666666666666963	6	3	0	7	1	2	1
-55	2017-06-27 22:01:15.259408+08	2	25	199.964404894327004	44	7.33333333333333037	3	1	0	3	1	2	1
-22	2017-06-27 21:48:26.81764+08	1	10	208.211143695015011	55	9.16666666666666963	3	2	1	70	1	1	1
-53	2017-06-27 22:01:15.256806+08	2	22	202.252085452415002	91	7.58333333333333037	6	2	0	42	1	2	1
-62	2017-06-27 22:01:15.272454+08	2	37	191.356205970909997	78	6.5	6	2	0	69	1	2	1
-60	2017-06-27 22:01:15.269799+08	2	44	186.96296296296299	33	5.5	3	0	0	67	1	2	1
-56	2017-06-27 22:01:15.260838+08	2	1	225.161682627115994	112	9.33333333333333037	6	4	2	41	1	2	1
-64	2017-06-27 22:01:15.276905+08	2	42	187.651135005973998	34	5.66666666666666963	3	0	0	64	1	2	1
-63	2017-06-27 22:01:15.275354+08	1	33	195.200687140910986	42	7	3	1	0	62	1	2	1
-61	2017-06-27 22:01:15.271127+08	2	28	197.463261956460002	88	7.33333333333333037	6	2	0	63	1	2	1
-65	2017-06-27 22:01:15.278184+08	1	38	190.303493986219991	32	5.33333333333333037	3	0	0	105	1	2	1
-59	2017-06-27 22:01:15.268214+08	2	49	169.611029433910005	57	4.75	6	1	0	61	1	2	1
-66	2017-06-27 22:01:15.284562+08	2	17	207.741674802046987	91	7.58333333333333037	6	3	0	73	1	2	1
-68	2017-06-27 22:01:15.287542+08	2	31	195.604395604395989	39	6.5	3	1	0	72	1	2	1
-43	2017-06-27 22:01:15.237396+08	2	9	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	2	1
-67	2017-06-27 22:01:15.286003+08	1	7	217.768712034820993	60	10	3	3	0	104	1	2	1
-70	2017-06-27 22:01:15.290316+08	2	12	211.253040798178006	102	8.5	6	4	0	74	1	2	1
-44	2017-06-27 22:01:15.238903+08	1	43	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	2	1
-42	2017-06-27 22:01:15.235561+08	2	5	220.379051246349007	98	8.16666666666666963	6	4	2	71	1	2	1
-4	2017-06-27 21:48:26.778042+08	1	13	205.16129032258101	52	8.66666666666666963	3	2	0	89	1	1	1
-21	2017-06-27 21:48:26.815994+08	1	22	198.896551724137993	44	7.33333333333333037	3	1	0	46	1	1	1
-2	2017-06-27 21:48:26.773054+08	1	31	193.714285714286007	41	6.83333333333333037	3	0	0	90	1	1	1
-5	2017-06-27 21:48:26.78009+08	1	27	195.636363636363996	45	7.5	3	0	0	81	1	1	1
-3	2017-06-27 21:48:26.775309+08	1	26	195.901477832512001	42	7	3	1	0	7	1	1	1
-7	2017-06-27 21:48:26.785536+08	1	11	208.098522167487999	52	8.66666666666666963	3	2	0	1	1	1	1
-10	2017-06-27 21:48:26.790663+08	1	23	198.748778103617013	48	8	3	1	0	91	1	1	1
-6	2017-06-27 21:48:26.783428+08	1	19	200.011942080908	45	7.5	3	2	0	87	1	1	1
-31	2017-06-27 21:48:26.839931+08	1	32	193.010936494806998	36	6	3	1	0	58	1	1	1
-8	2017-06-27 21:48:26.787356+08	1	21	198.999022482892997	48	8	3	0	0	79	1	1	1
-9	2017-06-27 21:48:26.788983+08	1	17	201.000977517107003	49	8.16666666666666963	3	2	0	80	1	1	1
-25	2017-06-27 21:48:26.824594+08	1	37	186.285714285713993	30	5	3	0	0	49	1	1	1
-27	2017-06-27 21:48:26.830641+08	1	1	224.01656314699801	60	10	3	3	2	41	1	1	1
-24	2017-06-27 21:48:26.822746+08	1	33	188.809902740936991	33	5.5	3	1	0	4	1	1	1
-26	2017-06-27 21:48:26.828615+08	1	20	199.964404894327004	44	7.33333333333333037	3	1	0	3	1	1	1
-29	2017-06-27 21:48:26.834508+08	1	6	214.684350132626008	56	9.33333333333333037	3	2	1	40	1	1	1
-30	2017-06-27 21:48:26.836214+08	1	29	195.502612330199014	41	6.83333333333333037	3	1	0	42	1	1	1
-28	2017-06-27 21:48:26.832786+08	1	18	200.523809523810002	45	7.5	3	1	0	43	1	1	1
-11	2017-06-27 21:48:26.793854+08	1	35	187.651135005973998	34	5.66666666666666963	3	0	0	64	1	1	1
-14	2017-06-27 21:48:26.79883+08	1	36	186.96296296296299	33	5.5	3	0	0	67	1	1	1
-16	2017-06-27 21:48:26.80372+08	1	8	211.864016509177986	56	9.33333333333333037	3	2	0	2	1	1	1
-12	2017-06-27 21:48:26.795401+08	1	39	176.296296296295992	21	3.5	3	0	0	61	1	1	1
-15	2017-06-27 21:48:26.800496+08	1	25	197.022332506203014	42	7	3	0	0	69	1	1	1
-13	2017-06-27 21:48:26.797086+08	1	12	205.686818928197994	50	8.33333333333333037	3	2	0	63	1	1	1
-18	2017-06-27 21:48:26.806892+08	1	5	215.407407407406993	56	9.33333333333333037	3	2	0	74	1	1	1
-19	2017-06-27 21:48:26.81131+08	1	28	195.604395604395989	39	6.5	3	1	0	72	1	1	1
-17	2017-06-27 21:48:26.805318+08	1	7	212.321839080459995	52	8.66666666666666963	3	2	0	73	1	1	1
-20	2017-06-27 21:48:26.812987+08	1	9	211.182795698924991	56	9.33333333333333037	3	3	0	84	1	1	1
-1	2017-06-27 21:48:26.769554+08	1	15	202.727340142245993	49	8.16666666666666963	3	2	0	6	1	1	1
-33	2017-06-27 21:48:26.842928+08	1	24	198.008124253286013	43	7.16666666666666963	3	2	0	53	1	1	1
-35	2017-06-27 21:48:26.846103+08	1	40	163.031055900620999	8	1.33333333333332993	3	0	0	54	1	1	1
-34	2017-06-27 21:48:26.844606+08	1	34	187.809523809523995	35	5.83333333333333037	3	0	0	55	1	1	1
-32	2017-06-27 21:48:26.841451+08	1	30	194.666666666666998	42	7	3	1	0	100	1	1	1
-38	2017-06-27 21:48:26.853304+08	1	2	219.809523809523995	57	9.5	3	2	0	88	1	1	1
-36	2017-06-27 21:48:26.849965+08	1	4	217.675549322113	56	9.33333333333333037	3	3	0	71	1	1	1
-37	2017-06-27 21:48:26.851699+08	1	16	202.02150537634401	43	7.16666666666666963	3	1	0	78	1	1	1
-39	2017-06-27 21:48:26.855184+08	1	14	204.559706959707	46	7.66666666666666963	3	1	0	92	1	1	1
-40	2017-06-27 21:48:26.856816+08	1	3	219.407407407406993	60	10	3	3	0	76	1	1	1
-69	2017-06-27 22:01:15.289018+08	2	16	208.712796158308009	104	8.66666666666666963	6	4	0	2	1	2	1
-58	2017-06-27 22:01:15.264086+08	2	30	196.418801515144992	88	7.33333333333333037	6	2	0	43	1	2	1
-110	2017-06-27 22:11:45.400499+08	3	9	214.742499074669013	149	8.27777777777778034	9	5	1	46	1	3	1
-76	2017-06-27 22:01:15.302953+08	2	47	180.594976057205997	69	5.75	6	0	0	55	1	2	1
-75	2017-06-27 22:01:15.301621+08	2	35	194.666666666666998	42	7	3	1	0	100	1	2	1
-78	2017-06-27 22:01:15.310255+08	2	10	211.864359283921004	104	8.66666666666666963	6	3	0	1	1	2	1
-73	2017-06-27 22:01:15.298785+08	2	29	196.788849609625004	81	6.75	6	3	0	58	1	2	1
-72	2017-06-27 22:01:15.297247+08	2	50	151.40648580159899	36	3	6	0	0	54	1	2	1
-84	2017-06-27 22:01:15.318751+08	2	24	200.011942080908	45	7.5	3	2	0	87	1	2	1
-74	2017-06-27 22:01:15.300338+08	1	11	211.492070094698988	52	8.66666666666666963	3	2	1	56	1	2	1
-77	2017-06-27 22:01:15.304242+08	2	40	189.043532249451005	80	6.66666666666666963	6	2	0	53	1	2	1
-80	2017-06-27 22:01:15.313251+08	2	32	195.409964129627014	93	7.75	6	3	0	80	1	2	1
-81	2017-06-27 22:01:15.314936+08	1	45	186.490487828123008	34	5.66666666666666963	3	0	0	97	1	2	1
-82	2017-06-27 22:01:15.316141+08	2	34	194.819373302375993	91	7.58333333333333037	6	0	0	79	1	2	1
-83	2017-06-27 22:01:15.317466+08	2	26	198.748778103617013	48	8	3	1	0	91	1	2	1
-89	2017-06-27 22:01:15.328183+08	2	46	186.285714285713993	30	5	3	0	0	49	1	2	1
-88	2017-06-27 22:01:15.326857+08	2	13	210.797695449466005	108	9	6	3	1	70	1	2	1
-79	2017-06-27 22:01:15.3118+08	1	41	188.240355949430011	35	5.83333333333333037	3	1	0	83	1	2	1
-87	2017-06-27 22:01:15.325571+08	2	48	179.551780285467004	71	5.91666666666666963	6	1	0	47	1	2	1
-85	2017-06-27 22:01:15.322837+08	1	19	204.645161290322989	51	8.5	3	1	0	48	1	2	1
-41	2017-06-27 22:01:15.233878+08	2	23	202.02150537634401	43	7.16666666666666963	3	1	0	78	1	2	1
-90	2017-06-27 22:01:15.329579+08	2	21	202.66559091258199	89	7.41666666666666963	6	4	0	4	1	2	1
-125	2017-06-27 22:11:45.442741+08	3	15	211.253040798178006	102	8.5	6	4	0	74	1	3	1
-86	2017-06-27 22:01:15.324235+08	2	8	212.636299422500002	100	8.33333333333333037	6	3	0	46	1	2	1
-111	2017-06-27 22:11:45.402287+08	3	20	205.909621456682004	146	8.11111111111111072	9	4	1	70	1	3	1
-112	2017-06-27 22:11:45.413554+08	3	5	220.379051246349007	98	8.16666666666666963	6	4	2	71	1	3	1
-109	2017-06-27 22:11:45.399112+08	3	53	182.203390406813014	72	6	6	0	0	49	1	3	1
-108	2017-06-27 22:11:45.39767+08	3	54	181.793758611606989	113	6.27777777777778034	9	2	0	47	1	3	1
-107	2017-06-27 22:11:45.396147+08	3	12	213.548182052525988	146	8.11111111111111072	9	7	0	4	1	3	1
-113	2017-06-27 22:11:45.415992+08	3	14	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	3	1
-116	2017-06-27 22:11:45.420766+08	3	46	188.589969191978014	78	6.5	6	1	0	78	1	3	1
-118	2017-06-27 22:11:45.423728+08	1	26	202.057110597328005	45	7.5	3	2	1	5	1	3	1
-117	2017-06-27 22:11:45.422242+08	1	18	207.267805536312011	51	8.5	3	2	0	77	1	3	1
-120	2017-06-27 22:11:45.427001+08	3	7	216.187161496199991	155	8.61111111111111072	9	6	0	76	1	3	1
-114	2017-06-27 22:11:45.417626+08	2	49	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	3	1
-115	2017-06-27 22:11:45.41923+08	1	24	202.613548575534992	47	7.83333333333333037	3	1	0	82	1	3	1
-119	2017-06-27 22:11:45.425241+08	3	23	203.807596953266994	90	7.5	6	3	1	92	1	3	1
-124	2017-06-27 22:11:45.440948+08	3	17	208.315488409213003	149	8.27777777777778034	9	5	0	2	1	3	1
-122	2017-06-27 22:11:45.437393+08	3	36	195.604395604395989	39	6.5	3	1	0	72	1	3	1
-121	2017-06-27 22:11:45.434556+08	2	6	219.347956987709011	109	9.08333333333333037	6	5	0	104	1	3	1
-126	2017-06-27 22:11:45.44422+08	3	27	201.350026447994992	126	7	9	4	0	73	1	3	1
-127	2017-06-27 22:11:45.445707+08	3	22	204.539945413990012	140	7.77777777777778034	9	7	0	84	1	3	1
-134	2017-06-27 22:11:45.46148+08	3	41	191.936316990254994	128	7.11111111111110983	9	3	0	43	1	3	1
-129	2017-06-27 22:11:45.45276+08	2	1	241.935599487693992	120	10	6	6	2	44	1	3	1
-136	2017-06-27 22:11:45.469231+08	2	16	210.585489538448002	52	8.66666666666666963	3	2	0	93	1	3	1
-133	2017-06-27 22:11:45.459104+08	1	35	195.728696305900002	38	6.33333333333333037	3	0	0	45	1	3	1
-128	2017-06-27 22:11:45.451118+08	3	25	202.252085452415002	91	7.58333333333333037	6	2	0	42	1	3	1
-132	2017-06-27 22:11:45.457566+08	3	2	229.537823978599988	160	8.88888888888888928	9	7	1	40	1	3	1
-130	2017-06-27 22:11:45.454497+08	3	29	199.964404894327004	44	7.33333333333333037	3	1	0	3	1	3	1
-131	2017-06-27 22:11:45.456101+08	3	3	228.63714197523899	157	8.72222222222221966	9	5	2	41	1	3	1
-94	2017-06-27 22:11:45.35189+08	3	42	191.03105192028201	84	7	6	1	0	64	1	3	1
-135	2017-06-27 22:11:45.467641+08	3	13	212.603685081961004	141	7.83333333333333037	9	5	2	6	1	3	1
-137	2017-06-27 22:11:45.470635+08	3	47	187.931596127196997	82	6.83333333333333037	6	1	0	90	1	3	1
-96	2017-06-27 22:11:45.357001+08	2	30	199.925463466672994	93	7.75	6	2	0	62	1	3	1
-93	2017-06-27 22:11:45.350113+08	3	19	206.287909881089007	134	7.4444444444444402	9	4	0	69	1	3	1
-95	2017-06-27 22:11:45.354+08	3	57	164.945166183103993	97	5.38888888888889017	9	1	0	61	1	3	1
-98	2017-06-27 22:11:45.36305+08	2	43	190.303493986219991	32	5.33333333333333037	3	0	0	105	1	3	1
-91	2017-06-27 22:11:45.345195+08	3	33	197.463261956460002	88	7.33333333333333037	6	2	0	63	1	3	1
-92	2017-06-27 22:11:45.348163+08	1	40	194.281409264230007	43	7.16666666666666963	3	0	0	66	1	3	1
-97	2017-06-27 22:11:45.358877+08	3	50	186.96296296296299	33	5.5	3	0	0	67	1	3	1
-104	2017-06-27 22:11:45.383879+08	3	55	179.094413230924999	125	6.9444444444444402	9	3	0	80	1	3	1
-105	2017-06-27 22:11:45.387958+08	3	8	215.808642359937011	158	8.77777777777778034	9	6	0	1	1	3	1
-99	2017-06-27 22:11:45.37376+08	2	38	194.515657124965998	89	7.41666666666666963	6	4	0	83	1	3	1
-100	2017-06-27 22:11:45.375785+08	3	45	189.278067508842014	133	7.38888888888889017	9	1	0	79	1	3	1
-101	2017-06-27 22:11:45.378588+08	3	32	197.734107380629013	98	8.16666666666666963	6	1	0	91	1	3	1
-102	2017-06-27 22:11:45.380469+08	2	52	186.490487828123008	34	5.66666666666666963	3	0	0	97	1	3	1
-106	2017-06-27 22:11:45.393728+08	2	21	204.645161290322989	51	8.5	3	1	0	48	1	3	1
-103	2017-06-27 22:11:45.382162+08	3	28	200.011942080908	45	7.5	3	2	0	87	1	3	1
-71	2017-06-27 22:01:15.291549+08	2	6	217.833561548273991	109	9.08333333333333037	6	6	0	84	1	2	1
-146	2017-06-27 22:11:45.493146+08	3	37	194.666666666666998	42	7	3	1	0	100	1	3	1
-142	2017-06-27 22:11:45.487112+08	1	10	213.999049971941986	57	9.5	3	3	1	52	1	3	1
-148	2017-06-27 22:11:45.495882+08	3	44	189.563909249722002	121	6.72222222222221966	9	2	0	55	1	3	1
-145	2017-06-27 22:11:45.491819+08	3	58	151.40648580159899	36	3	6	0	0	54	1	3	1
-144	2017-06-27 22:11:45.490195+08	1	56	168.257256379800992	12	2	3	0	0	106	1	3	1
-187	2017-06-27 22:24:29.500643+08	3	50	183.166795710477004	124	6.88888888888889017	9	4	0	83	1	4	1
-143	2017-06-27 22:11:45.488639+08	2	11	213.640369840167011	99	8.25	6	4	1	56	1	3	1
-147	2017-06-27 22:11:45.494476+08	3	51	186.614854109117999	124	6.88888888888889017	9	3	0	53	1	3	1
-141	2017-06-27 22:11:45.485393+08	3	34	196.788849609625004	81	6.75	6	3	0	58	1	3	1
-188	2017-06-27 22:24:29.502234+08	1	42	192.343268740602014	39	6.5	3	0	0	109	1	4	1
-164	2017-06-27 22:24:29.458471+08	3	45	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	4	1
-165	2017-06-27 22:24:29.459912+08	2	28	202.613548575534992	47	7.83333333333333037	3	1	0	82	1	4	1
-170	2017-06-27 22:24:29.466796+08	4	5	235.570983352067998	215	8.95833333333333037	12	9	0	76	1	4	1
-167	2017-06-27 22:24:29.462864+08	2	17	211.352016116620007	100	8.33333333333333037	6	4	2	5	1	4	1
-162	2017-06-27 22:24:29.455827+08	4	14	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	4	1
-168	2017-06-27 22:24:29.464145+08	4	57	175.081952721704994	109	6.0555555555555598	9	1	0	78	1	4	1
-169	2017-06-27 22:24:29.465469+08	4	24	203.807596953266994	90	7.5	6	3	1	92	1	4	1
-174	2017-06-27 22:24:29.47655+08	4	61	164.945166183103993	97	5.38888888888889017	9	1	0	61	1	4	1
-171	2017-06-27 22:24:29.470979+08	1	26	203.09197955511101	48	8	3	2	0	107	1	4	1
-179	2017-06-27 22:24:29.485622+08	3	51	180.949474597407004	64	5.33333333333333037	6	1	0	105	1	4	1
-172	2017-06-27 22:24:29.473905+08	4	44	191.03105192028201	84	7	6	1	0	64	1	4	1
-178	2017-06-27 22:24:29.484278+08	4	38	197.463261956460002	88	7.33333333333333037	6	2	0	63	1	4	1
-173	2017-06-27 22:24:29.475222+08	4	19	209.027597358067993	182	7.58333333333333037	12	5	0	69	1	4	1
-175	2017-06-27 22:24:29.477971+08	3	32	199.925463466672994	93	7.75	6	2	0	62	1	4	1
-176	2017-06-27 22:24:29.479492+08	2	55	179.078054992319011	72	6	6	0	0	66	1	4	1
-177	2017-06-27 22:24:29.482099+08	4	60	167.262514123337013	56	4.66666666666666963	6	1	0	67	1	4	1
-186	2017-06-27 22:24:29.499237+08	4	36	197.734107380629013	98	8.16666666666666963	6	1	0	91	1	4	1
-180	2017-06-27 22:24:29.49073+08	1	43	191.201452338244991	35	5.83333333333333037	3	1	0	108	1	4	1
-181	2017-06-27 22:24:29.492311+08	4	59	168.202946078047006	153	6.375	12	1	0	79	1	4	1
-182	2017-06-27 22:24:29.493596+08	4	13	212.844588589978002	197	8.20833333333333037	12	8	0	1	1	4	1
-185	2017-06-27 22:24:29.497299+08	4	54	179.094413230924999	125	6.9444444444444402	9	3	0	80	1	4	1
-183	2017-06-27 22:24:29.494812+08	3	48	186.490487828123008	34	5.66666666666666963	3	0	0	97	1	4	1
-184	2017-06-27 22:24:29.496026+08	4	30	200.011942080908	45	7.5	3	2	0	87	1	4	1
-190	2017-06-27 22:24:29.508102+08	4	29	200.160466433391008	168	7	12	5	0	73	1	4	1
-194	2017-06-27 22:24:29.515179+08	4	20	208.656434680403009	93	7.75	6	3	0	72	1	4	1
-193	2017-06-27 22:24:29.513408+08	3	7	229.959130983422995	165	9.16666666666666963	9	7	0	104	1	4	1
-191	2017-06-27 22:24:29.509356+08	4	6	235.53290000247901	162	9	9	7	1	74	1	4	1
-192	2017-06-27 22:24:29.511212+08	4	12	213.405291684191013	203	8.45833333333333037	12	7	0	2	1	4	1
-195	2017-06-27 22:24:29.516589+08	4	23	204.539945413990012	140	7.77777777777778034	9	7	0	84	1	4	1
-203	2017-06-27 22:24:29.529967+08	2	18	210.959724858491995	101	8.41666666666666963	6	5	1	52	1	4	1
-197	2017-06-27 22:24:29.522208+08	4	53	179.430586686624991	155	6.45833333333333037	12	2	0	55	1	4	1
-196	2017-06-27 22:24:29.520957+08	3	11	213.640369840167011	99	8.25	6	4	1	56	1	4	1
-198	2017-06-27 22:24:29.523544+08	2	58	168.257256379800992	12	2	3	0	0	106	1	4	1
-200	2017-06-27 22:24:29.526181+08	4	46	186.614854109117999	124	6.88888888888889017	9	3	0	53	1	4	1
-201	2017-06-27 22:24:29.527504+08	4	62	138.789019959592991	63	3.5	9	0	0	54	1	4	1
-202	2017-06-27 22:24:29.528706+08	4	27	203.001615001488005	131	7.27777777777778034	9	4	1	58	1	4	1
-199	2017-06-27 22:24:29.524838+08	4	40	194.666666666666998	42	7	3	1	0	100	1	4	1
-204	2017-06-27 22:24:29.531168+08	1	34	198.269349894263996	43	7.16666666666666963	3	1	0	57	1	4	1
-206	2017-06-27 22:24:29.536247+08	4	15	212.492579946195008	194	8.08333333333333037	12	6	1	46	1	4	1
-205	2017-06-27 22:24:29.534968+08	3	22	204.645161290322989	51	8.5	3	1	0	48	1	4	1
-207	2017-06-27 22:24:29.537551+08	4	52	180.778749273274997	156	6.5	12	3	0	47	1	4	1
-149	2017-06-27 22:24:29.432071+08	3	2	241.935599487693992	120	10	6	6	2	44	1	4	1
-150	2017-06-27 22:24:29.433889+08	4	31	199.964404894327004	44	7.33333333333333037	3	1	0	3	1	4	1
-152	2017-06-27 22:24:29.43673+08	2	25	203.51028087185199	87	7.25	6	1	1	45	1	4	1
-156	2017-06-27 22:24:29.444896+08	4	21	205.897384597773993	180	7.5	12	6	2	6	1	4	1
-151	2017-06-27 22:24:29.435309+08	4	1	246.945645360142009	220	9.16666666666666963	12	10	3	40	1	4	1
-153	2017-06-27 22:24:29.438143+08	4	4	236.962723559777004	213	8.875	12	8	3	41	1	4	1
-155	2017-06-27 22:24:29.440882+08	4	35	197.735795502645999	133	7.38888888888889017	9	3	0	42	1	4	1
-154	2017-06-27 22:24:29.439527+08	4	39	196.71851389393899	176	7.33333333333333037	12	4	0	43	1	4	1
-157	2017-06-27 22:24:29.446286+08	4	47	186.533467564332994	126	7	9	3	0	90	1	4	1
-158	2017-06-27 22:24:29.447614+08	3	37	197.483599825688998	85	7.08333333333333037	6	2	0	93	1	4	1
-159	2017-06-27 22:24:29.448911+08	4	41	194.418256227857995	135	7.5	9	4	0	89	1	4	1
-160	2017-06-27 22:24:29.450188+08	4	8	224.640362440417988	200	8.33333333333333037	12	8	1	7	1	4	1
-163	2017-06-27 22:24:29.457156+08	4	3	238.420966972184004	158	8.77777777777778034	9	7	2	71	1	4	1
-161	2017-06-27 22:24:29.451449+08	4	56	176.04707921391099	153	6.375	12	3	0	81	1	4	1
-139	2017-06-27 22:11:45.477015+08	3	48	187.474158007699998	121	6.72222222222221966	9	2	0	81	1	3	1
-249	2017-06-27 22:26:18.56313+08	5	16	215.791400718465013	234	7.79999999999999982	15	7	0	69	1	5	1
-208	2017-06-27 22:24:29.538887+08	4	49	185.545948402917986	119	6.61111111111110983	9	2	0	49	1	4	1
-234	2017-06-27 22:26:18.536245+08	5	11	224.904722651349005	200	8.33333333333333037	12	10	0	84	1	5	1
-230	2017-06-27 22:26:18.530223+08	3	34	198.273767470361008	44	7.33333333333333037	3	1	0	75	1	5	1
-233	2017-06-27 22:26:18.535025+08	5	7	231.860186125160993	153	8.5	9	6	1	72	1	5	1
-228	2017-06-27 22:26:18.527575+08	5	4	239.497301101543997	212	8.83333333333333037	12	9	1	74	1	5	1
-229	2017-06-27 22:26:18.528773+08	5	31	199.662474915596988	212	7.06666666666666998	15	7	0	73	1	5	1
-232	2017-06-27 22:26:18.533625+08	4	8	229.959130983422995	165	9.16666666666666963	9	7	0	104	1	5	1
-236	2017-06-27 22:26:18.54144+08	5	12	223.639223240071999	238	7.93333333333333002	15	9	5	46	1	5	1
-237	2017-06-27 22:26:18.542927+08	5	14	216.799858782720008	203	8.45833333333333037	12	7	2	70	1	5	1
-275	2017-06-27 22:26:21.704536+08	1	47	184.376776349604995	23	3.83333333333332993	3	0	0	96	1	6	1
-235	2017-06-27 22:26:18.540114+08	5	56	171.638253507400009	190	6.33333333333333037	15	3	0	47	1	5	1
-239	2017-06-27 22:26:18.547114+08	5	22	207.102815294694011	233	7.76666666666667016	15	10	0	4	1	5	1
-238	2017-06-27 22:26:18.54569+08	1	55	173.940955318065988	17	2.83333333333332993	3	0	0	110	1	5	1
-240	2017-06-27 22:26:18.548299+08	5	54	175.307660885021988	152	6.33333333333333037	12	2	0	49	1	5	1
-250	2017-06-27 22:26:18.566141+08	4	51	180.949474597407004	64	5.33333333333333037	6	1	0	105	1	5	1
-244	2017-06-27 22:26:18.556418+08	3	53	175.959340173918008	113	6.27777777777778034	9	1	0	66	1	5	1
-242	2017-06-27 22:26:18.553597+08	2	32	199.521151436064002	87	7.25	6	4	0	107	1	5	1
-247	2017-06-27 22:26:18.560345+08	5	38	197.463261956460002	88	7.33333333333333037	6	2	0	63	1	5	1
-243	2017-06-27 22:26:18.555095+08	5	63	156.136527623382989	132	5.5	12	1	0	61	1	5	1
-245	2017-06-27 22:26:18.557804+08	4	30	199.925463466672994	93	7.75	6	2	0	62	1	5	1
-246	2017-06-27 22:26:18.559083+08	5	61	167.262514123337013	56	4.66666666666666963	6	1	0	67	1	5	1
-248	2017-06-27 22:26:18.561714+08	5	52	178.918474579204002	114	6.33333333333333037	9	2	0	64	1	5	1
-253	2017-06-27 22:26:18.573626+08	4	37	197.483599825688998	85	7.08333333333333037	6	2	0	93	1	5	1
-252	2017-06-27 22:26:18.572204+08	5	21	207.966916691211992	231	7.70000000000000018	15	8	2	6	1	5	1
-254	2017-06-27 22:26:18.575006+08	5	9	227.936544201275012	249	8.30000000000000071	15	9	1	7	1	5	1
-251	2017-06-27 22:26:18.570823+08	5	41	193.763798424263001	176	7.33333333333333037	12	5	0	90	1	5	1
-255	2017-06-27 22:26:18.576503+08	5	59	169.486128955803991	190	6.33333333333333037	15	4	0	81	1	5	1
-256	2017-06-27 22:26:18.577894+08	5	20	209.230117249589	192	8	12	7	0	89	1	5	1
-257	2017-06-27 22:26:18.582425+08	5	58	171.037216576935009	193	6.43333333333333002	15	2	0	79	1	5	1
-272	2017-06-27 22:26:18.608462+08	5	18	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	5	1
-258	2017-06-27 22:26:18.583738+08	4	49	183.813891301973996	74	6.16666666666666963	6	0	0	97	1	5	1
-259	2017-06-27 22:26:18.585185+08	5	47	185.378227260746002	171	7.125	12	5	0	80	1	5	1
-260	2017-06-27 22:26:18.586608+08	5	48	184.587555770371011	72	6	6	3	0	87	1	5	1
-263	2017-06-27 22:26:18.590868+08	5	15	216.254064080179006	242	8.06666666666666998	15	10	0	1	1	5	1
-262	2017-06-27 22:26:18.58959+08	4	50	183.166795710477004	124	6.88888888888889017	9	4	0	83	1	5	1
-264	2017-06-27 22:26:18.592043+08	2	42	192.343268740602014	39	6.5	3	0	0	109	1	5	1
-265	2017-06-27 22:26:18.593212+08	2	44	191.201452338244991	35	5.83333333333333037	3	1	0	108	1	5	1
-261	2017-06-27 22:26:18.588014+08	5	36	197.734107380629013	98	8.16666666666666963	6	1	0	91	1	5	1
-267	2017-06-27 22:26:18.600316+08	3	28	202.613548575534992	47	7.83333333333333037	3	1	0	82	1	5	1
-273	2017-06-27 22:26:18.609787+08	5	26	203.807596953266994	90	7.5	6	3	1	92	1	5	1
-270	2017-06-27 22:26:18.605704+08	5	5	238.332610612898009	204	8.5	12	9	3	71	1	5	1
-269	2017-06-27 22:26:18.604026+08	5	57	171.068064741220013	151	6.29166666666666963	12	2	0	78	1	5	1
-271	2017-06-27 22:26:18.607117+08	3	24	205.50200629689499	142	7.88888888888889017	9	3	0	77	1	5	1
-266	2017-06-27 22:26:18.598786+08	4	46	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	5	1
-219	2017-06-27 22:26:18.51126+08	3	19	210.959724858491995	101	8.41666666666666963	6	5	1	52	1	5	1
-274	2017-06-27 22:26:18.611104+08	5	6	237.406928366280994	268	8.93333333333333002	15	11	0	76	1	5	1
-216	2017-06-27 22:26:18.507288+08	5	45	190.818623005082998	173	7.20833333333333037	12	4	0	53	1	5	1
-211	2017-06-27 22:26:18.500685+08	4	17	213.640369840167011	99	8.25	6	4	1	56	1	5	1
-217	2017-06-27 22:26:18.508644+08	5	27	203.001615001488005	131	7.27777777777778034	9	4	1	58	1	5	1
-212	2017-06-27 22:26:18.501989+08	5	64	125.476466607361004	85	3.54166666666667007	12	0	0	54	1	5	1
-218	2017-06-27 22:26:18.510007+08	5	62	166.51207161083201	182	6.06666666666666998	15	2	0	55	1	5	1
-213	2017-06-27 22:26:18.503302+08	3	60	168.257256379800992	12	2	3	0	0	106	1	5	1
-220	2017-06-27 22:26:18.512483+08	2	43	192.170657565724014	80	6.66666666666666963	6	1	0	57	1	5	1
-215	2017-06-27 22:26:18.505819+08	5	40	194.666666666666998	42	7	3	1	0	100	1	5	1
-214	2017-06-27 22:26:18.504582+08	1	33	199.471474551643013	42	7	3	2	0	59	1	5	1
-226	2017-06-27 22:26:18.5227+08	5	35	197.735795502645999	133	7.38888888888889017	9	3	0	42	1	5	1
-222	2017-06-27 22:26:18.5175+08	5	2	248.074542975921986	270	9	15	11	3	41	1	5	1
-224	2017-06-27 22:26:18.520219+08	3	23	205.578765758010007	133	7.38888888888889017	9	2	1	45	1	5	1
-225	2017-06-27 22:26:18.521453+08	5	1	262.012353576199985	280	9.33333333333333037	15	13	4	40	1	5	1
-231	2017-06-27 22:26:18.531905+08	5	13	217.44703622755199	250	8.33333333333333037	15	9	0	2	1	5	1
-227	2017-06-27 22:26:18.524014+08	4	3	241.935599487693992	120	10	6	6	2	44	1	5	1
-223	2017-06-27 22:26:18.518829+08	5	29	200.505728475234008	95	7.91666666666666963	6	3	0	3	1	5	1
-221	2017-06-27 22:26:18.51617+08	5	39	196.584695103628007	227	7.56666666666666998	15	6	0	43	1	5	1
-210	2017-06-27 22:24:29.541494+08	4	9	223.888313429613987	203	8.45833333333333037	12	10	0	4	1	4	1
-277	2017-06-27 22:26:21.707229+08	5	49	183.813891301973996	74	6.16666666666666963	6	0	0	97	1	6	1
-276	2017-06-27 22:26:21.705906+08	3	48	183.868806737798991	71	5.91666666666666963	6	0	0	109	1	6	1
-342	2017-06-27 22:26:25.553578+08	6	50	183.519666904788011	121	6.72222222222221966	9	2	0	48	1	7	1
-344	2017-06-27 22:26:25.556118+08	7	9	230.884380416249996	333	7.92857142857142971	21	13	6	46	1	7	1
-343	2017-06-27 22:26:25.554822+08	7	60	173.218758768174013	191	6.3666666666666698	15	4	0	49	1	7	1
-346	2017-06-27 22:26:25.55861+08	7	20	214.870328025585991	328	7.8095238095238102	21	14	0	4	1	7	1
-347	2017-06-27 22:26:25.562542+08	7	13	220.416800283604999	332	7.90476190476191043	21	12	1	69	1	7	1
-286	2017-06-27 22:26:21.722012+08	6	11	229.62237446663201	245	8.16666666666666963	15	10	3	71	1	6	1
-285	2017-06-27 22:26:21.720723+08	6	60	165.117050140493006	185	6.16666666666666963	15	2	0	78	1	6	1
-289	2017-06-27 22:26:21.726007+08	4	7	231.136784935305002	203	8.45833333333333037	12	8	4	5	1	6	1
-290	2017-06-27 22:26:21.727382+08	4	19	214.548313222892006	196	8.16666666666666963	12	6	0	77	1	6	1
-287	2017-06-27 22:26:21.723419+08	5	44	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	6	1
-291	2017-06-27 22:26:21.728765+08	6	20	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	6	1
-293	2017-06-27 22:26:21.731455+08	6	9	229.808374202463	306	8.5	18	11	0	76	1	6	1
-292	2017-06-27 22:26:21.730073+08	6	27	203.807596953266994	90	7.5	6	3	1	92	1	6	1
-294	2017-06-27 22:26:21.735974+08	4	35	198.273767470361008	44	7.33333333333333037	3	1	0	75	1	6	1
-297	2017-06-27 22:26:21.740212+08	6	4	242.576255382985011	260	8.66666666666666963	15	11	1	74	1	6	1
-296	2017-06-27 22:26:21.738903+08	5	8	229.959130983422995	165	9.16666666666666963	9	7	0	104	1	6	1
-298	2017-06-27 22:26:21.741495+08	6	39	196.85431501595599	253	7.02777777777778034	18	7	0	73	1	6	1
-299	2017-06-27 22:26:21.742776+08	6	14	220.734531330548009	303	8.41666666666666963	18	11	0	2	1	6	1
-295	2017-06-27 22:26:21.737504+08	6	6	231.70663159795501	201	8.375	12	8	1	72	1	6	1
-300	2017-06-27 22:26:21.744114+08	6	10	229.747767080178988	251	8.36666666666667069	15	12	0	84	1	6	1
-301	2017-06-27 22:26:21.74959+08	6	23	208.665293416048002	236	7.8666666666666698	15	8	0	90	1	6	1
-303	2017-06-27 22:26:21.752298+08	6	21	212.038793765126997	279	7.75	18	10	2	6	1	6	1
-302	2017-06-27 22:26:21.751+08	5	37	197.483599825688998	85	7.08333333333333037	6	2	0	93	1	6	1
-304	2017-06-27 22:26:21.753694+08	6	5	232.931393999108991	296	8.22222222222221966	18	11	2	7	1	6	1
-305	2017-06-27 22:26:21.755075+08	6	15	220.378118958327008	242	8.06666666666666998	15	9	1	89	1	6	1
-306	2017-06-27 22:26:21.756371+08	6	61	164.249021030984011	223	6.1944444444444402	18	4	0	81	1	6	1
-313	2017-06-27 22:26:21.769977+08	6	17	216.098643608315996	250	8.33333333333333037	15	9	3	70	1	6	1
-308	2017-06-27 22:26:21.761539+08	2	56	173.940955318065988	17	2.83333333333332993	3	0	0	110	1	6	1
-310	2017-06-27 22:26:21.764257+08	6	16	217.200864318804008	278	7.72222222222221966	18	10	5	46	1	6	1
-311	2017-06-27 22:26:21.765525+08	5	45	185.049103204688009	76	6.33333333333333037	6	1	0	48	1	6	1
-312	2017-06-27 22:26:21.76773+08	6	59	167.409979463424008	223	6.1944444444444402	18	4	0	47	1	6	1
-307	2017-06-27 22:26:21.760266+08	6	24	208.187605872523989	283	7.86111111111110983	18	12	0	4	1	6	1
-309	2017-06-27 22:26:21.762918+08	6	55	175.307660885021988	152	6.33333333333333037	12	2	0	49	1	6	1
-321	2017-06-27 22:26:21.784548+08	4	22	210.959724858491995	101	8.41666666666666963	6	5	1	52	1	6	1
-316	2017-06-27 22:26:21.777525+08	6	65	125.347475908912003	125	4.16666666666666963	15	0	0	54	1	6	1
-322	2017-06-27 22:26:21.78614+08	6	63	157.544745416779989	216	6	18	2	0	55	1	6	1
-315	2017-06-27 22:26:21.776099+08	2	33	199.471474551643013	42	7	3	2	0	59	1	6	1
-314	2017-06-27 22:26:21.774664+08	4	58	168.257256379800992	12	2	3	0	0	106	1	6	1
-317	2017-06-27 22:26:21.779018+08	6	40	194.666666666666998	42	7	3	1	0	100	1	6	1
-319	2017-06-27 22:26:21.781616+08	5	29	200.84386433127699	137	7.61111111111110983	9	4	1	56	1	6	1
-320	2017-06-27 22:26:21.782873+08	6	34	198.593540789093993	228	7.59999999999999964	15	7	0	53	1	6	1
-323	2017-06-27 22:26:21.787551+08	3	41	192.170657565724014	80	6.66666666666666963	6	1	0	57	1	6	1
-329	2017-06-27 22:26:21.799553+08	6	38	197.463261956460002	88	7.33333333333333037	6	2	0	63	1	6	1
-327	2017-06-27 22:26:21.795882+08	6	57	170.052127333089999	103	5.72222222222221966	9	3	0	67	1	6	1
-328	2017-06-27 22:26:21.797438+08	6	64	153.03496156135401	170	5.66666666666666963	15	1	0	61	1	6	1
-326	2017-06-27 22:26:21.794631+08	5	31	199.925463466672994	93	7.75	6	2	0	62	1	6	1
-331	2017-06-27 22:26:21.802577+08	6	13	220.946823440776001	288	8	18	10	1	69	1	6	1
-324	2017-06-27 22:26:21.791986+08	3	32	199.521151436064002	87	7.25	6	4	0	107	1	6	1
-330	2017-06-27 22:26:21.801247+08	6	52	178.918474579204002	114	6.33333333333333037	9	2	0	64	1	6	1
-325	2017-06-27 22:26:21.793342+08	4	53	177.742284700023987	157	6.54166666666666963	12	2	0	66	1	6	1
-332	2017-06-27 22:26:21.803958+08	5	54	175.696417534824008	111	6.16666666666666963	9	2	0	105	1	6	1
-336	2017-06-27 22:26:21.812359+08	6	2	261.131186981845985	330	9.16666666666666963	18	14	4	41	1	6	1
-339	2017-06-27 22:26:21.816421+08	6	26	205.115874949918009	186	7.75	12	6	1	42	1	6	1
-335	2017-06-27 22:26:21.811152+08	5	3	242.640687867796998	163	9.05555555555556069	9	8	3	44	1	6	1
-333	2017-06-27 22:26:21.808307+08	6	30	200.505728475234008	95	7.91666666666666963	6	3	0	3	1	6	1
-334	2017-06-27 22:26:21.809671+08	4	25	205.578765758010007	133	7.38888888888889017	9	2	1	45	1	6	1
-338	2017-06-27 22:26:21.814853+08	6	43	190.628925565960998	269	7.47222222222221966	18	7	0	43	1	6	1
-337	2017-06-27 22:26:21.813674+08	6	1	272.243190010316994	340	9.44444444444443931	18	16	5	40	1	6	1
-278	2017-06-27 22:26:21.70854+08	6	46	184.587555770371011	72	6	6	3	0	87	1	6	1
-280	2017-06-27 22:26:21.711306+08	5	50	183.166795710477004	124	6.88888888888889017	9	4	0	83	1	6	1
-282	2017-06-27 22:26:21.714112+08	6	51	179.784224950106989	208	6.93333333333333002	15	6	0	80	1	6	1
-281	2017-06-27 22:26:21.712818+08	3	42	191.201452338244991	35	5.83333333333333037	3	1	0	108	1	6	1
-279	2017-06-27 22:26:21.709914+08	6	36	197.734107380629013	98	8.16666666666666963	6	1	0	91	1	6	1
-283	2017-06-27 22:26:21.715448+08	6	12	228.078375384141992	291	8.08333333333333037	18	12	2	1	1	6	1
-284	2017-06-27 22:26:21.716766+08	6	62	163.487714507059991	224	6.22222222222221966	18	2	0	79	1	6	1
-345	2017-06-27 22:26:25.557462+08	7	19	216.098643608315996	250	8.33333333333333037	15	9	3	70	1	7	1
-363	2017-06-27 22:26:25.587245+08	7	18	217.039216215528	287	7.97222222222221966	18	13	0	84	1	7	1
-359	2017-06-27 22:26:25.581644+08	7	40	196.85431501595599	253	7.02777777777778034	18	7	0	73	1	7	1
-361	2017-06-27 22:26:25.58467+08	7	5	235.355181655347991	254	8.46666666666667034	15	10	2	72	1	7	1
-358	2017-06-27 22:26:25.580207+08	6	6	234.352249780616006	219	9.125	12	9	0	104	1	7	1
-360	2017-06-27 22:26:25.583203+08	7	4	241.694675663693999	309	8.58333333333333037	18	13	1	74	1	7	1
-365	2017-06-27 22:26:25.592444+08	7	25	208.52827369985701	279	7.75	18	8	0	90	1	7	1
-367	2017-06-27 22:26:25.596772+08	6	28	207.025091729964998	129	7.16666666666666963	9	3	1	93	1	7	1
-364	2017-06-27 22:26:25.591167+08	1	42	191.85998403855001	34	5.66666666666666963	3	1	0	111	1	7	1
-368	2017-06-27 22:26:25.598106+08	7	7	232.931393999108991	296	8.22222222222221966	18	11	2	7	1	7	1
-366	2017-06-27 22:26:25.595215+08	7	16	218.621685675867013	330	7.85714285714286031	21	12	2	6	1	7	1
-371	2017-06-27 22:26:25.605125+08	2	47	184.376776349604995	23	3.83333333333332993	3	0	0	96	1	7	1
-370	2017-06-27 22:26:25.600927+08	7	63	161.326195702717996	259	6.16666666666666963	21	4	0	81	1	7	1
-376	2017-06-27 22:26:25.613725+08	7	52	180.934106630998997	126	7	9	1	0	91	1	7	1
-382	2017-06-27 22:26:25.625599+08	7	11	224.02314483149101	248	8.26666666666666927	15	10	1	58	1	7	1
-379	2017-06-27 22:26:25.618239+08	7	10	229.520243151648998	343	8.16666666666666963	21	14	2	1	1	7	1
-380	2017-06-27 22:26:25.619551+08	6	49	183.813891301973996	74	6.16666666666666963	6	0	0	97	1	7	1
-372	2017-06-27 22:26:25.606495+08	7	46	184.587555770371011	72	6	6	3	0	87	1	7	1
-373	2017-06-27 22:26:25.607901+08	7	54	179.784224950106989	208	6.93333333333333002	15	6	0	80	1	7	1
-374	2017-06-27 22:26:25.609205+08	4	48	183.868806737798991	71	5.91666666666666963	6	0	0	109	1	7	1
-375	2017-06-27 22:26:25.610627+08	6	55	178.996933626274	163	6.79166666666666963	12	4	0	83	1	7	1
-381	2017-06-27 22:26:25.624202+08	7	68	125.347475908912003	125	4.16666666666666963	15	0	0	54	1	7	1
-383	2017-06-27 22:26:25.626853+08	7	41	194.666666666666998	42	7	3	1	0	100	1	7	1
-384	2017-06-27 22:26:25.628042+08	1	34	201.715960059383008	51	8.5	3	1	0	60	1	7	1
-391	2017-06-27 22:26:25.638518+08	4	35	201.465260865554001	132	7.33333333333333037	9	3	0	57	1	7	1
-385	2017-06-27 22:26:25.6301+08	6	36	200.84386433127699	137	7.61111111111110983	9	4	1	56	1	7	1
-390	2017-06-27 22:26:25.637273+08	7	64	157.544745416779989	216	6	18	2	0	55	1	7	1
-389	2017-06-27 22:26:25.635946+08	5	61	168.257256379800992	12	2	3	0	0	106	1	7	1
-387	2017-06-27 22:26:25.632855+08	3	24	209.420578381831007	94	7.83333333333333037	6	4	1	59	1	7	1
-386	2017-06-27 22:26:25.631475+08	7	27	207.902281360561005	279	7.75	18	9	0	53	1	7	1
-388	2017-06-27 22:26:25.634242+08	5	23	210.959724858491995	101	8.41666666666666963	6	5	1	52	1	7	1
-395	2017-06-27 22:26:25.648295+08	5	22	211.317293992664986	239	7.96666666666667034	15	7	0	77	1	7	1
-398	2017-06-27 22:26:25.65249+08	6	45	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	7	1
-399	2017-06-27 22:26:25.653837+08	7	31	203.807596953266994	90	7.5	6	3	1	92	1	7	1
-396	2017-06-27 22:26:25.649685+08	7	21	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	7	1
-394	2017-06-27 22:26:25.646788+08	5	8	232.654655226158013	251	8.36666666666667069	15	10	5	5	1	7	1
-392	2017-06-27 22:26:25.643425+08	5	33	202.613548575534992	47	7.83333333333333037	3	1	0	82	1	7	1
-393	2017-06-27 22:26:25.645465+08	7	62	163.078027329963987	222	6.16666666666666963	18	2	0	78	1	7	1
-397	2017-06-27 22:26:25.651085+08	7	15	219.92257406721501	279	7.75	18	11	4	71	1	7	1
-406	2017-06-27 22:26:25.665626+08	7	30	205.115874949918009	186	7.75	12	6	1	42	1	7	1
-407	2017-06-27 22:26:25.669172+08	5	26	208.385779197442986	181	7.54166666666666963	12	3	1	45	1	7	1
-404	2017-06-27 22:26:25.662755+08	7	44	188.34818034483601	311	7.40476190476191043	21	9	1	43	1	7	1
-401	2017-06-27 22:26:25.65908+08	7	1	284.565249769472018	400	9.52380952380952017	21	19	5	40	1	7	1
-405	2017-06-27 22:26:25.664115+08	6	3	242.640687867796998	163	9.05555555555556069	9	8	3	44	1	7	1
-403	2017-06-27 22:26:25.661498+08	7	2	270.196076863043004	383	9.1190476190476204	21	16	4	41	1	7	1
-402	2017-06-27 22:26:25.6603+08	7	32	203.589078837149998	139	7.72222222222221966	9	4	0	3	1	7	1
-349	2017-06-27 22:26:25.565217+08	7	65	153.03496156135401	170	5.66666666666666963	15	1	0	61	1	7	1
-348	2017-06-27 22:26:25.56383+08	6	37	200.032619331472006	137	7.61111111111110983	9	3	1	62	1	7	1
-352	2017-06-27 22:26:25.569244+08	7	39	197.463261956460002	88	7.33333333333333037	6	2	0	63	1	7	1
-350	2017-06-27 22:26:25.566602+08	4	53	180.769362188177013	115	6.38888888888889017	9	4	0	107	1	7	1
-355	2017-06-27 22:26:25.573348+08	5	57	177.742284700023987	157	6.54166666666666963	12	2	0	66	1	7	1
-356	2017-06-27 22:26:25.574658+08	6	58	175.696417534824008	111	6.16666666666666963	9	2	0	105	1	7	1
-354	2017-06-27 22:26:25.571855+08	7	66	150.902779792025001	126	5.25	12	3	0	67	1	7	1
-351	2017-06-27 22:26:25.56792+08	1	29	206.149105057876	48	8	3	1	1	65	1	7	1
-353	2017-06-27 22:26:25.570481+08	7	56	178.918474579204002	114	6.33333333333333037	9	2	0	64	1	7	1
-409	2017-06-27 22:26:29.83127+08	8	26	209.338624540176994	372	7.75	24	13	2	6	1	8	1
-408	2017-06-27 22:26:29.829981+08	7	29	207.513433205388992	175	7.29166666666666963	12	4	1	93	1	8	1
-411	2017-06-27 22:26:29.833862+08	8	36	199.426329013594994	317	7.54761904761905011	21	8	0	90	1	8	1
-410	2017-06-27 22:26:29.832538+08	2	41	191.85998403855001	34	5.66666666666666963	3	1	0	111	1	8	1
-414	2017-06-27 22:26:29.83772+08	8	17	220.378118958327008	242	8.06666666666666998	15	9	1	89	1	8	1
-412	2017-06-27 22:26:29.835173+08	8	13	223.532281280583987	337	8.02380952380952017	21	12	2	7	1	8	1
-413	2017-06-27 22:26:29.836462+08	8	67	143.392235566469992	280	5.83333333333333037	24	4	0	81	1	8	1
-415	2017-06-27 22:26:29.841585+08	6	32	202.613548575534992	47	7.83333333333333037	3	1	0	82	1	8	1
-416	2017-06-27 22:26:29.84288+08	6	4	243.474135613823989	307	8.52777777777778034	18	13	5	5	1	8	1
-417	2017-06-27 22:26:29.844218+08	6	14	221.519271745944991	296	8.22222222222221966	18	10	0	77	1	8	1
-357	2017-06-27 22:26:25.578824+08	5	38	198.273767470361008	44	7.33333333333333037	3	1	0	75	1	7	1
-377	2017-06-27 22:26:25.615138+08	4	43	189.630931051211007	80	6.66666666666666963	6	2	0	108	1	7	1
-420	2017-06-27 22:26:29.848082+08	7	44	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	8	1
-423	2017-06-27 22:26:29.851981+08	8	12	223.617691244815006	392	8.16666666666666963	24	14	0	76	1	8	1
-419	2017-06-27 22:26:29.846801+08	8	59	171.836905918972008	272	6.47619047619047983	21	3	0	78	1	8	1
-422	2017-06-27 22:26:29.850678+08	8	30	203.807596953266994	90	7.5	6	3	1	92	1	8	1
-424	2017-06-27 22:26:29.855883+08	8	24	211.749892255329002	313	7.45238095238094989	21	10	1	73	1	8	1
-428	2017-06-27 22:26:29.861344+08	8	8	235.875938765784014	305	8.47222222222221966	18	13	2	72	1	8	1
-427	2017-06-27 22:26:29.859703+08	8	15	220.754098217259013	405	8.4375	24	14	0	2	1	8	1
-430	2017-06-27 22:26:29.864278+08	8	19	218.297455558270997	339	8.0714285714285694	21	15	0	84	1	8	1
-426	2017-06-27 22:26:29.858296+08	8	6	241.694675663693999	309	8.58333333333333037	18	13	1	74	1	8	1
-425	2017-06-27 22:26:29.857101+08	7	7	241.233026601797008	276	9.19999999999999929	15	11	0	104	1	8	1
-429	2017-06-27 22:26:29.862913+08	6	37	198.273767470361008	44	7.33333333333333037	3	1	0	75	1	8	1
-431	2017-06-27 22:26:29.868139+08	7	35	200.032619331472006	137	7.61111111111110983	9	3	1	62	1	8	1
-440	2017-06-27 22:26:29.884266+08	7	63	165.600513797356001	140	5.83333333333333037	12	2	0	105	1	8	1
-435	2017-06-27 22:26:29.875128+08	8	39	197.463261956460002	88	7.33333333333333037	6	2	0	63	1	8	1
-438	2017-06-27 22:26:29.881331+08	2	38	198.254188944806003	87	7.25	6	1	1	65	1	8	1
-437	2017-06-27 22:26:29.878858+08	8	65	150.902779792025001	126	5.25	12	3	0	67	1	8	1
-434	2017-06-27 22:26:29.871975+08	8	21	213.697133178921007	371	7.72916666666666963	24	12	1	69	1	8	1
-433	2017-06-27 22:26:29.870751+08	5	51	180.769362188177013	115	6.38888888888889017	9	4	0	107	1	8	1
-436	2017-06-27 22:26:29.876543+08	8	53	178.918474579204002	114	6.33333333333333037	9	2	0	64	1	8	1
-439	2017-06-27 22:26:29.882634+08	6	61	168.584064270858988	187	6.23333333333332984	15	2	0	66	1	8	1
-444	2017-06-27 22:26:29.893129+08	8	28	207.600626787402007	238	7.93333333333333002	15	8	1	42	1	8	1
-445	2017-06-27 22:26:29.894337+08	6	42	191.236943500124994	208	6.93333333333333002	15	3	1	45	1	8	1
-456	2017-06-27 22:26:29.915444+08	8	68	117.134493182186006	149	4.13888888888889017	18	0	0	54	1	8	1
-441	2017-06-27 22:26:29.889103+08	8	55	177.451285509194008	346	7.20833333333333037	24	10	1	43	1	8	1
-443	2017-06-27 22:26:29.891905+08	7	5	242.640687867796998	163	9.05555555555556069	9	8	3	44	1	8	1
-447	2017-06-27 22:26:29.898037+08	8	31	203.589078837149998	139	7.72222222222221966	9	4	0	3	1	8	1
-446	2017-06-27 22:26:29.896147+08	8	1	270.697634491260999	431	8.97916666666666963	24	18	4	41	1	8	1
-442	2017-06-27 22:26:29.890643+08	8	2	265.924080946241986	434	9.04166666666666963	24	19	7	40	1	8	1
-457	2017-06-27 22:26:29.916809+08	8	49	181.494903892916	270	6.42857142857142971	21	5	0	55	1	8	1
-455	2017-06-27 22:26:29.914062+08	6	62	168.257256379800992	12	2	3	0	0	106	1	8	1
-450	2017-06-27 22:26:29.905249+08	8	40	194.666666666666998	42	7	3	1	0	100	1	8	1
-451	2017-06-27 22:26:29.906508+08	2	33	201.715960059383008	51	8.5	3	1	0	60	1	8	1
-448	2017-06-27 22:26:29.902628+08	8	18	219.93380515547301	286	7.9444444444444402	18	11	2	58	1	8	1
-449	2017-06-27 22:26:29.904003+08	4	9	230.208025690270006	147	8.16666666666666963	9	7	2	59	1	8	1
-453	2017-06-27 22:26:29.910512+08	8	27	207.902281360561005	279	7.75	18	9	0	53	1	8	1
-454	2017-06-27 22:26:29.91272+08	6	25	210.959724858491995	101	8.41666666666666963	6	5	1	52	1	8	1
-458	2017-06-27 22:26:29.918247+08	5	22	212.730567374210011	178	7.41666666666666963	12	5	0	57	1	8	1
-452	2017-06-27 22:26:29.907703+08	7	34	200.84386433127699	137	7.61111111111110983	9	4	1	56	1	8	1
-479	2017-06-27 22:26:36.269609+08	1	35	201.47926961475099	50	8.33333333333333037	3	3	0	112	1	9	1
-465	2017-06-27 22:26:29.929883+08	8	20	214.870328025585991	328	7.8095238095238102	21	14	0	4	1	8	1
-466	2017-06-27 22:26:29.933833+08	3	46	184.376776349604995	23	3.83333333333332993	3	0	0	96	1	8	1
-459	2017-06-27 22:26:29.922574+08	4	54	178.18063885563501	66	5.5	6	2	1	110	1	8	1
-463	2017-06-27 22:26:29.927436+08	8	58	173.534982585089011	315	6.5625	24	6	0	47	1	8	1
-461	2017-06-27 22:26:29.925078+08	8	60	169.805460692796004	231	6.41666666666666963	18	5	0	49	1	8	1
-462	2017-06-27 22:26:29.92623+08	8	11	227.459484503477	310	8.61111111111111072	18	12	3	70	1	8	1
-467	2017-06-27 22:26:29.935169+08	8	45	184.931108464238008	256	7.11111111111110983	18	8	0	80	1	8	1
-471	2017-06-27 22:26:29.94007+08	8	56	177.056325633665011	112	6.22222222222221966	9	4	0	87	1	8	1
-472	2017-06-27 22:26:29.941245+08	5	43	189.630931051211007	80	6.66666666666666963	6	2	0	108	1	8	1
-469	2017-06-27 22:26:29.937537+08	8	66	148.159056174108997	288	6	24	4	0	79	1	8	1
-473	2017-06-27 22:26:29.942467+08	7	47	183.813891301973996	74	6.16666666666666963	6	0	0	97	1	8	1
-468	2017-06-27 22:26:29.936388+08	7	52	178.996933626274	163	6.79166666666666963	12	4	0	83	1	8	1
-470	2017-06-27 22:26:29.938884+08	8	50	180.934106630998997	126	7	9	1	0	91	1	8	1
-421	2017-06-27 22:26:29.849327+08	8	10	230.018061424955988	333	7.92857142857142971	21	13	5	71	1	8	1
-477	2017-06-27 22:26:36.26706+08	9	28	209.338624540176994	372	7.75	24	13	2	6	1	9	1
-486	2017-06-27 22:26:36.282356+08	7	42	191.236943500124994	208	6.93333333333333002	15	3	1	45	1	9	1
-487	2017-06-27 22:26:36.283696+08	9	56	172.307699721073988	387	7.16666666666666963	27	10	1	43	1	9	1
-484	2017-06-27 22:26:36.278841+08	9	2	265.924080946241986	434	9.04166666666666963	24	19	7	40	1	9	1
-478	2017-06-27 22:26:36.268353+08	3	41	191.85998403855001	34	5.66666666666666963	3	1	0	111	1	9	1
-476	2017-06-27 22:26:36.265776+08	9	44	189.279223994684997	347	7.22916666666666963	24	10	0	90	1	9	1
-480	2017-06-27 22:26:36.270957+08	8	33	202.16302672744601	210	7	15	4	1	93	1	9	1
-481	2017-06-27 22:26:36.272254+08	9	66	153.982460434134993	321	5.9444444444444402	27	6	1	81	1	9	1
-482	2017-06-27 22:26:36.273639+08	9	20	218.178752750403987	376	7.83333333333333037	24	13	2	7	1	9	1
-483	2017-06-27 22:26:36.274943+08	9	18	220.378118958327008	242	8.06666666666666998	15	9	1	89	1	9	1
-485	2017-06-27 22:26:36.2801+08	9	37	199.080948602027007	177	7.375	12	4	0	3	1	9	1
-464	2017-06-27 22:26:29.928641+08	8	16	220.686197177238995	372	7.75	24	14	6	46	1	8	1
-474	2017-06-27 22:26:29.943684+08	5	57	174.951805884837	105	5.83333333333333037	9	0	0	109	1	8	1
-488	2017-06-27 22:26:36.285094+08	8	4	246.571075252762	210	8.75	12	10	4	44	1	9	1
-545	2017-06-27 22:26:40.060842+08	6	46	187.879276629326995	164	6.83333333333333037	12	5	1	110	1	10	1
-491	2017-06-27 22:26:36.291734+08	5	50	178.960391810044996	114	6.33333333333333037	9	3	1	110	1	9	1
-505	2017-06-27 22:26:36.316406+08	7	60	168.257256379800992	12	2	3	0	0	106	1	9	1
-495	2017-06-27 22:26:36.297497+08	9	62	166.283987855340001	353	6.53703703703703987	27	7	0	47	1	9	1
-496	2017-06-27 22:26:36.29898+08	9	24	214.870328025585991	328	7.8095238095238102	21	14	0	4	1	9	1
-494	2017-06-27 22:26:36.295882+08	9	12	229.601494229997996	429	7.9444444444444402	27	17	6	46	1	9	1
-492	2017-06-27 22:26:36.293021+08	9	61	167.890832600409993	272	6.47619047619047983	21	6	0	49	1	9	1
-501	2017-06-27 22:26:36.309698+08	3	34	201.715960059383008	51	8.5	3	1	0	60	1	9	1
-503	2017-06-27 22:26:36.312519+08	9	69	108.190993936943002	176	4.1904761904761898	21	0	0	54	1	9	1
-499	2017-06-27 22:26:36.305582+08	5	10	230.208025690270006	147	8.16666666666666963	9	7	2	59	1	9	1
-502	2017-06-27 22:26:36.311117+08	8	36	200.84386433127699	137	7.61111111111110983	9	4	1	56	1	9	1
-498	2017-06-27 22:26:36.304068+08	7	27	210.401850260229992	146	8.11111111111111072	9	7	1	52	1	9	1
-507	2017-06-27 22:26:36.31952+08	9	19	219.93380515547301	286	7.9444444444444402	18	11	2	58	1	9	1
-508	2017-06-27 22:26:36.321216+08	6	16	222.028686661942004	235	7.83333333333333037	15	8	0	57	1	9	1
-504	2017-06-27 22:26:36.313815+08	9	25	214.051870656912001	329	7.83333333333333037	21	11	0	53	1	9	1
-506	2017-06-27 22:26:36.31822+08	9	54	174.444512034697993	311	6.47916666666666963	24	5	0	55	1	9	1
-509	2017-06-27 22:26:36.325572+08	8	7	241.233026601797008	276	9.19999999999999929	15	11	0	104	1	9	1
-510	2017-06-27 22:26:36.327012+08	9	21	217.113089824823987	363	7.5625	24	12	2	73	1	9	1
-511	2017-06-27 22:26:36.328579+08	9	6	242.806431251815013	361	8.59523809523808957	21	15	1	74	1	9	1
-512	2017-06-27 22:26:36.330195+08	9	9	235.875938765784014	305	8.47222222222221966	18	13	2	72	1	9	1
-515	2017-06-27 22:26:36.334789+08	9	11	230.127245904835007	399	8.3125	24	18	0	84	1	9	1
-514	2017-06-27 22:26:36.333466+08	7	22	215.161465000801996	101	8.41666666666666963	6	4	2	75	1	9	1
-513	2017-06-27 22:26:36.33144+08	9	14	226.847396024116989	465	8.61111111111111072	27	17	0	2	1	9	1
-516	2017-06-27 22:26:36.339211+08	4	65	158.628627282320991	38	3.16666666666667007	6	0	0	96	1	9	1
-524	2017-06-27 22:26:36.351241+08	9	8	240.127186330638011	447	8.27777777777778034	27	18	3	1	1	9	1
-525	2017-06-27 22:26:36.352806+08	9	48	180.096069079697003	294	7	21	8	0	80	1	9	1
-522	2017-06-27 22:26:36.348278+08	9	52	177.056325633665011	112	6.22222222222221966	9	4	0	87	1	9	1
-517	2017-06-27 22:26:36.340594+08	8	55	173.206839820791998	107	5.9444444444444402	9	0	0	97	1	9	1
-518	2017-06-27 22:26:36.341846+08	9	67	153.952698891131007	333	6.16666666666666963	27	5	0	79	1	9	1
-519	2017-06-27 22:26:36.343063+08	6	53	174.951805884837	105	5.83333333333333037	9	0	0	109	1	9	1
-523	2017-06-27 22:26:36.349844+08	6	43	189.630931051211007	80	6.66666666666666963	6	2	0	108	1	9	1
-520	2017-06-27 22:26:36.344224+08	8	49	178.996933626274	163	6.79166666666666963	12	4	0	83	1	9	1
-521	2017-06-27 22:26:36.34611+08	9	47	180.934106630998997	126	7	9	1	0	91	1	9	1
-533	2017-06-27 22:26:36.365961+08	9	63	165.347632561859996	264	6.28571428571429003	21	3	0	61	1	9	1
-532	2017-06-27 22:26:36.364693+08	7	59	168.584064270858988	187	6.23333333333332984	15	2	0	66	1	9	1
-535	2017-06-27 22:26:36.368507+08	8	64	162.105872079908011	175	5.83333333333333037	15	3	1	105	1	9	1
-527	2017-06-27 22:26:36.35834+08	9	39	197.463261956460002	88	7.33333333333333037	6	2	0	63	1	9	1
-526	2017-06-27 22:26:36.357063+08	9	31	203.862619010408991	411	7.61111111111110983	27	13	1	69	1	9	1
-531	2017-06-27 22:26:36.363435+08	3	38	198.254188944806003	87	7.25	6	1	1	65	1	9	1
-530	2017-06-27 22:26:36.362089+08	6	58	168.989671164078999	143	5.95833333333333037	12	4	0	107	1	9	1
-528	2017-06-27 22:26:36.359587+08	9	51	178.918474579204002	114	6.33333333333333037	9	2	0	64	1	9	1
-534	2017-06-27 22:26:36.36718+08	8	32	202.602192546567011	180	7.5	12	5	1	62	1	9	1
-539	2017-06-27 22:26:36.376111+08	7	30	204.197250338890996	98	8.16666666666666963	6	3	0	82	1	9	1
-542	2017-06-27 22:26:36.379627+08	9	5	244.098767513443988	393	8.1875	24	16	6	71	1	9	1
-540	2017-06-27 22:26:36.377333+08	9	26	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	9	1
-536	2017-06-27 22:26:36.372207+08	9	57	171.744242019165	316	6.58333333333333037	24	4	0	78	1	9	1
-538	2017-06-27 22:26:36.374699+08	7	3	248.286859329860988	367	8.7380952380952408	21	16	5	5	1	9	1
-544	2017-06-27 22:26:36.382287+08	9	29	204.567460883839999	137	7.61111111111110983	9	5	2	92	1	9	1
-537	2017-06-27 22:26:36.373462+08	7	17	221.519271745944991	296	8.22222222222221966	18	10	0	77	1	9	1
-541	2017-06-27 22:26:36.378546+08	8	45	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	9	1
-543	2017-06-27 22:26:36.380909+08	9	15	223.617691244815006	392	8.16666666666666963	24	14	0	76	1	9	1
-490	2017-06-27 22:26:36.287728+08	9	23	215.071806627211998	289	8.02777777777778034	18	10	1	42	1	9	1
-548	2017-06-27 22:26:40.064723+08	10	14	222.869727144977986	474	7.90000000000000036	30	18	6	46	1	10	1
-549	2017-06-27 22:26:40.066+08	10	22	214.870328025585991	328	7.8095238095238102	21	14	0	4	1	10	1
-551	2017-06-27 22:26:40.068605+08	10	59	168.725785719177992	318	6.625	24	7	0	49	1	10	1
-550	2017-06-27 22:26:40.06727+08	9	49	183.519666904788011	121	6.72222222222221966	9	2	0	48	1	10	1
-547	2017-06-27 22:26:40.063494+08	10	24	213.101637179480008	389	8.10416666666666963	24	13	3	70	1	10	1
-556	2017-06-27 22:26:40.077477+08	10	44	190.151925312038998	391	7.24074074074073959	27	12	0	90	1	10	1
-546	2017-06-27 22:26:40.062164+08	10	58	168.747796333169987	397	6.6166666666666698	30	8	0	47	1	10	1
-555	2017-06-27 22:26:40.076132+08	9	34	202.16302672744601	210	7	15	4	1	93	1	10	1
-552	2017-06-27 22:26:40.072303+08	4	42	191.85998403855001	34	5.66666666666666963	3	1	0	111	1	10	1
-554	2017-06-27 22:26:40.074747+08	2	36	201.47926961475099	50	8.33333333333333037	3	3	0	112	1	10	1
-553	2017-06-27 22:26:40.073493+08	10	25	212.649400134952998	424	7.85185185185185031	27	15	2	6	1	10	1
-557	2017-06-27 22:26:40.078884+08	10	69	151.457016694928001	364	6.06666666666666998	30	7	1	81	1	10	1
-493	2017-06-27 22:26:36.294458+08	9	13	228.034114436082007	357	8.5	21	13	3	70	1	9	1
-569	2017-06-27 22:26:40.098202+08	10	30	204.890049837754987	462	7.70000000000000018	30	14	1	69	1	10	1
-561	2017-06-27 22:26:40.087272+08	10	67	152.631897310856999	169	5.6333333333333302	15	5	0	67	1	10	1
-560	2017-06-27 22:26:40.085969+08	10	38	199.383979333095994	134	7.4444444444444402	9	4	0	63	1	10	1
-564	2017-06-27 22:26:40.091409+08	4	40	197.646884294541991	134	7.4444444444444402	9	3	1	65	1	10	1
-562	2017-06-27 22:26:40.088589+08	1	29	206.259640175955013	51	8.5	3	2	0	113	1	10	1
-568	2017-06-27 22:26:40.096911+08	9	33	202.602192546567011	180	7.5	12	5	1	62	1	10	1
-567	2017-06-27 22:26:40.095616+08	10	62	165.347632561859996	264	6.28571428571429003	21	3	0	61	1	10	1
-565	2017-06-27 22:26:40.092951+08	7	57	168.989671164078999	143	5.95833333333333037	12	4	0	107	1	10	1
-570	2017-06-27 22:26:40.099513+08	9	63	162.105872079908011	175	5.83333333333333037	15	3	1	105	1	10	1
-573	2017-06-27 22:26:40.108407+08	4	35	201.715960059383008	51	8.5	3	1	0	60	1	10	1
-577	2017-06-27 22:26:40.114143+08	10	55	173.166720085254013	353	6.53703703703703987	27	6	0	55	1	10	1
-581	2017-06-27 22:26:40.119696+08	7	17	220.194719529668987	283	7.86111111111110983	18	10	1	57	1	10	1
-580	2017-06-27 22:26:40.118123+08	8	27	210.401850260229992	146	8.11111111111111072	9	7	1	52	1	10	1
-571	2017-06-27 22:26:40.10517+08	6	15	222.645349614552998	191	7.95833333333333037	12	8	2	59	1	10	1
-575	2017-06-27 22:26:40.111235+08	8	61	168.257256379800992	12	2	3	0	0	106	1	10	1
-579	2017-06-27 22:26:40.116846+08	10	18	219.93380515547301	286	7.9444444444444402	18	11	2	58	1	10	1
-576	2017-06-27 22:26:40.112624+08	10	70	108.008324499639997	212	4.41666666666666963	24	0	0	54	1	10	1
-578	2017-06-27 22:26:40.115528+08	10	23	214.579374003144011	375	7.8125	24	12	0	53	1	10	1
-574	2017-06-27 22:26:40.109891+08	9	37	200.84386433127699	137	7.61111111111110983	9	4	1	56	1	10	1
-586	2017-06-27 22:26:40.131481+08	10	3	264.257459941313016	531	8.84999999999999964	30	22	5	41	1	10	1
-588	2017-06-27 22:26:40.134332+08	10	39	199.080948602027007	177	7.375	12	4	0	3	1	10	1
-589	2017-06-27 22:26:40.138487+08	10	19	217.113089824823987	363	7.5625	24	12	2	73	1	10	1
-585	2017-06-27 22:26:40.13005+08	10	28	209.943514835288994	329	7.83333333333333037	21	11	1	42	1	10	1
-587	2017-06-27 22:26:40.132919+08	10	52	180.100321499611994	432	7.20000000000000018	30	12	1	43	1	10	1
-584	2017-06-27 22:26:40.1284+08	9	4	258.150814951284019	266	8.86666666666667069	15	13	4	44	1	10	1
-591	2017-06-27 22:26:40.141747+08	10	21	215.352812457194005	503	8.38333333333332931	30	17	0	2	1	10	1
-595	2017-06-27 22:26:40.147482+08	10	9	232.983541557756013	443	8.20370370370370061	27	20	0	84	1	10	1
-594	2017-06-27 22:26:40.146062+08	9	6	241.233026601797008	276	9.19999999999999929	15	11	0	104	1	10	1
-590	2017-06-27 22:26:40.139761+08	10	7	240.493760187281993	406	8.45833333333333037	24	16	1	74	1	10	1
-593	2017-06-27 22:26:40.144635+08	10	11	229.949537715775989	347	8.2619047619047592	21	14	2	72	1	10	1
-592	2017-06-27 22:26:40.143204+08	8	10	230.687649905224987	151	8.38888888888888928	9	6	3	75	1	10	1
-599	2017-06-27 22:26:40.156564+08	8	32	204.197250338890996	98	8.16666666666666963	6	3	0	82	1	10	1
-596	2017-06-27 22:26:40.151648+08	8	2	264.837010427033022	427	8.89583333333333037	24	19	7	5	1	10	1
-598	2017-06-27 22:26:40.154634+08	8	16	222.089479123329994	346	8.2380952380952408	21	12	0	77	1	10	1
-602	2017-06-27 22:26:40.16092+08	10	68	152.59911521516301	341	6.31481481481481044	27	4	0	78	1	10	1
-597	2017-06-27 22:26:40.152782+08	10	5	243.679425808363987	447	8.27777777777778034	27	18	6	71	1	10	1
-603	2017-06-27 22:26:40.162232+08	10	31	204.567460883839999	137	7.61111111111110983	9	5	2	92	1	10	1
-601	2017-06-27 22:26:40.159452+08	9	47	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	10	1
-604	2017-06-27 22:26:40.163697+08	10	13	229.600379768800991	449	8.31481481481480955	27	17	0	76	1	10	1
-605	2017-06-27 22:26:40.167406+08	5	65	158.628627282320991	38	3.16666666666667007	6	0	0	96	1	10	1
-606	2017-06-27 22:26:40.168735+08	10	53	179.956119090590988	155	6.45833333333333037	12	5	0	87	1	10	1
-607	2017-06-27 22:26:40.170077+08	7	56	172.412810678546009	140	5.83333333333333037	12	0	0	109	1	10	1
-609	2017-06-27 22:26:40.172979+08	9	64	160.348102365959988	181	6.03333333333332966	15	4	0	83	1	10	1
-610	2017-06-27 22:26:40.174169+08	10	48	186.915448456317989	341	7.10416666666666963	24	10	0	80	1	10	1
-612	2017-06-27 22:26:40.176813+08	9	50	181.136914964390996	153	6.375	12	2	0	97	1	10	1
-613	2017-06-27 22:26:40.178032+08	10	8	240.127186330638011	447	8.27777777777778034	27	18	3	1	1	10	1
-614	2017-06-27 22:26:40.179248+08	10	66	153.952698891131007	333	6.16666666666666963	27	5	0	79	1	10	1
-608	2017-06-27 22:26:40.171541+08	10	51	180.934106630998997	126	7	9	1	0	91	1	10	1
-611	2017-06-27 22:26:40.175508+08	7	45	189.630931051211007	80	6.66666666666666963	6	2	0	108	1	10	1
-558	2017-06-27 22:26:40.080258+08	10	12	229.912082724648002	432	8	27	15	2	7	1	10	1
-559	2017-06-27 22:26:40.081668+08	10	20	216.433353736902006	288	8	18	10	1	89	1	10	1
-566	2017-06-27 22:26:40.094309+08	8	60	168.584064270858988	187	6.23333333333332984	15	2	0	66	1	10	1
-23	2017-06-27 21:48:26.820656+08	1	38	183.104947526236998	29	4.83333333333333037	3	1	0	47	1	1	1
-54	2017-06-27 22:01:15.258109+08	2	3	222.753227582208012	107	8.91666666666666963	6	5	1	40	1	2	1
-57	2017-06-27 22:01:15.262467+08	1	2	223.21230719903599	60	10	3	3	1	44	1	2	1
-123	2017-06-27 22:11:45.439298+08	1	31	198.273767470361008	44	7.33333333333333037	3	1	0	75	1	3	1
-138	2017-06-27 22:11:45.475266+08	3	4	225.787859372766007	155	8.61111111111111072	9	6	0	7	1	3	1
-189	2017-06-27 22:24:29.506846+08	2	33	198.273767470361008	44	7.33333333333333037	3	1	0	75	1	4	1
-209	2017-06-27 22:24:29.540272+08	4	10	216.799858782720008	203	8.45833333333333037	12	7	2	70	1	4	1
-166	2017-06-27 22:24:29.461455+08	2	16	212.481334373851013	101	8.41666666666666963	6	3	0	77	1	4	1
-268	2017-06-27 22:26:18.601776+08	3	10	226.171066336910997	153	8.5	9	7	4	5	1	5	1
-241	2017-06-27 22:26:18.54956+08	4	25	204.645161290322989	51	8.5	3	1	0	48	1	5	1
-362	2017-06-27 22:26:25.585951+08	7	12	221.358470250794994	354	8.4285714285714306	21	13	0	2	1	7	1
-369	2017-06-27 22:26:25.599417+08	7	14	220.378118958327008	242	8.06666666666666998	15	9	1	89	1	7	1
-400	2017-06-27 22:26:25.655027+08	7	17	218.263778131207999	336	8	21	12	0	76	1	7	1
-582	2017-06-27 22:26:40.12553+08	8	43	191.236943500124994	208	6.93333333333333002	15	3	1	45	1	10	1
-140	2017-06-27 22:11:45.479415+08	3	39	194.418256227857995	135	7.5	9	4	0	89	1	3	1
-288	2017-06-27 22:26:21.724723+08	4	28	202.613548575534992	47	7.83333333333333037	3	1	0	82	1	6	1
-318	2017-06-27 22:26:21.780264+08	6	18	215.746162285309993	191	7.95833333333333037	12	7	1	58	1	6	1
-378	2017-06-27 22:26:25.616362+08	7	67	146.040840553372988	246	5.85714285714286031	21	2	0	79	1	7	1
-340	2017-06-27 22:26:25.550908+08	3	59	173.940955318065988	17	2.83333333333332993	3	0	0	110	1	7	1
-341	2017-06-27 22:26:25.552281+08	7	51	182.836978653111998	275	6.54761904761905011	21	6	0	47	1	7	1
-460	2017-06-27 22:26:29.923875+08	7	48	183.519666904788011	121	6.72222222222221966	9	2	0	48	1	8	1
-475	2017-06-27 22:26:29.94501+08	8	3	246.016327956131988	403	8.39583333333333037	24	17	3	1	1	8	1
-418	2017-06-27 22:26:29.845534+08	8	23	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	8	1
-432	2017-06-27 22:26:29.86947+08	8	64	163.952690465544009	220	6.11111111111110983	18	3	0	61	1	8	1
-497	2017-06-27 22:26:36.300266+08	8	46	183.519666904788011	121	6.72222222222221966	9	2	0	48	1	9	1
-500	2017-06-27 22:26:36.306918+08	9	40	194.666666666666998	42	7	3	1	0	100	1	9	1
-529	2017-06-27 22:26:36.36088+08	9	68	150.902779792025001	126	5.25	12	3	0	67	1	9	1
-489	2017-06-27 22:26:36.286444+08	9	1	277.729328834344983	491	9.0925925925925899	27	21	4	41	1	9	1
-583	2017-06-27 22:26:40.127102+08	10	1	266.503055278255999	485	8.98148148148147918	27	21	7	40	1	10	1
-600	2017-06-27 22:26:40.158173+08	10	26	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	10	1
-563	2017-06-27 22:26:40.089818+08	10	54	178.918474579204002	114	6.33333333333333037	9	2	0	64	1	10	1
-572	2017-06-27 22:26:40.106664+08	10	41	194.666666666666998	42	7	3	1	0	100	1	10	1
-615	2017-06-27 23:09:15.263998+08	8	57	168.989671164078999	143	5.95833333333333037	12	4	0	107	1	11	1
-616	2017-06-27 23:09:15.266283+08	9	59	168.584064270858988	187	6.23333333333332984	15	2	0	66	1	11	1
-617	2017-06-27 23:09:15.268003+08	11	30	208.457730215999987	518	7.8484848484848504	33	16	1	69	1	11	1
-618	2017-06-27 23:09:15.269853+08	5	39	197.646884294541991	134	7.4444444444444402	9	3	1	65	1	11	1
-619	2017-06-27 23:09:15.271534+08	2	38	201.289365747165988	87	7.25	6	3	0	113	1	11	1
-620	2017-06-27 23:09:15.273227+08	11	50	178.918474579204002	114	6.33333333333333037	9	2	0	64	1	11	1
-621	2017-06-27 23:09:15.275717+08	11	69	147.143449827000012	294	6.125	24	4	0	61	1	11	1
-622	2017-06-27 23:09:15.277725+08	11	67	152.631897310856999	169	5.6333333333333302	15	5	0	67	1	11	1
-623	2017-06-27 23:09:15.279303+08	10	34	202.602192546567011	180	7.5	12	5	1	62	1	11	1
-624	2017-06-27 23:09:15.280925+08	11	28	209.861083814000011	194	8.08333333333333037	12	7	0	63	1	11	1
-625	2017-06-27 23:09:15.282757+08	10	64	159.858185887334997	210	5.83333333333333037	18	3	1	105	1	11	1
-626	2017-06-27 23:09:15.287795+08	10	48	181.056917883990991	163	6.79166666666666963	12	3	0	48	1	11	1
-627	2017-06-27 23:09:15.289439+08	7	55	171.163527522484998	193	6.43333333333333002	15	5	1	110	1	11	1
-628	2017-06-27 23:09:15.290938+08	11	16	222.869727144977986	474	7.90000000000000036	30	18	6	46	1	11	1
-629	2017-06-27 23:09:15.292347+08	11	7	240.640705626381987	449	8.31481481481480955	27	16	4	70	1	11	1
-630	2017-06-27 23:09:15.296562+08	11	58	168.747796333169987	397	6.6166666666666698	30	8	0	47	1	11	1
-631	2017-06-27 23:09:15.298071+08	11	25	214.870328025585991	328	7.8095238095238102	21	14	0	4	1	11	1
-632	2017-06-27 23:09:15.299565+08	11	54	171.742573896934005	360	6.66666666666666963	27	8	0	49	1	11	1
-633	2017-06-27 23:09:15.306541+08	11	51	174.406346298517008	466	7.06060606060605966	33	12	1	43	1	11	1
-634	2017-06-27 23:09:15.308324+08	9	29	209.617622016029998	256	7.11111111111110983	18	5	3	45	1	11	1
-635	2017-06-27 23:09:15.310215+08	10	3	258.150814951284019	266	8.86666666666667069	15	13	4	44	1	11	1
-636	2017-06-27 23:09:15.311789+08	11	13	224.804499267338002	384	8	24	14	2	42	1	11	1
-637	2017-06-27 23:09:15.314024+08	11	4	249.561592592354998	562	8.51515151515151913	33	22	5	41	1	11	1
-638	2017-06-27 23:09:15.3158+08	11	43	192.999708682742011	216	7.20000000000000018	15	4	0	3	1	11	1
-639	2017-06-27 23:09:15.317779+08	11	1	266.503055278255999	485	8.98148148148147918	27	21	7	40	1	11	1
-640	2017-06-27 23:09:15.324716+08	9	2	265.717758734228028	477	8.83333333333333037	27	21	9	5	1	11	1
-641	2017-06-27 23:09:15.326437+08	11	68	150.754825362790996	376	6.26666666666667016	30	6	0	78	1	11	1
-642	2017-06-27 23:09:15.327901+08	9	18	222.089479123329994	346	8.2380952380952408	21	12	0	77	1	11	1
-643	2017-06-27 23:09:15.329444+08	10	46	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	11	1
-644	2017-06-27 23:09:15.330864+08	9	33	203.987771667778986	141	7.83333333333333037	9	4	0	82	1	11	1
-645	2017-06-27 23:09:15.332638+08	11	19	221.563371581736988	475	7.91666666666666963	30	19	6	71	1	11	1
-646	2017-06-27 23:09:15.334472+08	11	26	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	11	1
-647	2017-06-27 23:09:15.337071+08	11	32	204.567460883839999	137	7.61111111111110983	9	5	2	92	1	11	1
-648	2017-06-27 23:09:15.33875+08	11	5	246.118873733100997	509	8.48333333333333073	30	20	1	76	1	11	1
-649	2017-06-27 23:09:15.344425+08	5	44	191.85998403855001	34	5.66666666666666963	3	1	0	111	1	11	1
-650	2017-06-27 23:09:15.346158+08	3	37	201.47926961475099	50	8.33333333333333037	3	3	0	112	1	11	1
-651	2017-06-27 23:09:15.348438+08	11	31	205.927400738177994	461	7.68333333333333002	30	16	2	6	1	11	1
-652	2017-06-27 23:09:15.350226+08	11	40	195.927869759759005	435	7.25	30	13	0	90	1	11	1
-653	2017-06-27 23:09:15.351951+08	10	35	202.16302672744601	210	7	15	4	1	93	1	11	1
-654	2017-06-27 23:09:15.353488+08	11	66	155.019984144473	403	6.10606060606060996	33	7	1	81	1	11	1
-655	2017-06-27 23:09:15.355028+08	11	10	237.640080279115011	482	8.03333333333332966	30	17	2	7	1	11	1
-656	2017-06-27 23:09:15.356368+08	11	20	220.943734130085005	331	7.8809523809523796	21	12	1	89	1	11	1
-657	2017-06-27 23:09:15.363075+08	11	12	229.949537715775989	347	8.2619047619047592	21	14	2	72	1	11	1
-658	2017-06-27 23:09:15.365475+08	11	15	224.265927759582013	416	7.70370370370369972	27	14	2	73	1	11	1
-659	2017-06-27 23:09:15.366915+08	9	9	237.834724741526003	207	8.625	12	9	3	75	1	11	1
-660	2017-06-27 23:09:15.368377+08	11	24	217.100225245173988	548	8.30303030303029921	33	19	0	2	1	11	1
-661	2017-06-27 23:09:15.369765+08	10	6	241.233026601797008	276	9.19999999999999929	15	11	0	104	1	11	1
-662	2017-06-27 23:09:15.371288+08	11	14	224.503545498699992	441	8.16666666666666963	27	17	1	74	1	11	1
-663	2017-06-27 23:09:15.372786+08	11	22	218.071140239160002	475	7.91666666666666963	30	21	0	84	1	11	1
-664	2017-06-27 23:09:15.377897+08	11	42	194.666666666666998	42	7	3	1	0	100	1	11	1
-665	2017-06-27 23:09:15.379431+08	7	17	222.645349614552998	191	7.95833333333333037	12	8	2	59	1	11	1
-666	2017-06-27 23:09:15.380783+08	11	61	168.033754806984007	396	6.59999999999999964	30	7	0	55	1	11	1
-667	2017-06-27 23:09:15.382097+08	9	27	210.401850260229992	146	8.11111111111111072	9	7	1	52	1	11	1
-668	2017-06-27 23:09:15.383342+08	11	23	217.682698239485006	427	7.9074074074074101	27	14	0	53	1	11	1
-669	2017-06-27 23:09:15.384549+08	10	41	194.728281835911986	179	7.45833333333333037	12	5	1	56	1	11	1
-670	2017-06-27 23:09:15.385943+08	11	21	219.93380515547301	286	7.9444444444444402	18	11	2	58	1	11	1
-671	2017-06-27 23:09:15.387268+08	9	60	168.257256379800992	12	2	3	0	0	106	1	11	1
-672	2017-06-27 23:09:15.388521+08	5	36	201.715960059383008	51	8.5	3	1	0	60	1	11	1
-673	2017-06-27 23:09:15.389698+08	11	70	114.534611177798993	256	4.74074074074073959	27	1	0	54	1	11	1
-674	2017-06-27 23:09:15.390864+08	8	11	231.29207732568301	337	8.02380952380952017	21	13	2	57	1	11	1
-675	2017-06-27 23:09:15.394602+08	6	65	158.628627282320991	38	3.16666666666667007	6	0	0	96	1	11	1
-676	2017-06-27 23:09:15.395912+08	11	49	179.956119090590988	155	6.45833333333333037	12	5	0	87	1	11	1
-677	2017-06-27 23:09:15.397304+08	8	53	172.412810678546009	140	5.83333333333333037	12	0	0	109	1	11	1
-678	2017-06-27 23:09:15.398645+08	10	63	160.348102365959988	181	6.03333333333332966	15	4	0	83	1	11	1
-679	2017-06-27 23:09:15.399891+08	11	8	240.127186330638011	447	8.27777777777778034	27	18	3	1	1	11	1
-680	2017-06-27 23:09:15.401222+08	11	47	185.740520599247986	388	7.18518518518518956	27	12	0	80	1	11	1
-681	2017-06-27 23:09:15.402395+08	11	62	162.298522116638992	156	6.5	12	1	0	91	1	11	1
-682	2017-06-27 23:09:15.403632+08	10	52	173.313492446954001	192	6.40000000000000036	15	3	0	97	1	11	1
-683	2017-06-27 23:09:15.404842+08	8	45	191.049484175032006	126	7	9	3	0	108	1	11	1
-684	2017-06-27 23:09:15.406037+08	11	56	170.689659719296998	387	6.45000000000000018	30	7	0	79	1	11	1
-685	2017-06-27 23:10:42.73484+08	4	35	201.47926961475099	50	8.33333333333333037	3	3	0	112	1	12	1
-686	2017-06-27 23:10:42.736042+08	6	43	191.85998403855001	34	5.66666666666666963	3	1	0	111	1	12	1
-687	2017-06-27 23:10:42.737295+08	12	37	201.175027003276	483	7.31818181818182012	33	14	0	90	1	12	1
-688	2017-06-27 23:10:42.73861+08	11	33	202.16302672744601	210	7	15	4	1	93	1	12	1
-689	2017-06-27 23:10:42.740078+08	12	29	204.789792344393987	511	7.74242424242424043	33	18	2	6	1	12	1
-690	2017-06-27 23:10:42.741505+08	12	9	237.857401322632001	391	8.14583333333333037	24	15	2	89	1	12	1
-691	2017-06-27 23:10:42.742815+08	12	56	169.522405409174013	463	6.4305555555555598	36	10	1	81	1	12	1
-692	2017-06-27 23:10:42.744128+08	12	6	247.979387090077012	542	8.21212121212120927	33	20	4	7	1	12	1
-693	2017-06-27 23:10:42.748072+08	10	59	168.584064270858988	187	6.23333333333332984	15	2	0	66	1	12	1
-694	2017-06-27 23:10:42.749371+08	12	68	144.198255338578008	202	5.61111111111110983	18	5	0	67	1	12	1
-695	2017-06-27 23:10:42.750824+08	3	36	201.289365747165988	87	7.25	6	3	0	113	1	12	1
-696	2017-06-27 23:10:42.752191+08	12	51	178.918474579204002	114	6.33333333333333037	9	2	0	64	1	12	1
-697	2017-06-27 23:10:42.753494+08	12	67	147.143449827000012	294	6.125	24	4	0	61	1	12	1
-698	2017-06-27 23:10:42.754849+08	12	40	197.513003249522001	556	7.72222222222221966	36	16	1	69	1	12	1
-699	2017-06-27 23:10:42.756053+08	11	32	202.602192546567011	180	7.5	12	5	1	62	1	12	1
-700	2017-06-27 23:10:42.757326+08	6	42	194.624604591753013	180	7.5	12	4	1	65	1	12	1
-701	2017-06-27 23:10:42.758713+08	12	31	203.661390277844987	236	7.8666666666666698	15	9	0	63	1	12	1
-702	2017-06-27 23:10:42.760107+08	9	58	168.989671164078999	143	5.95833333333333037	12	4	0	107	1	12	1
-703	2017-06-27 23:10:42.761448+08	11	69	142.593583947093009	229	5.45238095238094989	21	3	1	105	1	12	1
-704	2017-06-27 23:10:42.765557+08	7	64	158.628627282320991	38	3.16666666666667007	6	0	0	96	1	12	1
-705	2017-06-27 23:10:42.767105+08	9	47	183.698842011192994	160	6.66666666666666963	12	3	0	108	1	12	1
-706	2017-06-27 23:10:42.768603+08	12	11	236.203150629031995	487	8.11666666666667069	30	18	3	1	1	12	1
-707	2017-06-27 23:10:42.769913+08	12	61	167.579825106756999	421	6.37878787878787978	33	7	0	79	1	12	1
-708	2017-06-27 23:10:42.771174+08	11	65	156.561188133985013	217	6.02777777777778034	18	4	0	83	1	12	1
-709	2017-06-27 23:10:42.772416+08	12	48	182.319427883618999	429	7.15000000000000036	30	12	0	80	1	12	1
-710	2017-06-27 23:10:42.773878+08	12	50	179.956119090590988	155	6.45833333333333037	12	5	0	87	1	12	1
-711	2017-06-27 23:10:42.775306+08	9	54	172.412810678546009	140	5.83333333333333037	12	0	0	109	1	12	1
-712	2017-06-27 23:10:42.776517+08	12	63	162.298522116638992	156	6.5	12	1	0	91	1	12	1
-713	2017-06-27 23:10:42.779297+08	11	53	173.313492446954001	192	6.40000000000000036	15	3	0	97	1	12	1
-714	2017-06-27 23:10:42.783394+08	10	27	209.617622016029998	256	7.11111111111110983	18	5	3	45	1	12	1
-715	2017-06-27 23:10:42.784788+08	12	38	200.462088139360986	270	7.5	18	7	0	3	1	12	1
-716	2017-06-27 23:10:42.786228+08	12	17	224.804499267338002	384	8	24	14	2	42	1	12	1
-717	2017-06-27 23:10:42.787612+08	11	5	254.515386314283006	319	8.86111111111111072	18	15	4	44	1	12	1
-718	2017-06-27 23:10:42.790873+08	12	46	184.865107196092993	523	7.26388888888889017	36	15	1	43	1	12	1
-719	2017-06-27 23:10:42.792426+08	12	2	257.397032729038983	618	8.58333333333333037	36	25	6	41	1	12	1
-720	2017-06-27 23:10:42.793806+08	12	1	265.974422849967993	538	8.96666666666667034	30	24	7	40	1	12	1
-721	2017-06-27 23:10:42.80067+08	10	4	254.545387293327991	514	8.56666666666666998	30	23	9	5	1	12	1
-722	2017-06-27 23:10:42.802316+08	12	14	230.613581445304987	532	8.06060606060606055	33	22	6	71	1	12	1
-723	2017-06-27 23:10:42.803781+08	10	20	222.089479123329994	346	8.2380952380952408	21	12	0	77	1	12	1
-724	2017-06-27 23:10:42.80527+08	11	45	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	12	1
-725	2017-06-27 23:10:42.806827+08	10	30	203.987771667778986	141	7.83333333333333037	9	4	0	82	1	12	1
-726	2017-06-27 23:10:42.808153+08	12	26	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	12	1
-727	2017-06-27 23:10:42.809626+08	12	66	153.339681803600996	424	6.42424242424242031	33	7	0	78	1	12	1
-728	2017-06-27 23:10:42.810935+08	12	3	256.823319073406992	565	8.56060606060606055	33	23	3	76	1	12	1
-729	2017-06-27 23:10:42.81303+08	12	28	208.758313729315006	190	7.91666666666666963	12	7	2	92	1	12	1
-730	2017-06-27 23:10:42.817477+08	12	70	103.667676943708003	279	4.65000000000000036	30	1	0	54	1	12	1
-731	2017-06-27 23:10:42.819027+08	12	52	175.63856237347801	443	6.71212121212121016	33	8	0	55	1	12	1
-732	2017-06-27 23:10:42.820469+08	10	21	221.494075755915986	193	8.04166666666666963	12	9	2	52	1	12	1
-733	2017-06-27 23:10:42.821792+08	11	41	194.728281835911986	179	7.45833333333333037	12	5	1	56	1	12	1
-734	2017-06-27 23:10:42.823043+08	12	22	219.93380515547301	286	7.9444444444444402	18	11	2	58	1	12	1
-735	2017-06-27 23:10:42.824546+08	10	60	168.257256379800992	12	2	3	0	0	106	1	12	1
-736	2017-06-27 23:10:42.826647+08	12	44	189.098847619715997	81	6.75	6	2	0	100	1	12	1
-737	2017-06-27 23:10:42.828667+08	6	34	201.715960059383008	51	8.5	3	1	0	60	1	12	1
-738	2017-06-27 23:10:42.829975+08	12	39	200.062425409087012	451	7.51666666666667016	30	14	0	53	1	12	1
-739	2017-06-27 23:10:42.831465+08	8	19	222.645349614552998	191	7.95833333333333037	12	8	2	59	1	12	1
-740	2017-06-27 23:10:42.8332+08	9	13	231.29207732568301	337	8.02380952380952017	21	13	2	57	1	12	1
-741	2017-06-27 23:10:42.837331+08	11	49	181.056917883990991	163	6.79166666666666963	12	3	0	48	1	12	1
-742	2017-06-27 23:10:42.838627+08	12	15	228.331406832959999	522	7.90909090909091006	33	20	6	46	1	12	1
-743	2017-06-27 23:10:42.83995+08	8	55	169.828091717569009	231	6.41666666666666963	18	5	1	110	1	12	1
-744	2017-06-27 23:10:42.841338+08	12	8	238.070494365506988	497	8.28333333333332966	30	17	4	70	1	12	1
-745	2017-06-27 23:10:42.842718+08	12	57	169.275641144411992	397	6.6166666666666698	30	8	0	49	1	12	1
-746	2017-06-27 23:10:42.844029+08	12	25	214.870328025585991	328	7.8095238095238102	21	14	0	4	1	12	1
-747	2017-06-27 23:10:42.845273+08	12	62	166.754529003892998	434	6.57575757575757969	33	8	0	47	1	12	1
-748	2017-06-27 23:10:42.849204+08	12	16	225.218562854525999	394	8.20833333333333037	24	15	2	72	1	12	1
-749	2017-06-27 23:10:42.850494+08	12	12	234.988578608440008	473	7.8833333333333302	30	17	3	73	1	12	1
-750	2017-06-27 23:10:42.851817+08	12	24	215.040049351315986	594	8.25	36	21	0	2	1	12	1
-751	2017-06-27 23:10:42.853127+08	10	10	237.730941560664007	257	8.56666666666666998	15	10	4	75	1	12	1
-752	2017-06-27 23:10:42.854447+08	11	7	241.233026601797008	276	9.19999999999999929	15	11	0	104	1	12	1
-753	2017-06-27 23:10:42.855833+08	12	18	224.503545498699992	441	8.16666666666666963	27	17	1	74	1	12	1
-754	2017-06-27 23:10:42.857218+08	12	23	217.147590785879004	526	7.96969696969696972	33	24	0	84	1	12	1
-755	2017-06-27 23:10:49.220678+08	8	63	158.628627282320991	38	3.16666666666667007	6	0	0	96	1	13	1
-756	2017-06-27 23:10:49.221989+08	13	64	156.788786121004989	453	6.29166666666666963	36	8	0	79	1	13	1
-757	2017-06-27 23:10:49.223319+08	13	52	173.537372708240014	463	7.01515151515152002	33	13	0	80	1	13	1
-758	2017-06-27 23:10:49.224599+08	13	10	238.383618580854005	532	8.06060606060606055	33	21	4	1	1	13	1
-759	2017-06-27 23:10:49.22589+08	12	66	144.493875610859988	242	5.76190476190476009	21	4	0	83	1	13	1
-760	2017-06-27 23:10:49.227283+08	10	49	183.698842011192994	160	6.66666666666666963	12	3	0	108	1	13	1
-761	2017-06-27 23:10:49.228562+08	13	50	179.956119090590988	155	6.45833333333333037	12	5	0	87	1	13	1
-762	2017-06-27 23:10:49.230067+08	13	61	162.298522116638992	156	6.5	12	1	0	91	1	13	1
-763	2017-06-27 23:10:49.231358+08	12	53	173.313492446954001	192	6.40000000000000036	15	3	0	97	1	13	1
-764	2017-06-27 23:10:49.232861+08	10	46	185.157887728984008	193	6.43333333333333002	15	1	0	109	1	13	1
-765	2017-06-27 23:10:49.236741+08	7	43	191.85998403855001	34	5.66666666666666963	3	1	0	111	1	13	1
-766	2017-06-27 23:10:49.237988+08	13	39	199.154777832103008	529	7.34722222222221966	36	16	0	90	1	13	1
-767	2017-06-27 23:10:49.23917+08	12	27	215.526701477234013	263	7.3055555555555598	18	6	2	93	1	13	1
-768	2017-06-27 23:10:49.240478+08	5	36	201.47926961475099	50	8.33333333333333037	3	3	0	112	1	13	1
-769	2017-06-27 23:10:49.241826+08	13	22	221.118961972056013	564	7.83333333333333037	36	20	4	6	1	13	1
-770	2017-06-27 23:10:49.243245+08	13	62	161.427837801077004	503	6.44871794871794979	39	10	1	81	1	13	1
-771	2017-06-27 23:10:49.244435+08	13	6	245.116221173892995	590	8.19444444444443931	36	22	5	7	1	13	1
-772	2017-06-27 23:10:49.245808+08	13	11	237.857401322632001	391	8.14583333333333037	24	15	2	89	1	13	1
-773	2017-06-27 23:10:49.249355+08	13	15	230.613581445304987	532	8.06060606060606055	33	22	6	71	1	13	1
-774	2017-06-27 23:10:49.250724+08	13	65	152.515964416863	468	6.5	36	8	0	78	1	13	1
-775	2017-06-27 23:10:49.252508+08	12	45	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	13	1
-776	2017-06-27 23:10:49.253945+08	11	32	203.987771667778986	141	7.83333333333333037	9	4	0	82	1	13	1
-777	2017-06-27 23:10:49.255229+08	13	29	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	13	1
-778	2017-06-27 23:10:49.256551+08	11	13	232.790971614739988	403	8.39583333333333037	24	15	0	77	1	13	1
-779	2017-06-27 23:10:49.257811+08	11	3	255.949557508178998	563	8.53030303030302939	33	25	9	5	1	13	1
-780	2017-06-27 23:10:49.259034+08	13	5	245.954069614208009	609	8.45833333333333037	36	23	3	76	1	13	1
-781	2017-06-27 23:10:49.260308+08	13	25	216.306071405143001	239	7.96666666666667034	15	8	2	92	1	13	1
-782	2017-06-27 23:10:49.266014+08	13	14	232.209089373868011	538	8.15151515151515049	33	18	5	70	1	13	1
-783	2017-06-27 23:10:49.267333+08	9	55	169.828091717569009	231	6.41666666666666963	18	5	1	110	1	13	1
-784	2017-06-27 23:10:49.270297+08	13	19	225.999982447646005	563	7.8194444444444402	36	22	7	46	1	13	1
-785	2017-06-27 23:10:49.271909+08	12	48	184.615098325323004	211	7.03333333333332966	15	4	0	48	1	13	1
-786	2017-06-27 23:10:49.273041+08	13	56	169.105134340603001	474	6.58333333333333037	36	10	0	47	1	13	1
-787	2017-06-27 23:10:49.274654+08	13	60	163.599231207169993	433	6.56060606060605966	33	8	0	49	1	13	1
-788	2017-06-27 23:10:49.276281+08	13	28	214.870328025585991	328	7.8095238095238102	21	14	0	4	1	13	1
-789	2017-06-27 23:10:49.280855+08	12	41	194.728281835911986	179	7.45833333333333037	12	5	1	56	1	13	1
-790	2017-06-27 23:10:49.282109+08	13	24	219.93380515547301	286	7.9444444444444402	18	11	2	58	1	13	1
-791	2017-06-27 23:10:49.283297+08	11	59	168.257256379800992	12	2	3	0	0	106	1	13	1
-792	2017-06-27 23:10:49.284507+08	13	44	189.098847619715997	81	6.75	6	2	0	100	1	13	1
-793	2017-06-27 23:10:49.285805+08	11	31	207.756897750472007	222	7.40000000000000036	15	9	2	52	1	13	1
-794	2017-06-27 23:10:49.288129+08	7	35	201.715960059383008	51	8.5	3	1	0	60	1	13	1
-795	2017-06-27 23:10:49.289566+08	13	54	171.764104658342006	479	6.65277777777778034	36	8	0	55	1	13	1
-796	2017-06-27 23:10:49.290972+08	13	33	203.694373596051008	501	7.59090909090908994	33	15	0	53	1	13	1
-797	2017-06-27 23:10:49.292383+08	9	21	222.645349614552998	191	7.95833333333333037	12	8	2	59	1	13	1
-798	2017-06-27 23:10:49.293932+08	13	70	94.1596363439468007	298	4.51515151515152002	33	1	0	54	1	13	1
-799	2017-06-27 23:10:49.295192+08	10	16	229.727602474988998	378	7.875	24	15	3	57	1	13	1
-800	2017-06-27 23:10:49.29909+08	11	9	238.752779482394999	304	8.44444444444443931	18	12	4	75	1	13	1
-801	2017-06-27 23:10:49.301055+08	13	18	226.041765439247996	444	8.22222222222221966	27	17	2	72	1	13	1
-802	2017-06-27 23:10:49.30314+08	13	26	215.917152751620989	649	8.32051282051281937	39	23	0	2	1	13	1
-803	2017-06-27 23:10:49.304757+08	12	7	241.233026601797008	276	9.19999999999999929	15	11	0	104	1	13	1
-804	2017-06-27 23:10:49.306107+08	13	20	224.503545498699992	441	8.16666666666666963	27	17	1	74	1	13	1
-805	2017-06-27 23:10:49.307512+08	13	8	239.038249774119009	525	7.9545454545454497	33	19	4	73	1	13	1
-806	2017-06-27 23:10:49.308923+08	13	12	235.427978697513993	582	8.08333333333333037	36	26	1	84	1	13	1
-807	2017-06-27 23:10:49.313216+08	13	67	144.198255338578008	202	5.61111111111110983	18	5	0	67	1	13	1
-808	2017-06-27 23:10:49.314453+08	4	37	201.289365747165988	87	7.25	6	3	0	113	1	13	1
-809	2017-06-27 23:10:49.315753+08	13	34	201.912322175646011	607	7.78205128205128016	39	17	1	69	1	13	1
-810	2017-06-27 23:10:49.317079+08	13	51	178.918474579204002	114	6.33333333333333037	9	2	0	64	1	13	1
-811	2017-06-27 23:10:49.318301+08	13	68	143.557769868381996	327	6.0555555555555598	27	4	0	61	1	13	1
-812	2017-06-27 23:10:49.319494+08	12	40	195.297450588380002	216	7.20000000000000018	15	5	1	62	1	13	1
-813	2017-06-27 23:10:49.320715+08	7	42	194.624604591753013	180	7.5	12	4	1	65	1	13	1
-814	2017-06-27 23:10:49.322055+08	13	30	208.073803201501988	284	7.88888888888889017	18	11	0	63	1	13	1
-815	2017-06-27 23:10:49.323346+08	10	57	168.989671164078999	143	5.95833333333333037	12	4	0	107	1	13	1
-816	2017-06-27 23:10:49.324814+08	11	58	168.584064270858988	187	6.23333333333332984	15	2	0	66	1	13	1
-817	2017-06-27 23:10:49.326179+08	12	69	138.500903847600995	258	5.375	24	3	1	105	1	13	1
-818	2017-06-27 23:10:49.329836+08	13	38	200.462088139360986	270	7.5	18	7	0	3	1	13	1
-819	2017-06-27 23:10:49.331077+08	13	4	246.429813105502006	668	8.56410256410256032	39	27	6	41	1	13	1
-820	2017-06-27 23:10:49.332335+08	11	23	220.324517467291997	313	7.45238095238094989	21	8	3	45	1	13	1
-821	2017-06-27 23:10:49.3337+08	13	17	228.948029046977013	438	8.11111111111111072	27	16	2	42	1	13	1
-822	2017-06-27 23:10:49.335046+08	13	47	185.097840700263987	572	7.33333333333333037	39	17	1	43	1	13	1
-823	2017-06-27 23:10:49.336348+08	13	1	265.974422849967993	538	8.96666666666667034	30	24	7	40	1	13	1
-824	2017-06-27 23:10:49.337562+08	12	2	256.570817369263011	369	8.78571428571429003	21	17	4	44	1	13	1
-825	2017-06-27 23:10:53.028192+08	14	20	226.041765439247996	444	8.22222222222221966	27	17	2	72	1	14	1
-826	2017-06-27 23:10:53.029452+08	13	12	236.82566247031599	320	8.88888888888888928	18	13	0	104	1	14	1
-827	2017-06-27 23:10:53.030733+08	14	22	220.33486986064699	483	8.05000000000000071	30	17	1	74	1	14	1
-828	2017-06-27 23:10:53.031981+08	14	34	203.829081685447989	683	8.1309523809523796	42	24	0	2	1	14	1
-829	2017-06-27 23:10:53.033211+08	14	10	239.038249774119009	525	7.9545454545454497	33	19	4	73	1	14	1
-830	2017-06-27 23:10:53.034531+08	12	7	249.183101431545992	354	8.4285714285714306	21	14	5	75	1	14	1
-831	2017-06-27 23:10:53.035995+08	14	16	230.954739813550987	626	8.02564102564103088	39	27	1	84	1	14	1
-832	2017-06-27 23:10:53.039763+08	14	11	237.342424035356004	582	8.08333333333333037	36	24	8	71	1	14	1
-833	2017-06-27 23:10:53.041039+08	13	47	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	14	1
-834	2017-06-27 23:10:53.042416+08	12	32	203.987771667778986	141	7.83333333333333037	9	4	0	82	1	14	1
-835	2017-06-27 23:10:53.04374+08	14	29	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	14	1
-836	2017-06-27 23:10:53.045072+08	12	3	258.623875860145006	610	8.47222222222221966	36	27	9	5	1	14	1
-837	2017-06-27 23:10:53.046268+08	12	8	247.504948877276007	460	8.51851851851852082	27	18	0	77	1	14	1
-838	2017-06-27 23:10:53.047563+08	14	64	154.135062910301002	505	6.47435897435897001	39	8	0	78	1	14	1
-839	2017-06-27 23:10:53.048927+08	14	24	216.306071405143001	239	7.96666666666667034	15	8	2	92	1	14	1
-840	2017-06-27 23:10:53.050223+08	14	13	234.924860686735002	647	8.29487179487179915	39	24	3	76	1	14	1
-841	2017-06-27 23:10:53.054327+08	14	5	251.160682939866007	720	8.5714285714285694	42	29	6	41	1	14	1
-842	2017-06-27 23:10:53.055685+08	12	23	220.324517467291997	313	7.45238095238094989	21	8	3	45	1	14	1
-843	2017-06-27 23:10:53.056991+08	14	33	203.860668471162995	319	7.59523809523808957	21	9	0	3	1	14	1
-844	2017-06-27 23:10:53.058529+08	14	1	265.974422849967993	538	8.96666666666667034	30	24	7	40	1	14	1
-845	2017-06-27 23:10:53.060191+08	13	2	261.251153299822988	423	8.8125	24	19	4	44	1	14	1
-846	2017-06-27 23:10:53.061679+08	14	17	228.728171706195013	488	8.13333333333332931	30	18	2	42	1	14	1
-847	2017-06-27 23:10:53.06297+08	14	46	187.28356281525501	619	7.3690476190476204	42	18	1	43	1	14	1
-848	2017-06-27 23:10:53.066748+08	10	56	169.828091717569009	231	6.41666666666666963	18	5	1	110	1	14	1
-849	2017-06-27 23:10:53.068053+08	14	18	227.890818715684986	612	7.84615384615385025	39	24	7	46	1	14	1
-850	2017-06-27 23:10:53.069283+08	13	50	177.284844463995	246	6.83333333333333037	18	5	0	48	1	14	1
-851	2017-06-27 23:10:53.072307+08	14	9	240.715223885877009	587	8.15277777777778034	36	20	5	70	1	14	1
-852	2017-06-27 23:10:53.073693+08	14	27	214.870328025585991	328	7.8095238095238102	21	14	0	4	1	14	1
-853	2017-06-27 23:10:53.07505+08	14	60	158.255552712836987	501	6.4230769230769198	39	10	0	47	1	14	1
-854	2017-06-27 23:10:53.076336+08	14	62	156.606445045279997	464	6.4444444444444402	36	8	0	49	1	14	1
-855	2017-06-27 23:10:53.080298+08	9	59	158.628627282320991	38	3.16666666666667007	6	0	0	96	1	14	1
-856	2017-06-27 23:10:53.081668+08	11	49	179.816144842987001	233	6.47222222222221966	18	2	0	109	1	14	1
-857	2017-06-27 23:10:53.082968+08	13	66	144.493875610859988	242	5.76190476190476009	21	4	0	83	1	14	1
-858	2017-06-27 23:10:53.084765+08	11	48	183.698842011192994	160	6.66666666666666963	12	3	0	108	1	14	1
-859	2017-06-27 23:10:53.087456+08	14	61	157.976408905941014	497	6.37179487179486959	39	9	0	79	1	14	1
-860	2017-06-27 23:10:53.088922+08	14	58	162.298522116638992	156	6.5	12	1	0	91	1	14	1
-861	2017-06-27 23:10:53.090156+08	13	53	173.313492446954001	192	6.40000000000000036	15	3	0	97	1	14	1
-862	2017-06-27 23:10:53.092169+08	14	55	172.357405244100988	507	7.04166666666666963	36	14	0	80	1	14	1
-863	2017-06-27 23:10:53.093619+08	14	4	252.203008973115004	592	8.22222222222221966	36	24	5	1	1	14	1
-864	2017-06-27 23:10:53.095134+08	14	51	176.283683075113998	197	6.56666666666666998	15	6	0	87	1	14	1
-865	2017-06-27 23:10:53.099389+08	14	68	139.418706609581989	364	6.06666666666666998	30	5	0	61	1	14	1
-866	2017-06-27 23:10:53.100607+08	5	37	201.289365747165988	87	7.25	6	3	0	113	1	14	1
-867	2017-06-27 23:10:53.101784+08	11	52	175.463588028105988	191	6.3666666666666698	15	6	0	107	1	14	1
-868	2017-06-27 23:10:53.103794+08	12	63	154.619020194802005	215	5.97222222222221966	18	3	0	66	1	14	1
-869	2017-06-27 23:10:53.105142+08	14	54	172.847325496958007	151	6.29166666666666963	12	3	0	64	1	14	1
-870	2017-06-27 23:10:53.106586+08	13	38	195.297450588380002	216	7.20000000000000018	15	5	1	62	1	14	1
-871	2017-06-27 23:10:53.108081+08	8	41	194.624604591753013	180	7.5	12	4	1	65	1	14	1
-872	2017-06-27 23:10:53.109607+08	14	30	208.073803201501988	284	7.88888888888889017	18	11	0	63	1	14	1
-873	2017-06-27 23:10:53.11088+08	14	28	214.800794917138006	667	7.9404761904761898	42	20	1	69	1	14	1
-874	2017-06-27 23:10:53.11208+08	14	67	144.198255338578008	202	5.61111111111110983	18	5	0	67	1	14	1
-875	2017-06-27 23:10:53.113243+08	13	69	138.500903847600995	258	5.375	24	3	1	105	1	14	1
-876	2017-06-27 23:10:53.119329+08	14	70	97.3262783579581026	332	4.61111111111110983	36	2	0	54	1	14	1
-877	2017-06-27 23:10:53.120743+08	12	57	168.257256379800992	12	2	3	0	0	106	1	14	1
-878	2017-06-27 23:10:53.122183+08	14	44	189.098847619715997	81	6.75	6	2	0	100	1	14	1
-879	2017-06-27 23:10:53.123562+08	12	31	207.756897750472007	222	7.40000000000000036	15	9	2	52	1	14	1
-880	2017-06-27 23:10:53.12502+08	8	35	201.715960059383008	51	8.5	3	1	0	60	1	14	1
-881	2017-06-27 23:10:53.126327+08	14	15	231.279909083250004	340	8.09523809523808957	21	13	5	58	1	14	1
-882	2017-06-27 23:10:53.127505+08	10	21	222.645349614552998	191	7.95833333333333037	12	8	2	59	1	14	1
-883	2017-06-27 23:10:53.128712+08	14	45	188.466037156292998	531	6.80769230769231015	39	10	0	55	1	14	1
-884	2017-06-27 23:10:53.130073+08	13	40	194.728281835911986	179	7.45833333333333037	12	5	1	56	1	14	1
-885	2017-06-27 23:10:53.131303+08	14	42	192.328447971439999	533	7.40277777777778034	36	15	0	53	1	14	1
-886	2017-06-27 23:10:53.132515+08	11	19	226.743649766647991	424	7.85185185185185031	27	17	3	57	1	14	1
-887	2017-06-27 23:10:53.136391+08	13	25	215.526701477234013	263	7.3055555555555598	18	6	2	93	1	14	1
-888	2017-06-27 23:10:53.137792+08	14	39	194.774953264662997	575	7.37179487179486959	39	18	0	90	1	14	1
-889	2017-06-27 23:10:53.138926+08	14	26	215.096250756954987	606	7.76923076923077005	39	21	4	6	1	14	1
-890	2017-06-27 23:10:53.140285+08	6	36	201.47926961475099	50	8.33333333333333037	3	3	0	112	1	14	1
-891	2017-06-27 23:10:53.141663+08	8	43	191.85998403855001	34	5.66666666666666963	3	1	0	111	1	14	1
-892	2017-06-27 23:10:53.143054+08	14	65	153.427201907779988	537	6.39285714285713969	42	10	1	81	1	14	1
-893	2017-06-27 23:10:53.144318+08	14	14	233.845327520599994	440	8.14814814814815058	27	17	2	89	1	14	1
-894	2017-06-27 23:10:53.145628+08	14	6	250.66666654497601	647	8.29487179487179915	39	25	6	7	1	14	1
+COPY stats_playerranking (id, date, serial_id, ranking, elo_points, total_points, handicap, season_matches_played, season_matches_won, season_clearances, player_id, league_id, week_id, season_id, season_points, total_clearances, total_matches_played, total_matches_won) FROM stdin;
+48	2017-06-27 22:01:15.247147+08	1	14	210.585489538448002	52	8.66666666666666963	3	2	0	93	1	2	1	52	0	3	2
+47	2017-06-27 22:01:15.24585+08	2	36	193.714285714286007	41	6.83333333333333037	3	0	0	90	1	2	1	41	0	3	0
+51	2017-06-27 22:01:15.251206+08	2	27	197.84443049751701	91	7.58333333333333037	6	3	0	89	1	2	1	91	0	6	3
+50	2017-06-27 22:01:15.249776+08	2	39	189.692855389918009	83	6.91666666666666963	6	1	0	81	1	2	1	83	0	6	1
+49	2017-06-27 22:01:15.248301+08	2	15	210.571433646232009	99	8.25	6	4	2	6	1	2	1	99	2	6	4
+52	2017-06-27 22:01:15.25276+08	2	18	207.337410718922001	95	7.91666666666666963	6	3	0	7	1	2	1	95	0	6	3
+55	2017-06-27 22:01:15.259408+08	2	25	199.964404894327004	44	7.33333333333333037	3	1	0	3	1	2	1	44	0	3	1
+22	2017-06-27 21:48:26.81764+08	1	10	208.211143695015011	55	9.16666666666666963	3	2	1	70	1	1	1	55	1	3	2
+53	2017-06-27 22:01:15.256806+08	2	22	202.252085452415002	91	7.58333333333333037	6	2	0	42	1	2	1	91	0	6	2
+62	2017-06-27 22:01:15.272454+08	2	37	191.356205970909997	78	6.5	6	2	0	69	1	2	1	78	0	6	2
+60	2017-06-27 22:01:15.269799+08	2	44	186.96296296296299	33	5.5	3	0	0	67	1	2	1	33	0	3	0
+56	2017-06-27 22:01:15.260838+08	2	1	225.161682627115994	112	9.33333333333333037	6	4	2	41	1	2	1	112	2	6	4
+64	2017-06-27 22:01:15.276905+08	2	42	187.651135005973998	34	5.66666666666666963	3	0	0	64	1	2	1	34	0	3	0
+63	2017-06-27 22:01:15.275354+08	1	33	195.200687140910986	42	7	3	1	0	62	1	2	1	42	0	3	1
+61	2017-06-27 22:01:15.271127+08	2	28	197.463261956460002	88	7.33333333333333037	6	2	0	63	1	2	1	88	0	6	2
+65	2017-06-27 22:01:15.278184+08	1	38	190.303493986219991	32	5.33333333333333037	3	0	0	105	1	2	1	32	0	3	0
+66	2017-06-27 22:01:15.284562+08	2	17	207.741674802046987	91	7.58333333333333037	6	3	0	73	1	2	1	91	0	6	3
+68	2017-06-27 22:01:15.287542+08	2	31	195.604395604395989	39	6.5	3	1	0	72	1	2	1	39	0	3	1
+43	2017-06-27 22:01:15.237396+08	2	9	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	2	1	97	0	6	3
+67	2017-06-27 22:01:15.286003+08	1	7	217.768712034820993	60	10	3	3	0	104	1	2	1	60	0	3	3
+70	2017-06-27 22:01:15.290316+08	2	12	211.253040798178006	102	8.5	6	4	0	74	1	2	1	102	0	6	4
+44	2017-06-27 22:01:15.238903+08	1	43	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	2	1	35	0	3	0
+42	2017-06-27 22:01:15.235561+08	2	5	220.379051246349007	98	8.16666666666666963	6	4	2	71	1	2	1	98	2	6	4
+4	2017-06-27 21:48:26.778042+08	1	13	205.16129032258101	52	8.66666666666666963	3	2	0	89	1	1	1	52	0	3	2
+21	2017-06-27 21:48:26.815994+08	1	22	198.896551724137993	44	7.33333333333333037	3	1	0	46	1	1	1	44	0	3	1
+2	2017-06-27 21:48:26.773054+08	1	31	193.714285714286007	41	6.83333333333333037	3	0	0	90	1	1	1	41	0	3	0
+5	2017-06-27 21:48:26.78009+08	1	27	195.636363636363996	45	7.5	3	0	0	81	1	1	1	45	0	3	0
+7	2017-06-27 21:48:26.785536+08	1	11	208.098522167487999	52	8.66666666666666963	3	2	0	1	1	1	1	52	0	3	2
+10	2017-06-27 21:48:26.790663+08	1	23	198.748778103617013	48	8	3	1	0	91	1	1	1	48	0	3	1
+6	2017-06-27 21:48:26.783428+08	1	19	200.011942080908	45	7.5	3	2	0	87	1	1	1	45	0	3	2
+31	2017-06-27 21:48:26.839931+08	1	32	193.010936494806998	36	6	3	1	0	58	1	1	1	36	0	3	1
+8	2017-06-27 21:48:26.787356+08	1	21	198.999022482892997	48	8	3	0	0	79	1	1	1	48	0	3	0
+9	2017-06-27 21:48:26.788983+08	1	17	201.000977517107003	49	8.16666666666666963	3	2	0	80	1	1	1	49	0	3	2
+25	2017-06-27 21:48:26.824594+08	1	37	186.285714285713993	30	5	3	0	0	49	1	1	1	30	0	3	0
+27	2017-06-27 21:48:26.830641+08	1	1	224.01656314699801	60	10	3	3	2	41	1	1	1	60	2	3	3
+24	2017-06-27 21:48:26.822746+08	1	33	188.809902740936991	33	5.5	3	1	0	4	1	1	1	33	0	3	1
+26	2017-06-27 21:48:26.828615+08	1	20	199.964404894327004	44	7.33333333333333037	3	1	0	3	1	1	1	44	0	3	1
+29	2017-06-27 21:48:26.834508+08	1	6	214.684350132626008	56	9.33333333333333037	3	2	1	40	1	1	1	56	1	3	2
+30	2017-06-27 21:48:26.836214+08	1	29	195.502612330199014	41	6.83333333333333037	3	1	0	42	1	1	1	41	0	3	1
+28	2017-06-27 21:48:26.832786+08	1	18	200.523809523810002	45	7.5	3	1	0	43	1	1	1	45	0	3	1
+11	2017-06-27 21:48:26.793854+08	1	35	187.651135005973998	34	5.66666666666666963	3	0	0	64	1	1	1	34	0	3	0
+16	2017-06-27 21:48:26.80372+08	1	8	211.864016509177986	56	9.33333333333333037	3	2	0	2	1	1	1	56	0	3	2
+12	2017-06-27 21:48:26.795401+08	1	39	176.296296296295992	21	3.5	3	0	0	61	1	1	1	21	0	3	0
+15	2017-06-27 21:48:26.800496+08	1	25	197.022332506203014	42	7	3	0	0	69	1	1	1	42	0	3	0
+13	2017-06-27 21:48:26.797086+08	1	12	205.686818928197994	50	8.33333333333333037	3	2	0	63	1	1	1	50	0	3	2
+18	2017-06-27 21:48:26.806892+08	1	5	215.407407407406993	56	9.33333333333333037	3	2	0	74	1	1	1	56	0	3	2
+19	2017-06-27 21:48:26.81131+08	1	28	195.604395604395989	39	6.5	3	1	0	72	1	1	1	39	0	3	1
+17	2017-06-27 21:48:26.805318+08	1	7	212.321839080459995	52	8.66666666666666963	3	2	0	73	1	1	1	52	0	3	2
+20	2017-06-27 21:48:26.812987+08	1	9	211.182795698924991	56	9.33333333333333037	3	3	0	84	1	1	1	56	0	3	3
+1	2017-06-27 21:48:26.769554+08	1	15	202.727340142245993	49	8.16666666666666963	3	2	0	6	1	1	1	49	0	3	2
+33	2017-06-27 21:48:26.842928+08	1	24	198.008124253286013	43	7.16666666666666963	3	2	0	53	1	1	1	43	0	3	2
+35	2017-06-27 21:48:26.846103+08	1	40	163.031055900620999	8	1.33333333333332993	3	0	0	54	1	1	1	8	0	3	0
+34	2017-06-27 21:48:26.844606+08	1	34	187.809523809523995	35	5.83333333333333037	3	0	0	55	1	1	1	35	0	3	0
+32	2017-06-27 21:48:26.841451+08	1	30	194.666666666666998	42	7	3	1	0	100	1	1	1	42	0	3	1
+38	2017-06-27 21:48:26.853304+08	1	2	219.809523809523995	57	9.5	3	2	0	88	1	1	1	57	0	3	2
+36	2017-06-27 21:48:26.849965+08	1	4	217.675549322113	56	9.33333333333333037	3	3	0	71	1	1	1	56	0	3	3
+37	2017-06-27 21:48:26.851699+08	1	16	202.02150537634401	43	7.16666666666666963	3	1	0	78	1	1	1	43	0	3	1
+40	2017-06-27 21:48:26.856816+08	1	3	219.407407407406993	60	10	3	3	0	76	1	1	1	60	0	3	3
+69	2017-06-27 22:01:15.289018+08	2	16	208.712796158308009	104	8.66666666666666963	6	4	0	2	1	2	1	104	0	6	4
+58	2017-06-27 22:01:15.264086+08	2	30	196.418801515144992	88	7.33333333333333037	6	2	0	43	1	2	1	88	0	6	2
+110	2017-06-27 22:11:45.400499+08	3	9	214.742499074669013	149	8.27777777777778034	9	5	1	46	1	3	1	149	1	9	5
+76	2017-06-27 22:01:15.302953+08	2	47	180.594976057205997	69	5.75	6	0	0	55	1	2	1	69	0	6	0
+78	2017-06-27 22:01:15.310255+08	2	10	211.864359283921004	104	8.66666666666666963	6	3	0	1	1	2	1	104	0	6	3
+73	2017-06-27 22:01:15.298785+08	2	29	196.788849609625004	81	6.75	6	3	0	58	1	2	1	81	0	6	3
+72	2017-06-27 22:01:15.297247+08	2	50	151.40648580159899	36	3	6	0	0	54	1	2	1	36	0	6	0
+74	2017-06-27 22:01:15.300338+08	1	11	211.492070094698988	52	8.66666666666666963	3	2	1	56	1	2	1	52	1	3	2
+77	2017-06-27 22:01:15.304242+08	2	40	189.043532249451005	80	6.66666666666666963	6	2	0	53	1	2	1	80	0	6	2
+81	2017-06-27 22:01:15.314936+08	1	45	186.490487828123008	34	5.66666666666666963	3	0	0	97	1	2	1	34	0	3	0
+82	2017-06-27 22:01:15.316141+08	2	34	194.819373302375993	91	7.58333333333333037	6	0	0	79	1	2	1	91	0	6	0
+83	2017-06-27 22:01:15.317466+08	2	26	198.748778103617013	48	8	3	1	0	91	1	2	1	48	0	3	1
+89	2017-06-27 22:01:15.328183+08	2	46	186.285714285713993	30	5	3	0	0	49	1	2	1	30	0	3	0
+88	2017-06-27 22:01:15.326857+08	2	13	210.797695449466005	108	9	6	3	1	70	1	2	1	108	1	6	3
+79	2017-06-27 22:01:15.3118+08	1	41	188.240355949430011	35	5.83333333333333037	3	1	0	83	1	2	1	35	0	3	1
+87	2017-06-27 22:01:15.325571+08	2	48	179.551780285467004	71	5.91666666666666963	6	1	0	47	1	2	1	71	0	6	1
+85	2017-06-27 22:01:15.322837+08	1	19	204.645161290322989	51	8.5	3	1	0	48	1	2	1	51	0	3	1
+41	2017-06-27 22:01:15.233878+08	2	23	202.02150537634401	43	7.16666666666666963	3	1	0	78	1	2	1	43	0	3	1
+90	2017-06-27 22:01:15.329579+08	2	21	202.66559091258199	89	7.41666666666666963	6	4	0	4	1	2	1	89	0	6	4
+125	2017-06-27 22:11:45.442741+08	3	15	211.253040798178006	102	8.5	6	4	0	74	1	3	1	102	0	6	4
+86	2017-06-27 22:01:15.324235+08	2	8	212.636299422500002	100	8.33333333333333037	6	3	0	46	1	2	1	100	0	6	3
+111	2017-06-27 22:11:45.402287+08	3	20	205.909621456682004	146	8.11111111111111072	9	4	1	70	1	3	1	146	1	9	4
+112	2017-06-27 22:11:45.413554+08	3	5	220.379051246349007	98	8.16666666666666963	6	4	2	71	1	3	1	98	2	6	4
+109	2017-06-27 22:11:45.399112+08	3	53	182.203390406813014	72	6	6	0	0	49	1	3	1	72	0	6	0
+108	2017-06-27 22:11:45.39767+08	3	54	181.793758611606989	113	6.27777777777778034	9	2	0	47	1	3	1	113	0	9	2
+107	2017-06-27 22:11:45.396147+08	3	12	213.548182052525988	146	8.11111111111111072	9	7	0	4	1	3	1	146	0	9	7
+116	2017-06-27 22:11:45.420766+08	3	46	188.589969191978014	78	6.5	6	1	0	78	1	3	1	78	0	6	1
+118	2017-06-27 22:11:45.423728+08	1	26	202.057110597328005	45	7.5	3	2	1	5	1	3	1	45	1	3	2
+117	2017-06-27 22:11:45.422242+08	1	18	207.267805536312011	51	8.5	3	2	0	77	1	3	1	51	0	3	2
+120	2017-06-27 22:11:45.427001+08	3	7	216.187161496199991	155	8.61111111111111072	9	6	0	76	1	3	1	155	0	9	6
+114	2017-06-27 22:11:45.417626+08	2	49	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	3	1	35	0	3	0
+119	2017-06-27 22:11:45.425241+08	3	23	203.807596953266994	90	7.5	6	3	1	92	1	3	1	90	1	6	3
+124	2017-06-27 22:11:45.440948+08	3	17	208.315488409213003	149	8.27777777777778034	9	5	0	2	1	3	1	149	0	9	5
+122	2017-06-27 22:11:45.437393+08	3	36	195.604395604395989	39	6.5	3	1	0	72	1	3	1	39	0	3	1
+121	2017-06-27 22:11:45.434556+08	2	6	219.347956987709011	109	9.08333333333333037	6	5	0	104	1	3	1	109	0	6	5
+126	2017-06-27 22:11:45.44422+08	3	27	201.350026447994992	126	7	9	4	0	73	1	3	1	126	0	9	4
+127	2017-06-27 22:11:45.445707+08	3	22	204.539945413990012	140	7.77777777777778034	9	7	0	84	1	3	1	140	0	9	7
+134	2017-06-27 22:11:45.46148+08	3	41	191.936316990254994	128	7.11111111111110983	9	3	0	43	1	3	1	128	0	9	3
+129	2017-06-27 22:11:45.45276+08	2	1	241.935599487693992	120	10	6	6	2	44	1	3	1	120	2	6	6
+136	2017-06-27 22:11:45.469231+08	2	16	210.585489538448002	52	8.66666666666666963	3	2	0	93	1	3	1	52	0	3	2
+133	2017-06-27 22:11:45.459104+08	1	35	195.728696305900002	38	6.33333333333333037	3	0	0	45	1	3	1	38	0	3	0
+128	2017-06-27 22:11:45.451118+08	3	25	202.252085452415002	91	7.58333333333333037	6	2	0	42	1	3	1	91	0	6	2
+132	2017-06-27 22:11:45.457566+08	3	2	229.537823978599988	160	8.88888888888888928	9	7	1	40	1	3	1	160	1	9	7
+130	2017-06-27 22:11:45.454497+08	3	29	199.964404894327004	44	7.33333333333333037	3	1	0	3	1	3	1	44	0	3	1
+131	2017-06-27 22:11:45.456101+08	3	3	228.63714197523899	157	8.72222222222221966	9	5	2	41	1	3	1	157	2	9	5
+94	2017-06-27 22:11:45.35189+08	3	42	191.03105192028201	84	7	6	1	0	64	1	3	1	84	0	6	1
+135	2017-06-27 22:11:45.467641+08	3	13	212.603685081961004	141	7.83333333333333037	9	5	2	6	1	3	1	141	2	9	5
+137	2017-06-27 22:11:45.470635+08	3	47	187.931596127196997	82	6.83333333333333037	6	1	0	90	1	3	1	82	0	6	1
+96	2017-06-27 22:11:45.357001+08	2	30	199.925463466672994	93	7.75	6	2	0	62	1	3	1	93	0	6	2
+93	2017-06-27 22:11:45.350113+08	3	19	206.287909881089007	134	7.4444444444444402	9	4	0	69	1	3	1	134	0	9	4
+95	2017-06-27 22:11:45.354+08	3	57	164.945166183103993	97	5.38888888888889017	9	1	0	61	1	3	1	97	0	9	1
+91	2017-06-27 22:11:45.345195+08	3	33	197.463261956460002	88	7.33333333333333037	6	2	0	63	1	3	1	88	0	6	2
+92	2017-06-27 22:11:45.348163+08	1	40	194.281409264230007	43	7.16666666666666963	3	0	0	66	1	3	1	43	0	3	0
+97	2017-06-27 22:11:45.358877+08	3	50	186.96296296296299	33	5.5	3	0	0	67	1	3	1	33	0	3	0
+104	2017-06-27 22:11:45.383879+08	3	55	179.094413230924999	125	6.9444444444444402	9	3	0	80	1	3	1	125	0	9	3
+105	2017-06-27 22:11:45.387958+08	3	8	215.808642359937011	158	8.77777777777778034	9	6	0	1	1	3	1	158	0	9	6
+99	2017-06-27 22:11:45.37376+08	2	38	194.515657124965998	89	7.41666666666666963	6	4	0	83	1	3	1	89	0	6	4
+100	2017-06-27 22:11:45.375785+08	3	45	189.278067508842014	133	7.38888888888889017	9	1	0	79	1	3	1	133	0	9	1
+101	2017-06-27 22:11:45.378588+08	3	32	197.734107380629013	98	8.16666666666666963	6	1	0	91	1	3	1	98	0	6	1
+102	2017-06-27 22:11:45.380469+08	2	52	186.490487828123008	34	5.66666666666666963	3	0	0	97	1	3	1	34	0	3	0
+106	2017-06-27 22:11:45.393728+08	2	21	204.645161290322989	51	8.5	3	1	0	48	1	3	1	51	0	3	1
+71	2017-06-27 22:01:15.291549+08	2	6	217.833561548273991	109	9.08333333333333037	6	6	0	84	1	2	1	109	0	6	6
+146	2017-06-27 22:11:45.493146+08	3	37	194.666666666666998	42	7	3	1	0	100	1	3	1	42	0	3	1
+142	2017-06-27 22:11:45.487112+08	1	10	213.999049971941986	57	9.5	3	3	1	52	1	3	1	57	1	3	3
+148	2017-06-27 22:11:45.495882+08	3	44	189.563909249722002	121	6.72222222222221966	9	2	0	55	1	3	1	121	0	9	2
+145	2017-06-27 22:11:45.491819+08	3	58	151.40648580159899	36	3	6	0	0	54	1	3	1	36	0	6	0
+187	2017-06-27 22:24:29.500643+08	3	50	183.166795710477004	124	6.88888888888889017	9	4	0	83	1	4	1	124	0	9	4
+143	2017-06-27 22:11:45.488639+08	2	11	213.640369840167011	99	8.25	6	4	1	56	1	3	1	99	1	6	4
+147	2017-06-27 22:11:45.494476+08	3	51	186.614854109117999	124	6.88888888888889017	9	3	0	53	1	3	1	124	0	9	3
+141	2017-06-27 22:11:45.485393+08	3	34	196.788849609625004	81	6.75	6	3	0	58	1	3	1	81	0	6	3
+188	2017-06-27 22:24:29.502234+08	1	42	192.343268740602014	39	6.5	3	0	0	109	1	4	1	39	0	3	0
+164	2017-06-27 22:24:29.458471+08	3	45	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	4	1	35	0	3	0
+165	2017-06-27 22:24:29.459912+08	2	28	202.613548575534992	47	7.83333333333333037	3	1	0	82	1	4	1	47	0	3	1
+170	2017-06-27 22:24:29.466796+08	4	5	235.570983352067998	215	8.95833333333333037	12	9	0	76	1	4	1	215	0	12	9
+167	2017-06-27 22:24:29.462864+08	2	17	211.352016116620007	100	8.33333333333333037	6	4	2	5	1	4	1	100	2	6	4
+168	2017-06-27 22:24:29.464145+08	4	57	175.081952721704994	109	6.0555555555555598	9	1	0	78	1	4	1	109	0	9	1
+169	2017-06-27 22:24:29.465469+08	4	24	203.807596953266994	90	7.5	6	3	1	92	1	4	1	90	1	6	3
+171	2017-06-27 22:24:29.470979+08	1	26	203.09197955511101	48	8	3	2	0	107	1	4	1	48	0	3	2
+179	2017-06-27 22:24:29.485622+08	3	51	180.949474597407004	64	5.33333333333333037	6	1	0	105	1	4	1	64	0	6	1
+172	2017-06-27 22:24:29.473905+08	4	44	191.03105192028201	84	7	6	1	0	64	1	4	1	84	0	6	1
+178	2017-06-27 22:24:29.484278+08	4	38	197.463261956460002	88	7.33333333333333037	6	2	0	63	1	4	1	88	0	6	2
+173	2017-06-27 22:24:29.475222+08	4	19	209.027597358067993	182	7.58333333333333037	12	5	0	69	1	4	1	182	0	12	5
+175	2017-06-27 22:24:29.477971+08	3	32	199.925463466672994	93	7.75	6	2	0	62	1	4	1	93	0	6	2
+176	2017-06-27 22:24:29.479492+08	2	55	179.078054992319011	72	6	6	0	0	66	1	4	1	72	0	6	0
+177	2017-06-27 22:24:29.482099+08	4	60	167.262514123337013	56	4.66666666666666963	6	1	0	67	1	4	1	56	0	6	1
+186	2017-06-27 22:24:29.499237+08	4	36	197.734107380629013	98	8.16666666666666963	6	1	0	91	1	4	1	98	0	6	1
+180	2017-06-27 22:24:29.49073+08	1	43	191.201452338244991	35	5.83333333333333037	3	1	0	108	1	4	1	35	0	3	1
+181	2017-06-27 22:24:29.492311+08	4	59	168.202946078047006	153	6.375	12	1	0	79	1	4	1	153	0	12	1
+182	2017-06-27 22:24:29.493596+08	4	13	212.844588589978002	197	8.20833333333333037	12	8	0	1	1	4	1	197	0	12	8
+185	2017-06-27 22:24:29.497299+08	4	54	179.094413230924999	125	6.9444444444444402	9	3	0	80	1	4	1	125	0	9	3
+183	2017-06-27 22:24:29.494812+08	3	48	186.490487828123008	34	5.66666666666666963	3	0	0	97	1	4	1	34	0	3	0
+184	2017-06-27 22:24:29.496026+08	4	30	200.011942080908	45	7.5	3	2	0	87	1	4	1	45	0	3	2
+190	2017-06-27 22:24:29.508102+08	4	29	200.160466433391008	168	7	12	5	0	73	1	4	1	168	0	12	5
+191	2017-06-27 22:24:29.509356+08	4	6	235.53290000247901	162	9	9	7	1	74	1	4	1	162	1	9	7
+192	2017-06-27 22:24:29.511212+08	4	12	213.405291684191013	203	8.45833333333333037	12	7	0	2	1	4	1	203	0	12	7
+195	2017-06-27 22:24:29.516589+08	4	23	204.539945413990012	140	7.77777777777778034	9	7	0	84	1	4	1	140	0	9	7
+203	2017-06-27 22:24:29.529967+08	2	18	210.959724858491995	101	8.41666666666666963	6	5	1	52	1	4	1	101	1	6	5
+197	2017-06-27 22:24:29.522208+08	4	53	179.430586686624991	155	6.45833333333333037	12	2	0	55	1	4	1	155	0	12	2
+196	2017-06-27 22:24:29.520957+08	3	11	213.640369840167011	99	8.25	6	4	1	56	1	4	1	99	1	6	4
+198	2017-06-27 22:24:29.523544+08	2	58	168.257256379800992	12	2	3	0	0	106	1	4	1	12	0	3	0
+200	2017-06-27 22:24:29.526181+08	4	46	186.614854109117999	124	6.88888888888889017	9	3	0	53	1	4	1	124	0	9	3
+201	2017-06-27 22:24:29.527504+08	4	62	138.789019959592991	63	3.5	9	0	0	54	1	4	1	63	0	9	0
+202	2017-06-27 22:24:29.528706+08	4	27	203.001615001488005	131	7.27777777777778034	9	4	1	58	1	4	1	131	1	9	4
+199	2017-06-27 22:24:29.524838+08	4	40	194.666666666666998	42	7	3	1	0	100	1	4	1	42	0	3	1
+204	2017-06-27 22:24:29.531168+08	1	34	198.269349894263996	43	7.16666666666666963	3	1	0	57	1	4	1	43	0	3	1
+206	2017-06-27 22:24:29.536247+08	4	15	212.492579946195008	194	8.08333333333333037	12	6	1	46	1	4	1	194	1	12	6
+205	2017-06-27 22:24:29.534968+08	3	22	204.645161290322989	51	8.5	3	1	0	48	1	4	1	51	0	3	1
+207	2017-06-27 22:24:29.537551+08	4	52	180.778749273274997	156	6.5	12	3	0	47	1	4	1	156	0	12	3
+149	2017-06-27 22:24:29.432071+08	3	2	241.935599487693992	120	10	6	6	2	44	1	4	1	120	2	6	6
+150	2017-06-27 22:24:29.433889+08	4	31	199.964404894327004	44	7.33333333333333037	3	1	0	3	1	4	1	44	0	3	1
+152	2017-06-27 22:24:29.43673+08	2	25	203.51028087185199	87	7.25	6	1	1	45	1	4	1	87	1	6	1
+156	2017-06-27 22:24:29.444896+08	4	21	205.897384597773993	180	7.5	12	6	2	6	1	4	1	180	2	12	6
+151	2017-06-27 22:24:29.435309+08	4	1	246.945645360142009	220	9.16666666666666963	12	10	3	40	1	4	1	220	3	12	10
+153	2017-06-27 22:24:29.438143+08	4	4	236.962723559777004	213	8.875	12	8	3	41	1	4	1	213	3	12	8
+155	2017-06-27 22:24:29.440882+08	4	35	197.735795502645999	133	7.38888888888889017	9	3	0	42	1	4	1	133	0	9	3
+154	2017-06-27 22:24:29.439527+08	4	39	196.71851389393899	176	7.33333333333333037	12	4	0	43	1	4	1	176	0	12	4
+157	2017-06-27 22:24:29.446286+08	4	47	186.533467564332994	126	7	9	3	0	90	1	4	1	126	0	9	3
+158	2017-06-27 22:24:29.447614+08	3	37	197.483599825688998	85	7.08333333333333037	6	2	0	93	1	4	1	85	0	6	2
+159	2017-06-27 22:24:29.448911+08	4	41	194.418256227857995	135	7.5	9	4	0	89	1	4	1	135	0	9	4
+163	2017-06-27 22:24:29.457156+08	4	3	238.420966972184004	158	8.77777777777778034	9	7	2	71	1	4	1	158	2	9	7
+161	2017-06-27 22:24:29.451449+08	4	56	176.04707921391099	153	6.375	12	3	0	81	1	4	1	153	0	12	3
+139	2017-06-27 22:11:45.477015+08	3	48	187.474158007699998	121	6.72222222222221966	9	2	0	81	1	3	1	121	0	9	2
+249	2017-06-27 22:26:18.56313+08	5	16	215.791400718465013	234	7.79999999999999982	15	7	0	69	1	5	1	234	0	15	7
+234	2017-06-27 22:26:18.536245+08	5	11	224.904722651349005	200	8.33333333333333037	12	10	0	84	1	5	1	200	0	12	10
+230	2017-06-27 22:26:18.530223+08	3	34	198.273767470361008	44	7.33333333333333037	3	1	0	75	1	5	1	44	0	3	1
+233	2017-06-27 22:26:18.535025+08	5	7	231.860186125160993	153	8.5	9	6	1	72	1	5	1	153	1	9	6
+228	2017-06-27 22:26:18.527575+08	5	4	239.497301101543997	212	8.83333333333333037	12	9	1	74	1	5	1	212	1	12	9
+229	2017-06-27 22:26:18.528773+08	5	31	199.662474915596988	212	7.06666666666666998	15	7	0	73	1	5	1	212	0	15	7
+236	2017-06-27 22:26:18.54144+08	5	12	223.639223240071999	238	7.93333333333333002	15	9	5	46	1	5	1	238	5	15	9
+237	2017-06-27 22:26:18.542927+08	5	14	216.799858782720008	203	8.45833333333333037	12	7	2	70	1	5	1	203	2	12	7
+275	2017-06-27 22:26:21.704536+08	1	47	184.376776349604995	23	3.83333333333332993	3	0	0	96	1	6	1	23	0	3	0
+235	2017-06-27 22:26:18.540114+08	5	56	171.638253507400009	190	6.33333333333333037	15	3	0	47	1	5	1	190	0	15	3
+239	2017-06-27 22:26:18.547114+08	5	22	207.102815294694011	233	7.76666666666667016	15	10	0	4	1	5	1	233	0	15	10
+238	2017-06-27 22:26:18.54569+08	1	55	173.940955318065988	17	2.83333333333332993	3	0	0	110	1	5	1	17	0	3	0
+240	2017-06-27 22:26:18.548299+08	5	54	175.307660885021988	152	6.33333333333333037	12	2	0	49	1	5	1	152	0	12	2
+250	2017-06-27 22:26:18.566141+08	4	51	180.949474597407004	64	5.33333333333333037	6	1	0	105	1	5	1	64	0	6	1
+244	2017-06-27 22:26:18.556418+08	3	53	175.959340173918008	113	6.27777777777778034	9	1	0	66	1	5	1	113	0	9	1
+242	2017-06-27 22:26:18.553597+08	2	32	199.521151436064002	87	7.25	6	4	0	107	1	5	1	87	0	6	4
+247	2017-06-27 22:26:18.560345+08	5	38	197.463261956460002	88	7.33333333333333037	6	2	0	63	1	5	1	88	0	6	2
+243	2017-06-27 22:26:18.555095+08	5	63	156.136527623382989	132	5.5	12	1	0	61	1	5	1	132	0	12	1
+245	2017-06-27 22:26:18.557804+08	4	30	199.925463466672994	93	7.75	6	2	0	62	1	5	1	93	0	6	2
+246	2017-06-27 22:26:18.559083+08	5	61	167.262514123337013	56	4.66666666666666963	6	1	0	67	1	5	1	56	0	6	1
+248	2017-06-27 22:26:18.561714+08	5	52	178.918474579204002	114	6.33333333333333037	9	2	0	64	1	5	1	114	0	9	2
+252	2017-06-27 22:26:18.572204+08	5	21	207.966916691211992	231	7.70000000000000018	15	8	2	6	1	5	1	231	2	15	8
+254	2017-06-27 22:26:18.575006+08	5	9	227.936544201275012	249	8.30000000000000071	15	9	1	7	1	5	1	249	1	15	9
+255	2017-06-27 22:26:18.576503+08	5	59	169.486128955803991	190	6.33333333333333037	15	4	0	81	1	5	1	190	0	15	4
+256	2017-06-27 22:26:18.577894+08	5	20	209.230117249589	192	8	12	7	0	89	1	5	1	192	0	12	7
+257	2017-06-27 22:26:18.582425+08	5	58	171.037216576935009	193	6.43333333333333002	15	2	0	79	1	5	1	193	0	15	2
+272	2017-06-27 22:26:18.608462+08	5	18	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	5	1	97	0	6	3
+258	2017-06-27 22:26:18.583738+08	4	49	183.813891301973996	74	6.16666666666666963	6	0	0	97	1	5	1	74	0	6	0
+259	2017-06-27 22:26:18.585185+08	5	47	185.378227260746002	171	7.125	12	5	0	80	1	5	1	171	0	12	5
+260	2017-06-27 22:26:18.586608+08	5	48	184.587555770371011	72	6	6	3	0	87	1	5	1	72	0	6	3
+263	2017-06-27 22:26:18.590868+08	5	15	216.254064080179006	242	8.06666666666666998	15	10	0	1	1	5	1	242	0	15	10
+262	2017-06-27 22:26:18.58959+08	4	50	183.166795710477004	124	6.88888888888889017	9	4	0	83	1	5	1	124	0	9	4
+264	2017-06-27 22:26:18.592043+08	2	42	192.343268740602014	39	6.5	3	0	0	109	1	5	1	39	0	3	0
+261	2017-06-27 22:26:18.588014+08	5	36	197.734107380629013	98	8.16666666666666963	6	1	0	91	1	5	1	98	0	6	1
+267	2017-06-27 22:26:18.600316+08	3	28	202.613548575534992	47	7.83333333333333037	3	1	0	82	1	5	1	47	0	3	1
+273	2017-06-27 22:26:18.609787+08	5	26	203.807596953266994	90	7.5	6	3	1	92	1	5	1	90	1	6	3
+270	2017-06-27 22:26:18.605704+08	5	5	238.332610612898009	204	8.5	12	9	3	71	1	5	1	204	3	12	9
+269	2017-06-27 22:26:18.604026+08	5	57	171.068064741220013	151	6.29166666666666963	12	2	0	78	1	5	1	151	0	12	2
+271	2017-06-27 22:26:18.607117+08	3	24	205.50200629689499	142	7.88888888888889017	9	3	0	77	1	5	1	142	0	9	3
+219	2017-06-27 22:26:18.51126+08	3	19	210.959724858491995	101	8.41666666666666963	6	5	1	52	1	5	1	101	1	6	5
+274	2017-06-27 22:26:18.611104+08	5	6	237.406928366280994	268	8.93333333333333002	15	11	0	76	1	5	1	268	0	15	11
+216	2017-06-27 22:26:18.507288+08	5	45	190.818623005082998	173	7.20833333333333037	12	4	0	53	1	5	1	173	0	12	4
+211	2017-06-27 22:26:18.500685+08	4	17	213.640369840167011	99	8.25	6	4	1	56	1	5	1	99	1	6	4
+217	2017-06-27 22:26:18.508644+08	5	27	203.001615001488005	131	7.27777777777778034	9	4	1	58	1	5	1	131	1	9	4
+212	2017-06-27 22:26:18.501989+08	5	64	125.476466607361004	85	3.54166666666667007	12	0	0	54	1	5	1	85	0	12	0
+218	2017-06-27 22:26:18.510007+08	5	62	166.51207161083201	182	6.06666666666666998	15	2	0	55	1	5	1	182	0	15	2
+213	2017-06-27 22:26:18.503302+08	3	60	168.257256379800992	12	2	3	0	0	106	1	5	1	12	0	3	0
+220	2017-06-27 22:26:18.512483+08	2	43	192.170657565724014	80	6.66666666666666963	6	1	0	57	1	5	1	80	0	6	1
+215	2017-06-27 22:26:18.505819+08	5	40	194.666666666666998	42	7	3	1	0	100	1	5	1	42	0	3	1
+214	2017-06-27 22:26:18.504582+08	1	33	199.471474551643013	42	7	3	2	0	59	1	5	1	42	0	3	2
+226	2017-06-27 22:26:18.5227+08	5	35	197.735795502645999	133	7.38888888888889017	9	3	0	42	1	5	1	133	0	9	3
+222	2017-06-27 22:26:18.5175+08	5	2	248.074542975921986	270	9	15	11	3	41	1	5	1	270	3	15	11
+224	2017-06-27 22:26:18.520219+08	3	23	205.578765758010007	133	7.38888888888889017	9	2	1	45	1	5	1	133	1	9	2
+225	2017-06-27 22:26:18.521453+08	5	1	262.012353576199985	280	9.33333333333333037	15	13	4	40	1	5	1	280	4	15	13
+231	2017-06-27 22:26:18.531905+08	5	13	217.44703622755199	250	8.33333333333333037	15	9	0	2	1	5	1	250	0	15	9
+227	2017-06-27 22:26:18.524014+08	4	3	241.935599487693992	120	10	6	6	2	44	1	5	1	120	2	6	6
+223	2017-06-27 22:26:18.518829+08	5	29	200.505728475234008	95	7.91666666666666963	6	3	0	3	1	5	1	95	0	6	3
+221	2017-06-27 22:26:18.51617+08	5	39	196.584695103628007	227	7.56666666666666998	15	6	0	43	1	5	1	227	0	15	6
+210	2017-06-27 22:24:29.541494+08	4	9	223.888313429613987	203	8.45833333333333037	12	10	0	4	1	4	1	203	0	12	10
+277	2017-06-27 22:26:21.707229+08	5	49	183.813891301973996	74	6.16666666666666963	6	0	0	97	1	6	1	74	0	6	0
+276	2017-06-27 22:26:21.705906+08	3	48	183.868806737798991	71	5.91666666666666963	6	0	0	109	1	6	1	71	0	6	0
+342	2017-06-27 22:26:25.553578+08	6	50	183.519666904788011	121	6.72222222222221966	9	2	0	48	1	7	1	121	0	9	2
+344	2017-06-27 22:26:25.556118+08	7	9	230.884380416249996	333	7.92857142857142971	21	13	6	46	1	7	1	333	6	21	13
+346	2017-06-27 22:26:25.55861+08	7	20	214.870328025585991	328	7.8095238095238102	21	14	0	4	1	7	1	328	0	21	14
+286	2017-06-27 22:26:21.722012+08	6	11	229.62237446663201	245	8.16666666666666963	15	10	3	71	1	6	1	245	3	15	10
+285	2017-06-27 22:26:21.720723+08	6	60	165.117050140493006	185	6.16666666666666963	15	2	0	78	1	6	1	185	0	15	2
+289	2017-06-27 22:26:21.726007+08	4	7	231.136784935305002	203	8.45833333333333037	12	8	4	5	1	6	1	203	4	12	8
+290	2017-06-27 22:26:21.727382+08	4	19	214.548313222892006	196	8.16666666666666963	12	6	0	77	1	6	1	196	0	12	6
+291	2017-06-27 22:26:21.728765+08	6	20	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	6	1	97	0	6	3
+293	2017-06-27 22:26:21.731455+08	6	9	229.808374202463	306	8.5	18	11	0	76	1	6	1	306	0	18	11
+292	2017-06-27 22:26:21.730073+08	6	27	203.807596953266994	90	7.5	6	3	1	92	1	6	1	90	1	6	3
+294	2017-06-27 22:26:21.735974+08	4	35	198.273767470361008	44	7.33333333333333037	3	1	0	75	1	6	1	44	0	3	1
+297	2017-06-27 22:26:21.740212+08	6	4	242.576255382985011	260	8.66666666666666963	15	11	1	74	1	6	1	260	1	15	11
+296	2017-06-27 22:26:21.738903+08	5	8	229.959130983422995	165	9.16666666666666963	9	7	0	104	1	6	1	165	0	9	7
+298	2017-06-27 22:26:21.741495+08	6	39	196.85431501595599	253	7.02777777777778034	18	7	0	73	1	6	1	253	0	18	7
+299	2017-06-27 22:26:21.742776+08	6	14	220.734531330548009	303	8.41666666666666963	18	11	0	2	1	6	1	303	0	18	11
+295	2017-06-27 22:26:21.737504+08	6	6	231.70663159795501	201	8.375	12	8	1	72	1	6	1	201	1	12	8
+300	2017-06-27 22:26:21.744114+08	6	10	229.747767080178988	251	8.36666666666667069	15	12	0	84	1	6	1	251	0	15	12
+301	2017-06-27 22:26:21.74959+08	6	23	208.665293416048002	236	7.8666666666666698	15	8	0	90	1	6	1	236	0	15	8
+303	2017-06-27 22:26:21.752298+08	6	21	212.038793765126997	279	7.75	18	10	2	6	1	6	1	279	2	18	10
+302	2017-06-27 22:26:21.751+08	5	37	197.483599825688998	85	7.08333333333333037	6	2	0	93	1	6	1	85	0	6	2
+304	2017-06-27 22:26:21.753694+08	6	5	232.931393999108991	296	8.22222222222221966	18	11	2	7	1	6	1	296	2	18	11
+305	2017-06-27 22:26:21.755075+08	6	15	220.378118958327008	242	8.06666666666666998	15	9	1	89	1	6	1	242	1	15	9
+306	2017-06-27 22:26:21.756371+08	6	61	164.249021030984011	223	6.1944444444444402	18	4	0	81	1	6	1	223	0	18	4
+313	2017-06-27 22:26:21.769977+08	6	17	216.098643608315996	250	8.33333333333333037	15	9	3	70	1	6	1	250	3	15	9
+308	2017-06-27 22:26:21.761539+08	2	56	173.940955318065988	17	2.83333333333332993	3	0	0	110	1	6	1	17	0	3	0
+310	2017-06-27 22:26:21.764257+08	6	16	217.200864318804008	278	7.72222222222221966	18	10	5	46	1	6	1	278	5	18	10
+311	2017-06-27 22:26:21.765525+08	5	45	185.049103204688009	76	6.33333333333333037	6	1	0	48	1	6	1	76	0	6	1
+312	2017-06-27 22:26:21.76773+08	6	59	167.409979463424008	223	6.1944444444444402	18	4	0	47	1	6	1	223	0	18	4
+309	2017-06-27 22:26:21.762918+08	6	55	175.307660885021988	152	6.33333333333333037	12	2	0	49	1	6	1	152	0	12	2
+321	2017-06-27 22:26:21.784548+08	4	22	210.959724858491995	101	8.41666666666666963	6	5	1	52	1	6	1	101	1	6	5
+322	2017-06-27 22:26:21.78614+08	6	63	157.544745416779989	216	6	18	2	0	55	1	6	1	216	0	18	2
+315	2017-06-27 22:26:21.776099+08	2	33	199.471474551643013	42	7	3	2	0	59	1	6	1	42	0	3	2
+314	2017-06-27 22:26:21.774664+08	4	58	168.257256379800992	12	2	3	0	0	106	1	6	1	12	0	3	0
+317	2017-06-27 22:26:21.779018+08	6	40	194.666666666666998	42	7	3	1	0	100	1	6	1	42	0	3	1
+320	2017-06-27 22:26:21.782873+08	6	34	198.593540789093993	228	7.59999999999999964	15	7	0	53	1	6	1	228	0	15	7
+323	2017-06-27 22:26:21.787551+08	3	41	192.170657565724014	80	6.66666666666666963	6	1	0	57	1	6	1	80	0	6	1
+329	2017-06-27 22:26:21.799553+08	6	38	197.463261956460002	88	7.33333333333333037	6	2	0	63	1	6	1	88	0	6	2
+327	2017-06-27 22:26:21.795882+08	6	57	170.052127333089999	103	5.72222222222221966	9	3	0	67	1	6	1	103	0	9	3
+328	2017-06-27 22:26:21.797438+08	6	64	153.03496156135401	170	5.66666666666666963	15	1	0	61	1	6	1	170	0	15	1
+326	2017-06-27 22:26:21.794631+08	5	31	199.925463466672994	93	7.75	6	2	0	62	1	6	1	93	0	6	2
+331	2017-06-27 22:26:21.802577+08	6	13	220.946823440776001	288	8	18	10	1	69	1	6	1	288	1	18	10
+324	2017-06-27 22:26:21.791986+08	3	32	199.521151436064002	87	7.25	6	4	0	107	1	6	1	87	0	6	4
+330	2017-06-27 22:26:21.801247+08	6	52	178.918474579204002	114	6.33333333333333037	9	2	0	64	1	6	1	114	0	9	2
+325	2017-06-27 22:26:21.793342+08	4	53	177.742284700023987	157	6.54166666666666963	12	2	0	66	1	6	1	157	0	12	2
+332	2017-06-27 22:26:21.803958+08	5	54	175.696417534824008	111	6.16666666666666963	9	2	0	105	1	6	1	111	0	9	2
+336	2017-06-27 22:26:21.812359+08	6	2	261.131186981845985	330	9.16666666666666963	18	14	4	41	1	6	1	330	4	18	14
+335	2017-06-27 22:26:21.811152+08	5	3	242.640687867796998	163	9.05555555555556069	9	8	3	44	1	6	1	163	3	9	8
+333	2017-06-27 22:26:21.808307+08	6	30	200.505728475234008	95	7.91666666666666963	6	3	0	3	1	6	1	95	0	6	3
+334	2017-06-27 22:26:21.809671+08	4	25	205.578765758010007	133	7.38888888888889017	9	2	1	45	1	6	1	133	1	9	2
+338	2017-06-27 22:26:21.814853+08	6	43	190.628925565960998	269	7.47222222222221966	18	7	0	43	1	6	1	269	0	18	7
+337	2017-06-27 22:26:21.813674+08	6	1	272.243190010316994	340	9.44444444444443931	18	16	5	40	1	6	1	340	5	18	16
+278	2017-06-27 22:26:21.70854+08	6	46	184.587555770371011	72	6	6	3	0	87	1	6	1	72	0	6	3
+280	2017-06-27 22:26:21.711306+08	5	50	183.166795710477004	124	6.88888888888889017	9	4	0	83	1	6	1	124	0	9	4
+282	2017-06-27 22:26:21.714112+08	6	51	179.784224950106989	208	6.93333333333333002	15	6	0	80	1	6	1	208	0	15	6
+281	2017-06-27 22:26:21.712818+08	3	42	191.201452338244991	35	5.83333333333333037	3	1	0	108	1	6	1	35	0	3	1
+279	2017-06-27 22:26:21.709914+08	6	36	197.734107380629013	98	8.16666666666666963	6	1	0	91	1	6	1	98	0	6	1
+283	2017-06-27 22:26:21.715448+08	6	12	228.078375384141992	291	8.08333333333333037	18	12	2	1	1	6	1	291	2	18	12
+284	2017-06-27 22:26:21.716766+08	6	62	163.487714507059991	224	6.22222222222221966	18	2	0	79	1	6	1	224	0	18	2
+345	2017-06-27 22:26:25.557462+08	7	19	216.098643608315996	250	8.33333333333333037	15	9	3	70	1	7	1	250	3	15	9
+363	2017-06-27 22:26:25.587245+08	7	18	217.039216215528	287	7.97222222222221966	18	13	0	84	1	7	1	287	0	18	13
+359	2017-06-27 22:26:25.581644+08	7	40	196.85431501595599	253	7.02777777777778034	18	7	0	73	1	7	1	253	0	18	7
+361	2017-06-27 22:26:25.58467+08	7	5	235.355181655347991	254	8.46666666666667034	15	10	2	72	1	7	1	254	2	15	10
+358	2017-06-27 22:26:25.580207+08	6	6	234.352249780616006	219	9.125	12	9	0	104	1	7	1	219	0	12	9
+360	2017-06-27 22:26:25.583203+08	7	4	241.694675663693999	309	8.58333333333333037	18	13	1	74	1	7	1	309	1	18	13
+367	2017-06-27 22:26:25.596772+08	6	28	207.025091729964998	129	7.16666666666666963	9	3	1	93	1	7	1	129	1	9	3
+364	2017-06-27 22:26:25.591167+08	1	42	191.85998403855001	34	5.66666666666666963	3	1	0	111	1	7	1	34	0	3	1
+368	2017-06-27 22:26:25.598106+08	7	7	232.931393999108991	296	8.22222222222221966	18	11	2	7	1	7	1	296	2	18	11
+366	2017-06-27 22:26:25.595215+08	7	16	218.621685675867013	330	7.85714285714286031	21	12	2	6	1	7	1	330	2	21	12
+371	2017-06-27 22:26:25.605125+08	2	47	184.376776349604995	23	3.83333333333332993	3	0	0	96	1	7	1	23	0	3	0
+376	2017-06-27 22:26:25.613725+08	7	52	180.934106630998997	126	7	9	1	0	91	1	7	1	126	0	9	1
+379	2017-06-27 22:26:25.618239+08	7	10	229.520243151648998	343	8.16666666666666963	21	14	2	1	1	7	1	343	2	21	14
+380	2017-06-27 22:26:25.619551+08	6	49	183.813891301973996	74	6.16666666666666963	6	0	0	97	1	7	1	74	0	6	0
+372	2017-06-27 22:26:25.606495+08	7	46	184.587555770371011	72	6	6	3	0	87	1	7	1	72	0	6	3
+373	2017-06-27 22:26:25.607901+08	7	54	179.784224950106989	208	6.93333333333333002	15	6	0	80	1	7	1	208	0	15	6
+374	2017-06-27 22:26:25.609205+08	4	48	183.868806737798991	71	5.91666666666666963	6	0	0	109	1	7	1	71	0	6	0
+375	2017-06-27 22:26:25.610627+08	6	55	178.996933626274	163	6.79166666666666963	12	4	0	83	1	7	1	163	0	12	4
+381	2017-06-27 22:26:25.624202+08	7	68	125.347475908912003	125	4.16666666666666963	15	0	0	54	1	7	1	125	0	15	0
+383	2017-06-27 22:26:25.626853+08	7	41	194.666666666666998	42	7	3	1	0	100	1	7	1	42	0	3	1
+384	2017-06-27 22:26:25.628042+08	1	34	201.715960059383008	51	8.5	3	1	0	60	1	7	1	51	0	3	1
+391	2017-06-27 22:26:25.638518+08	4	35	201.465260865554001	132	7.33333333333333037	9	3	0	57	1	7	1	132	0	9	3
+385	2017-06-27 22:26:25.6301+08	6	36	200.84386433127699	137	7.61111111111110983	9	4	1	56	1	7	1	137	1	9	4
+390	2017-06-27 22:26:25.637273+08	7	64	157.544745416779989	216	6	18	2	0	55	1	7	1	216	0	18	2
+389	2017-06-27 22:26:25.635946+08	5	61	168.257256379800992	12	2	3	0	0	106	1	7	1	12	0	3	0
+387	2017-06-27 22:26:25.632855+08	3	24	209.420578381831007	94	7.83333333333333037	6	4	1	59	1	7	1	94	1	6	4
+386	2017-06-27 22:26:25.631475+08	7	27	207.902281360561005	279	7.75	18	9	0	53	1	7	1	279	0	18	9
+388	2017-06-27 22:26:25.634242+08	5	23	210.959724858491995	101	8.41666666666666963	6	5	1	52	1	7	1	101	1	6	5
+395	2017-06-27 22:26:25.648295+08	5	22	211.317293992664986	239	7.96666666666667034	15	7	0	77	1	7	1	239	0	15	7
+398	2017-06-27 22:26:25.65249+08	6	45	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	7	1	35	0	3	0
+399	2017-06-27 22:26:25.653837+08	7	31	203.807596953266994	90	7.5	6	3	1	92	1	7	1	90	1	6	3
+396	2017-06-27 22:26:25.649685+08	7	21	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	7	1	97	0	6	3
+394	2017-06-27 22:26:25.646788+08	5	8	232.654655226158013	251	8.36666666666667069	15	10	5	5	1	7	1	251	5	15	10
+392	2017-06-27 22:26:25.643425+08	5	33	202.613548575534992	47	7.83333333333333037	3	1	0	82	1	7	1	47	0	3	1
+393	2017-06-27 22:26:25.645465+08	7	62	163.078027329963987	222	6.16666666666666963	18	2	0	78	1	7	1	222	0	18	2
+397	2017-06-27 22:26:25.651085+08	7	15	219.92257406721501	279	7.75	18	11	4	71	1	7	1	279	4	18	11
+406	2017-06-27 22:26:25.665626+08	7	30	205.115874949918009	186	7.75	12	6	1	42	1	7	1	186	1	12	6
+407	2017-06-27 22:26:25.669172+08	5	26	208.385779197442986	181	7.54166666666666963	12	3	1	45	1	7	1	181	1	12	3
+405	2017-06-27 22:26:25.664115+08	6	3	242.640687867796998	163	9.05555555555556069	9	8	3	44	1	7	1	163	3	9	8
+402	2017-06-27 22:26:25.6603+08	7	32	203.589078837149998	139	7.72222222222221966	9	4	0	3	1	7	1	139	0	9	4
+349	2017-06-27 22:26:25.565217+08	7	65	153.03496156135401	170	5.66666666666666963	15	1	0	61	1	7	1	170	0	15	1
+348	2017-06-27 22:26:25.56383+08	6	37	200.032619331472006	137	7.61111111111110983	9	3	1	62	1	7	1	137	1	9	3
+352	2017-06-27 22:26:25.569244+08	7	39	197.463261956460002	88	7.33333333333333037	6	2	0	63	1	7	1	88	0	6	2
+350	2017-06-27 22:26:25.566602+08	4	53	180.769362188177013	115	6.38888888888889017	9	4	0	107	1	7	1	115	0	9	4
+355	2017-06-27 22:26:25.573348+08	5	57	177.742284700023987	157	6.54166666666666963	12	2	0	66	1	7	1	157	0	12	2
+356	2017-06-27 22:26:25.574658+08	6	58	175.696417534824008	111	6.16666666666666963	9	2	0	105	1	7	1	111	0	9	2
+354	2017-06-27 22:26:25.571855+08	7	66	150.902779792025001	126	5.25	12	3	0	67	1	7	1	126	0	12	3
+351	2017-06-27 22:26:25.56792+08	1	29	206.149105057876	48	8	3	1	1	65	1	7	1	48	1	3	1
+353	2017-06-27 22:26:25.570481+08	7	56	178.918474579204002	114	6.33333333333333037	9	2	0	64	1	7	1	114	0	9	2
+409	2017-06-27 22:26:29.83127+08	8	26	209.338624540176994	372	7.75	24	13	2	6	1	8	1	372	2	24	13
+408	2017-06-27 22:26:29.829981+08	7	29	207.513433205388992	175	7.29166666666666963	12	4	1	93	1	8	1	175	1	12	4
+411	2017-06-27 22:26:29.833862+08	8	36	199.426329013594994	317	7.54761904761905011	21	8	0	90	1	8	1	317	0	21	8
+410	2017-06-27 22:26:29.832538+08	2	41	191.85998403855001	34	5.66666666666666963	3	1	0	111	1	8	1	34	0	3	1
+414	2017-06-27 22:26:29.83772+08	8	17	220.378118958327008	242	8.06666666666666998	15	9	1	89	1	8	1	242	1	15	9
+412	2017-06-27 22:26:29.835173+08	8	13	223.532281280583987	337	8.02380952380952017	21	12	2	7	1	8	1	337	2	21	12
+413	2017-06-27 22:26:29.836462+08	8	67	143.392235566469992	280	5.83333333333333037	24	4	0	81	1	8	1	280	0	24	4
+416	2017-06-27 22:26:29.84288+08	6	4	243.474135613823989	307	8.52777777777778034	18	13	5	5	1	8	1	307	5	18	13
+417	2017-06-27 22:26:29.844218+08	6	14	221.519271745944991	296	8.22222222222221966	18	10	0	77	1	8	1	296	0	18	10
+357	2017-06-27 22:26:25.578824+08	5	38	198.273767470361008	44	7.33333333333333037	3	1	0	75	1	7	1	44	0	3	1
+377	2017-06-27 22:26:25.615138+08	4	43	189.630931051211007	80	6.66666666666666963	6	2	0	108	1	7	1	80	0	6	2
+420	2017-06-27 22:26:29.848082+08	7	44	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	8	1	35	0	3	0
+423	2017-06-27 22:26:29.851981+08	8	12	223.617691244815006	392	8.16666666666666963	24	14	0	76	1	8	1	392	0	24	14
+419	2017-06-27 22:26:29.846801+08	8	59	171.836905918972008	272	6.47619047619047983	21	3	0	78	1	8	1	272	0	21	3
+422	2017-06-27 22:26:29.850678+08	8	30	203.807596953266994	90	7.5	6	3	1	92	1	8	1	90	1	6	3
+424	2017-06-27 22:26:29.855883+08	8	24	211.749892255329002	313	7.45238095238094989	21	10	1	73	1	8	1	313	1	21	10
+428	2017-06-27 22:26:29.861344+08	8	8	235.875938765784014	305	8.47222222222221966	18	13	2	72	1	8	1	305	2	18	13
+427	2017-06-27 22:26:29.859703+08	8	15	220.754098217259013	405	8.4375	24	14	0	2	1	8	1	405	0	24	14
+430	2017-06-27 22:26:29.864278+08	8	19	218.297455558270997	339	8.0714285714285694	21	15	0	84	1	8	1	339	0	21	15
+425	2017-06-27 22:26:29.857101+08	7	7	241.233026601797008	276	9.19999999999999929	15	11	0	104	1	8	1	276	0	15	11
+429	2017-06-27 22:26:29.862913+08	6	37	198.273767470361008	44	7.33333333333333037	3	1	0	75	1	8	1	44	0	3	1
+431	2017-06-27 22:26:29.868139+08	7	35	200.032619331472006	137	7.61111111111110983	9	3	1	62	1	8	1	137	1	9	3
+440	2017-06-27 22:26:29.884266+08	7	63	165.600513797356001	140	5.83333333333333037	12	2	0	105	1	8	1	140	0	12	2
+435	2017-06-27 22:26:29.875128+08	8	39	197.463261956460002	88	7.33333333333333037	6	2	0	63	1	8	1	88	0	6	2
+437	2017-06-27 22:26:29.878858+08	8	65	150.902779792025001	126	5.25	12	3	0	67	1	8	1	126	0	12	3
+434	2017-06-27 22:26:29.871975+08	8	21	213.697133178921007	371	7.72916666666666963	24	12	1	69	1	8	1	371	1	24	12
+433	2017-06-27 22:26:29.870751+08	5	51	180.769362188177013	115	6.38888888888889017	9	4	0	107	1	8	1	115	0	9	4
+436	2017-06-27 22:26:29.876543+08	8	53	178.918474579204002	114	6.33333333333333037	9	2	0	64	1	8	1	114	0	9	2
+439	2017-06-27 22:26:29.882634+08	6	61	168.584064270858988	187	6.23333333333332984	15	2	0	66	1	8	1	187	0	15	2
+444	2017-06-27 22:26:29.893129+08	8	28	207.600626787402007	238	7.93333333333333002	15	8	1	42	1	8	1	238	1	15	8
+445	2017-06-27 22:26:29.894337+08	6	42	191.236943500124994	208	6.93333333333333002	15	3	1	45	1	8	1	208	1	15	3
+441	2017-06-27 22:26:29.889103+08	8	55	177.451285509194008	346	7.20833333333333037	24	10	1	43	1	8	1	346	1	24	10
+443	2017-06-27 22:26:29.891905+08	7	5	242.640687867796998	163	9.05555555555556069	9	8	3	44	1	8	1	163	3	9	8
+447	2017-06-27 22:26:29.898037+08	8	31	203.589078837149998	139	7.72222222222221966	9	4	0	3	1	8	1	139	0	9	4
+446	2017-06-27 22:26:29.896147+08	8	1	270.697634491260999	431	8.97916666666666963	24	18	4	41	1	8	1	431	4	24	18
+442	2017-06-27 22:26:29.890643+08	8	2	265.924080946241986	434	9.04166666666666963	24	19	7	40	1	8	1	434	7	24	19
+457	2017-06-27 22:26:29.916809+08	8	49	181.494903892916	270	6.42857142857142971	21	5	0	55	1	8	1	270	0	21	5
+455	2017-06-27 22:26:29.914062+08	6	62	168.257256379800992	12	2	3	0	0	106	1	8	1	12	0	3	0
+450	2017-06-27 22:26:29.905249+08	8	40	194.666666666666998	42	7	3	1	0	100	1	8	1	42	0	3	1
+451	2017-06-27 22:26:29.906508+08	2	33	201.715960059383008	51	8.5	3	1	0	60	1	8	1	51	0	3	1
+448	2017-06-27 22:26:29.902628+08	8	18	219.93380515547301	286	7.9444444444444402	18	11	2	58	1	8	1	286	2	18	11
+449	2017-06-27 22:26:29.904003+08	4	9	230.208025690270006	147	8.16666666666666963	9	7	2	59	1	8	1	147	2	9	7
+453	2017-06-27 22:26:29.910512+08	8	27	207.902281360561005	279	7.75	18	9	0	53	1	8	1	279	0	18	9
+454	2017-06-27 22:26:29.91272+08	6	25	210.959724858491995	101	8.41666666666666963	6	5	1	52	1	8	1	101	1	6	5
+458	2017-06-27 22:26:29.918247+08	5	22	212.730567374210011	178	7.41666666666666963	12	5	0	57	1	8	1	178	0	12	5
+452	2017-06-27 22:26:29.907703+08	7	34	200.84386433127699	137	7.61111111111110983	9	4	1	56	1	8	1	137	1	9	4
+479	2017-06-27 22:26:36.269609+08	1	35	201.47926961475099	50	8.33333333333333037	3	3	0	112	1	9	1	50	0	3	3
+465	2017-06-27 22:26:29.929883+08	8	20	214.870328025585991	328	7.8095238095238102	21	14	0	4	1	8	1	328	0	21	14
+466	2017-06-27 22:26:29.933833+08	3	46	184.376776349604995	23	3.83333333333332993	3	0	0	96	1	8	1	23	0	3	0
+459	2017-06-27 22:26:29.922574+08	4	54	178.18063885563501	66	5.5	6	2	1	110	1	8	1	66	1	6	2
+463	2017-06-27 22:26:29.927436+08	8	58	173.534982585089011	315	6.5625	24	6	0	47	1	8	1	315	0	24	6
+462	2017-06-27 22:26:29.92623+08	8	11	227.459484503477	310	8.61111111111111072	18	12	3	70	1	8	1	310	3	18	12
+467	2017-06-27 22:26:29.935169+08	8	45	184.931108464238008	256	7.11111111111110983	18	8	0	80	1	8	1	256	0	18	8
+471	2017-06-27 22:26:29.94007+08	8	56	177.056325633665011	112	6.22222222222221966	9	4	0	87	1	8	1	112	0	9	4
+472	2017-06-27 22:26:29.941245+08	5	43	189.630931051211007	80	6.66666666666666963	6	2	0	108	1	8	1	80	0	6	2
+469	2017-06-27 22:26:29.937537+08	8	66	148.159056174108997	288	6	24	4	0	79	1	8	1	288	0	24	4
+468	2017-06-27 22:26:29.936388+08	7	52	178.996933626274	163	6.79166666666666963	12	4	0	83	1	8	1	163	0	12	4
+470	2017-06-27 22:26:29.938884+08	8	50	180.934106630998997	126	7	9	1	0	91	1	8	1	126	0	9	1
+477	2017-06-27 22:26:36.26706+08	9	28	209.338624540176994	372	7.75	24	13	2	6	1	9	1	372	2	24	13
+486	2017-06-27 22:26:36.282356+08	7	42	191.236943500124994	208	6.93333333333333002	15	3	1	45	1	9	1	208	1	15	3
+487	2017-06-27 22:26:36.283696+08	9	56	172.307699721073988	387	7.16666666666666963	27	10	1	43	1	9	1	387	1	27	10
+484	2017-06-27 22:26:36.278841+08	9	2	265.924080946241986	434	9.04166666666666963	24	19	7	40	1	9	1	434	7	24	19
+478	2017-06-27 22:26:36.268353+08	3	41	191.85998403855001	34	5.66666666666666963	3	1	0	111	1	9	1	34	0	3	1
+476	2017-06-27 22:26:36.265776+08	9	44	189.279223994684997	347	7.22916666666666963	24	10	0	90	1	9	1	347	0	24	10
+480	2017-06-27 22:26:36.270957+08	8	33	202.16302672744601	210	7	15	4	1	93	1	9	1	210	1	15	4
+481	2017-06-27 22:26:36.272254+08	9	66	153.982460434134993	321	5.9444444444444402	27	6	1	81	1	9	1	321	1	27	6
+482	2017-06-27 22:26:36.273639+08	9	20	218.178752750403987	376	7.83333333333333037	24	13	2	7	1	9	1	376	2	24	13
+483	2017-06-27 22:26:36.274943+08	9	18	220.378118958327008	242	8.06666666666666998	15	9	1	89	1	9	1	242	1	15	9
+485	2017-06-27 22:26:36.2801+08	9	37	199.080948602027007	177	7.375	12	4	0	3	1	9	1	177	0	12	4
+464	2017-06-27 22:26:29.928641+08	8	16	220.686197177238995	372	7.75	24	14	6	46	1	8	1	372	6	24	14
+474	2017-06-27 22:26:29.943684+08	5	57	174.951805884837	105	5.83333333333333037	9	0	0	109	1	8	1	105	0	9	0
+488	2017-06-27 22:26:36.285094+08	8	4	246.571075252762	210	8.75	12	10	4	44	1	9	1	210	4	12	10
+545	2017-06-27 22:26:40.060842+08	6	46	187.879276629326995	164	6.83333333333333037	12	5	1	110	1	10	1	164	1	12	5
+491	2017-06-27 22:26:36.291734+08	5	50	178.960391810044996	114	6.33333333333333037	9	3	1	110	1	9	1	114	1	9	3
+505	2017-06-27 22:26:36.316406+08	7	60	168.257256379800992	12	2	3	0	0	106	1	9	1	12	0	3	0
+496	2017-06-27 22:26:36.29898+08	9	24	214.870328025585991	328	7.8095238095238102	21	14	0	4	1	9	1	328	0	21	14
+494	2017-06-27 22:26:36.295882+08	9	12	229.601494229997996	429	7.9444444444444402	27	17	6	46	1	9	1	429	6	27	17
+492	2017-06-27 22:26:36.293021+08	9	61	167.890832600409993	272	6.47619047619047983	21	6	0	49	1	9	1	272	0	21	6
+501	2017-06-27 22:26:36.309698+08	3	34	201.715960059383008	51	8.5	3	1	0	60	1	9	1	51	0	3	1
+503	2017-06-27 22:26:36.312519+08	9	69	108.190993936943002	176	4.1904761904761898	21	0	0	54	1	9	1	176	0	21	0
+499	2017-06-27 22:26:36.305582+08	5	10	230.208025690270006	147	8.16666666666666963	9	7	2	59	1	9	1	147	2	9	7
+498	2017-06-27 22:26:36.304068+08	7	27	210.401850260229992	146	8.11111111111111072	9	7	1	52	1	9	1	146	1	9	7
+507	2017-06-27 22:26:36.31952+08	9	19	219.93380515547301	286	7.9444444444444402	18	11	2	58	1	9	1	286	2	18	11
+508	2017-06-27 22:26:36.321216+08	6	16	222.028686661942004	235	7.83333333333333037	15	8	0	57	1	9	1	235	0	15	8
+504	2017-06-27 22:26:36.313815+08	9	25	214.051870656912001	329	7.83333333333333037	21	11	0	53	1	9	1	329	0	21	11
+506	2017-06-27 22:26:36.31822+08	9	54	174.444512034697993	311	6.47916666666666963	24	5	0	55	1	9	1	311	0	24	5
+510	2017-06-27 22:26:36.327012+08	9	21	217.113089824823987	363	7.5625	24	12	2	73	1	9	1	363	2	24	12
+511	2017-06-27 22:26:36.328579+08	9	6	242.806431251815013	361	8.59523809523808957	21	15	1	74	1	9	1	361	1	21	15
+512	2017-06-27 22:26:36.330195+08	9	9	235.875938765784014	305	8.47222222222221966	18	13	2	72	1	9	1	305	2	18	13
+515	2017-06-27 22:26:36.334789+08	9	11	230.127245904835007	399	8.3125	24	18	0	84	1	9	1	399	0	24	18
+514	2017-06-27 22:26:36.333466+08	7	22	215.161465000801996	101	8.41666666666666963	6	4	2	75	1	9	1	101	2	6	4
+513	2017-06-27 22:26:36.33144+08	9	14	226.847396024116989	465	8.61111111111111072	27	17	0	2	1	9	1	465	0	27	17
+516	2017-06-27 22:26:36.339211+08	4	65	158.628627282320991	38	3.16666666666667007	6	0	0	96	1	9	1	38	0	6	0
+524	2017-06-27 22:26:36.351241+08	9	8	240.127186330638011	447	8.27777777777778034	27	18	3	1	1	9	1	447	3	27	18
+525	2017-06-27 22:26:36.352806+08	9	48	180.096069079697003	294	7	21	8	0	80	1	9	1	294	0	21	8
+522	2017-06-27 22:26:36.348278+08	9	52	177.056325633665011	112	6.22222222222221966	9	4	0	87	1	9	1	112	0	9	4
+517	2017-06-27 22:26:36.340594+08	8	55	173.206839820791998	107	5.9444444444444402	9	0	0	97	1	9	1	107	0	9	0
+518	2017-06-27 22:26:36.341846+08	9	67	153.952698891131007	333	6.16666666666666963	27	5	0	79	1	9	1	333	0	27	5
+519	2017-06-27 22:26:36.343063+08	6	53	174.951805884837	105	5.83333333333333037	9	0	0	109	1	9	1	105	0	9	0
+520	2017-06-27 22:26:36.344224+08	8	49	178.996933626274	163	6.79166666666666963	12	4	0	83	1	9	1	163	0	12	4
+521	2017-06-27 22:26:36.34611+08	9	47	180.934106630998997	126	7	9	1	0	91	1	9	1	126	0	9	1
+533	2017-06-27 22:26:36.365961+08	9	63	165.347632561859996	264	6.28571428571429003	21	3	0	61	1	9	1	264	0	21	3
+532	2017-06-27 22:26:36.364693+08	7	59	168.584064270858988	187	6.23333333333332984	15	2	0	66	1	9	1	187	0	15	2
+535	2017-06-27 22:26:36.368507+08	8	64	162.105872079908011	175	5.83333333333333037	15	3	1	105	1	9	1	175	1	15	3
+527	2017-06-27 22:26:36.35834+08	9	39	197.463261956460002	88	7.33333333333333037	6	2	0	63	1	9	1	88	0	6	2
+526	2017-06-27 22:26:36.357063+08	9	31	203.862619010408991	411	7.61111111111110983	27	13	1	69	1	9	1	411	1	27	13
+531	2017-06-27 22:26:36.363435+08	3	38	198.254188944806003	87	7.25	6	1	1	65	1	9	1	87	1	6	1
+530	2017-06-27 22:26:36.362089+08	6	58	168.989671164078999	143	5.95833333333333037	12	4	0	107	1	9	1	143	0	12	4
+528	2017-06-27 22:26:36.359587+08	9	51	178.918474579204002	114	6.33333333333333037	9	2	0	64	1	9	1	114	0	9	2
+534	2017-06-27 22:26:36.36718+08	8	32	202.602192546567011	180	7.5	12	5	1	62	1	9	1	180	1	12	5
+539	2017-06-27 22:26:36.376111+08	7	30	204.197250338890996	98	8.16666666666666963	6	3	0	82	1	9	1	98	0	6	3
+542	2017-06-27 22:26:36.379627+08	9	5	244.098767513443988	393	8.1875	24	16	6	71	1	9	1	393	6	24	16
+540	2017-06-27 22:26:36.377333+08	9	26	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	9	1	97	0	6	3
+538	2017-06-27 22:26:36.374699+08	7	3	248.286859329860988	367	8.7380952380952408	21	16	5	5	1	9	1	367	5	21	16
+544	2017-06-27 22:26:36.382287+08	9	29	204.567460883839999	137	7.61111111111110983	9	5	2	92	1	9	1	137	2	9	5
+537	2017-06-27 22:26:36.373462+08	7	17	221.519271745944991	296	8.22222222222221966	18	10	0	77	1	9	1	296	0	18	10
+541	2017-06-27 22:26:36.378546+08	8	45	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	9	1	35	0	3	0
+543	2017-06-27 22:26:36.380909+08	9	15	223.617691244815006	392	8.16666666666666963	24	14	0	76	1	9	1	392	0	24	14
+490	2017-06-27 22:26:36.287728+08	9	23	215.071806627211998	289	8.02777777777778034	18	10	1	42	1	9	1	289	1	18	10
+548	2017-06-27 22:26:40.064723+08	10	14	222.869727144977986	474	7.90000000000000036	30	18	6	46	1	10	1	474	6	30	18
+549	2017-06-27 22:26:40.066+08	10	22	214.870328025585991	328	7.8095238095238102	21	14	0	4	1	10	1	328	0	21	14
+551	2017-06-27 22:26:40.068605+08	10	59	168.725785719177992	318	6.625	24	7	0	49	1	10	1	318	0	24	7
+550	2017-06-27 22:26:40.06727+08	9	49	183.519666904788011	121	6.72222222222221966	9	2	0	48	1	10	1	121	0	9	2
+547	2017-06-27 22:26:40.063494+08	10	24	213.101637179480008	389	8.10416666666666963	24	13	3	70	1	10	1	389	3	24	13
+546	2017-06-27 22:26:40.062164+08	10	58	168.747796333169987	397	6.6166666666666698	30	8	0	47	1	10	1	397	0	30	8
+555	2017-06-27 22:26:40.076132+08	9	34	202.16302672744601	210	7	15	4	1	93	1	10	1	210	1	15	4
+554	2017-06-27 22:26:40.074747+08	2	36	201.47926961475099	50	8.33333333333333037	3	3	0	112	1	10	1	50	0	3	3
+553	2017-06-27 22:26:40.073493+08	10	25	212.649400134952998	424	7.85185185185185031	27	15	2	6	1	10	1	424	2	27	15
+557	2017-06-27 22:26:40.078884+08	10	69	151.457016694928001	364	6.06666666666666998	30	7	1	81	1	10	1	364	1	30	7
+493	2017-06-27 22:26:36.294458+08	9	13	228.034114436082007	357	8.5	21	13	3	70	1	9	1	357	3	21	13
+569	2017-06-27 22:26:40.098202+08	10	30	204.890049837754987	462	7.70000000000000018	30	14	1	69	1	10	1	462	1	30	14
+561	2017-06-27 22:26:40.087272+08	10	67	152.631897310856999	169	5.6333333333333302	15	5	0	67	1	10	1	169	0	15	5
+560	2017-06-27 22:26:40.085969+08	10	38	199.383979333095994	134	7.4444444444444402	9	4	0	63	1	10	1	134	0	9	4
+564	2017-06-27 22:26:40.091409+08	4	40	197.646884294541991	134	7.4444444444444402	9	3	1	65	1	10	1	134	1	9	3
+562	2017-06-27 22:26:40.088589+08	1	29	206.259640175955013	51	8.5	3	2	0	113	1	10	1	51	0	3	2
+568	2017-06-27 22:26:40.096911+08	9	33	202.602192546567011	180	7.5	12	5	1	62	1	10	1	180	1	12	5
+567	2017-06-27 22:26:40.095616+08	10	62	165.347632561859996	264	6.28571428571429003	21	3	0	61	1	10	1	264	0	21	3
+565	2017-06-27 22:26:40.092951+08	7	57	168.989671164078999	143	5.95833333333333037	12	4	0	107	1	10	1	143	0	12	4
+570	2017-06-27 22:26:40.099513+08	9	63	162.105872079908011	175	5.83333333333333037	15	3	1	105	1	10	1	175	1	15	3
+573	2017-06-27 22:26:40.108407+08	4	35	201.715960059383008	51	8.5	3	1	0	60	1	10	1	51	0	3	1
+577	2017-06-27 22:26:40.114143+08	10	55	173.166720085254013	353	6.53703703703703987	27	6	0	55	1	10	1	353	0	27	6
+581	2017-06-27 22:26:40.119696+08	7	17	220.194719529668987	283	7.86111111111110983	18	10	1	57	1	10	1	283	1	18	10
+580	2017-06-27 22:26:40.118123+08	8	27	210.401850260229992	146	8.11111111111111072	9	7	1	52	1	10	1	146	1	9	7
+579	2017-06-27 22:26:40.116846+08	10	18	219.93380515547301	286	7.9444444444444402	18	11	2	58	1	10	1	286	2	18	11
+576	2017-06-27 22:26:40.112624+08	10	70	108.008324499639997	212	4.41666666666666963	24	0	0	54	1	10	1	212	0	24	0
+578	2017-06-27 22:26:40.115528+08	10	23	214.579374003144011	375	7.8125	24	12	0	53	1	10	1	375	0	24	12
+574	2017-06-27 22:26:40.109891+08	9	37	200.84386433127699	137	7.61111111111110983	9	4	1	56	1	10	1	137	1	9	4
+586	2017-06-27 22:26:40.131481+08	10	3	264.257459941313016	531	8.84999999999999964	30	22	5	41	1	10	1	531	5	30	22
+589	2017-06-27 22:26:40.138487+08	10	19	217.113089824823987	363	7.5625	24	12	2	73	1	10	1	363	2	24	12
+585	2017-06-27 22:26:40.13005+08	10	28	209.943514835288994	329	7.83333333333333037	21	11	1	42	1	10	1	329	1	21	11
+587	2017-06-27 22:26:40.132919+08	10	52	180.100321499611994	432	7.20000000000000018	30	12	1	43	1	10	1	432	1	30	12
+584	2017-06-27 22:26:40.1284+08	9	4	258.150814951284019	266	8.86666666666667069	15	13	4	44	1	10	1	266	4	15	13
+591	2017-06-27 22:26:40.141747+08	10	21	215.352812457194005	503	8.38333333333332931	30	17	0	2	1	10	1	503	0	30	17
+595	2017-06-27 22:26:40.147482+08	10	9	232.983541557756013	443	8.20370370370370061	27	20	0	84	1	10	1	443	0	27	20
+594	2017-06-27 22:26:40.146062+08	9	6	241.233026601797008	276	9.19999999999999929	15	11	0	104	1	10	1	276	0	15	11
+590	2017-06-27 22:26:40.139761+08	10	7	240.493760187281993	406	8.45833333333333037	24	16	1	74	1	10	1	406	1	24	16
+593	2017-06-27 22:26:40.144635+08	10	11	229.949537715775989	347	8.2619047619047592	21	14	2	72	1	10	1	347	2	21	14
+592	2017-06-27 22:26:40.143204+08	8	10	230.687649905224987	151	8.38888888888888928	9	6	3	75	1	10	1	151	3	9	6
+599	2017-06-27 22:26:40.156564+08	8	32	204.197250338890996	98	8.16666666666666963	6	3	0	82	1	10	1	98	0	6	3
+596	2017-06-27 22:26:40.151648+08	8	2	264.837010427033022	427	8.89583333333333037	24	19	7	5	1	10	1	427	7	24	19
+598	2017-06-27 22:26:40.154634+08	8	16	222.089479123329994	346	8.2380952380952408	21	12	0	77	1	10	1	346	0	21	12
+602	2017-06-27 22:26:40.16092+08	10	68	152.59911521516301	341	6.31481481481481044	27	4	0	78	1	10	1	341	0	27	4
+597	2017-06-27 22:26:40.152782+08	10	5	243.679425808363987	447	8.27777777777778034	27	18	6	71	1	10	1	447	6	27	18
+603	2017-06-27 22:26:40.162232+08	10	31	204.567460883839999	137	7.61111111111110983	9	5	2	92	1	10	1	137	2	9	5
+601	2017-06-27 22:26:40.159452+08	9	47	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	10	1	35	0	3	0
+604	2017-06-27 22:26:40.163697+08	10	13	229.600379768800991	449	8.31481481481480955	27	17	0	76	1	10	1	449	0	27	17
+605	2017-06-27 22:26:40.167406+08	5	65	158.628627282320991	38	3.16666666666667007	6	0	0	96	1	10	1	38	0	6	0
+607	2017-06-27 22:26:40.170077+08	7	56	172.412810678546009	140	5.83333333333333037	12	0	0	109	1	10	1	140	0	12	0
+609	2017-06-27 22:26:40.172979+08	9	64	160.348102365959988	181	6.03333333333332966	15	4	0	83	1	10	1	181	0	15	4
+610	2017-06-27 22:26:40.174169+08	10	48	186.915448456317989	341	7.10416666666666963	24	10	0	80	1	10	1	341	0	24	10
+612	2017-06-27 22:26:40.176813+08	9	50	181.136914964390996	153	6.375	12	2	0	97	1	10	1	153	0	12	2
+613	2017-06-27 22:26:40.178032+08	10	8	240.127186330638011	447	8.27777777777778034	27	18	3	1	1	10	1	447	3	27	18
+614	2017-06-27 22:26:40.179248+08	10	66	153.952698891131007	333	6.16666666666666963	27	5	0	79	1	10	1	333	0	27	5
+608	2017-06-27 22:26:40.171541+08	10	51	180.934106630998997	126	7	9	1	0	91	1	10	1	126	0	9	1
+611	2017-06-27 22:26:40.175508+08	7	45	189.630931051211007	80	6.66666666666666963	6	2	0	108	1	10	1	80	0	6	2
+559	2017-06-27 22:26:40.081668+08	10	20	216.433353736902006	288	8	18	10	1	89	1	10	1	288	1	18	10
+566	2017-06-27 22:26:40.094309+08	8	60	168.584064270858988	187	6.23333333333332984	15	2	0	66	1	10	1	187	0	15	2
+23	2017-06-27 21:48:26.820656+08	1	38	183.104947526236998	29	4.83333333333333037	3	1	0	47	1	1	1	29	0	3	1
+54	2017-06-27 22:01:15.258109+08	2	3	222.753227582208012	107	8.91666666666666963	6	5	1	40	1	2	1	107	1	6	5
+57	2017-06-27 22:01:15.262467+08	1	2	223.21230719903599	60	10	3	3	1	44	1	2	1	60	1	3	3
+123	2017-06-27 22:11:45.439298+08	1	31	198.273767470361008	44	7.33333333333333037	3	1	0	75	1	3	1	44	0	3	1
+138	2017-06-27 22:11:45.475266+08	3	4	225.787859372766007	155	8.61111111111111072	9	6	0	7	1	3	1	155	0	9	6
+189	2017-06-27 22:24:29.506846+08	2	33	198.273767470361008	44	7.33333333333333037	3	1	0	75	1	4	1	44	0	3	1
+209	2017-06-27 22:24:29.540272+08	4	10	216.799858782720008	203	8.45833333333333037	12	7	2	70	1	4	1	203	2	12	7
+166	2017-06-27 22:24:29.461455+08	2	16	212.481334373851013	101	8.41666666666666963	6	3	0	77	1	4	1	101	0	6	3
+268	2017-06-27 22:26:18.601776+08	3	10	226.171066336910997	153	8.5	9	7	4	5	1	5	1	153	4	9	7
+241	2017-06-27 22:26:18.54956+08	4	25	204.645161290322989	51	8.5	3	1	0	48	1	5	1	51	0	3	1
+362	2017-06-27 22:26:25.585951+08	7	12	221.358470250794994	354	8.4285714285714306	21	13	0	2	1	7	1	354	0	21	13
+369	2017-06-27 22:26:25.599417+08	7	14	220.378118958327008	242	8.06666666666666998	15	9	1	89	1	7	1	242	1	15	9
+400	2017-06-27 22:26:25.655027+08	7	17	218.263778131207999	336	8	21	12	0	76	1	7	1	336	0	21	12
+582	2017-06-27 22:26:40.12553+08	8	43	191.236943500124994	208	6.93333333333333002	15	3	1	45	1	10	1	208	1	15	3
+140	2017-06-27 22:11:45.479415+08	3	39	194.418256227857995	135	7.5	9	4	0	89	1	3	1	135	0	9	4
+318	2017-06-27 22:26:21.780264+08	6	18	215.746162285309993	191	7.95833333333333037	12	7	1	58	1	6	1	191	1	12	7
+378	2017-06-27 22:26:25.616362+08	7	67	146.040840553372988	246	5.85714285714286031	21	2	0	79	1	7	1	246	0	21	2
+341	2017-06-27 22:26:25.552281+08	7	51	182.836978653111998	275	6.54761904761905011	21	6	0	47	1	7	1	275	0	21	6
+460	2017-06-27 22:26:29.923875+08	7	48	183.519666904788011	121	6.72222222222221966	9	2	0	48	1	8	1	121	0	9	2
+475	2017-06-27 22:26:29.94501+08	8	3	246.016327956131988	403	8.39583333333333037	24	17	3	1	1	8	1	403	3	24	17
+418	2017-06-27 22:26:29.845534+08	8	23	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	8	1	97	0	6	3
+432	2017-06-27 22:26:29.86947+08	8	64	163.952690465544009	220	6.11111111111110983	18	3	0	61	1	8	1	220	0	18	3
+497	2017-06-27 22:26:36.300266+08	8	46	183.519666904788011	121	6.72222222222221966	9	2	0	48	1	9	1	121	0	9	2
+500	2017-06-27 22:26:36.306918+08	9	40	194.666666666666998	42	7	3	1	0	100	1	9	1	42	0	3	1
+529	2017-06-27 22:26:36.36088+08	9	68	150.902779792025001	126	5.25	12	3	0	67	1	9	1	126	0	12	3
+489	2017-06-27 22:26:36.286444+08	9	1	277.729328834344983	491	9.0925925925925899	27	21	4	41	1	9	1	491	4	27	21
+583	2017-06-27 22:26:40.127102+08	10	1	266.503055278255999	485	8.98148148148147918	27	21	7	40	1	10	1	485	7	27	21
+600	2017-06-27 22:26:40.158173+08	10	26	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	10	1	97	0	6	3
+572	2017-06-27 22:26:40.106664+08	10	41	194.666666666666998	42	7	3	1	0	100	1	10	1	42	0	3	1
+615	2017-06-27 23:09:15.263998+08	8	57	168.989671164078999	143	5.95833333333333037	12	4	0	107	1	11	1	143	0	12	4
+616	2017-06-27 23:09:15.266283+08	9	59	168.584064270858988	187	6.23333333333332984	15	2	0	66	1	11	1	187	0	15	2
+617	2017-06-27 23:09:15.268003+08	11	30	208.457730215999987	518	7.8484848484848504	33	16	1	69	1	11	1	518	1	33	16
+618	2017-06-27 23:09:15.269853+08	5	39	197.646884294541991	134	7.4444444444444402	9	3	1	65	1	11	1	134	1	9	3
+621	2017-06-27 23:09:15.275717+08	11	69	147.143449827000012	294	6.125	24	4	0	61	1	11	1	294	0	24	4
+622	2017-06-27 23:09:15.277725+08	11	67	152.631897310856999	169	5.6333333333333302	15	5	0	67	1	11	1	169	0	15	5
+623	2017-06-27 23:09:15.279303+08	10	34	202.602192546567011	180	7.5	12	5	1	62	1	11	1	180	1	12	5
+624	2017-06-27 23:09:15.280925+08	11	28	209.861083814000011	194	8.08333333333333037	12	7	0	63	1	11	1	194	0	12	7
+625	2017-06-27 23:09:15.282757+08	10	64	159.858185887334997	210	5.83333333333333037	18	3	1	105	1	11	1	210	1	18	3
+626	2017-06-27 23:09:15.287795+08	10	48	181.056917883990991	163	6.79166666666666963	12	3	0	48	1	11	1	163	0	12	3
+627	2017-06-27 23:09:15.289439+08	7	55	171.163527522484998	193	6.43333333333333002	15	5	1	110	1	11	1	193	1	15	5
+628	2017-06-27 23:09:15.290938+08	11	16	222.869727144977986	474	7.90000000000000036	30	18	6	46	1	11	1	474	6	30	18
+629	2017-06-27 23:09:15.292347+08	11	7	240.640705626381987	449	8.31481481481480955	27	16	4	70	1	11	1	449	4	27	16
+630	2017-06-27 23:09:15.296562+08	11	58	168.747796333169987	397	6.6166666666666698	30	8	0	47	1	11	1	397	0	30	8
+631	2017-06-27 23:09:15.298071+08	11	25	214.870328025585991	328	7.8095238095238102	21	14	0	4	1	11	1	328	0	21	14
+632	2017-06-27 23:09:15.299565+08	11	54	171.742573896934005	360	6.66666666666666963	27	8	0	49	1	11	1	360	0	27	8
+633	2017-06-27 23:09:15.306541+08	11	51	174.406346298517008	466	7.06060606060605966	33	12	1	43	1	11	1	466	1	33	12
+634	2017-06-27 23:09:15.308324+08	9	29	209.617622016029998	256	7.11111111111110983	18	5	3	45	1	11	1	256	3	18	5
+635	2017-06-27 23:09:15.310215+08	10	3	258.150814951284019	266	8.86666666666667069	15	13	4	44	1	11	1	266	4	15	13
+636	2017-06-27 23:09:15.311789+08	11	13	224.804499267338002	384	8	24	14	2	42	1	11	1	384	2	24	14
+637	2017-06-27 23:09:15.314024+08	11	4	249.561592592354998	562	8.51515151515151913	33	22	5	41	1	11	1	562	5	33	22
+638	2017-06-27 23:09:15.3158+08	11	43	192.999708682742011	216	7.20000000000000018	15	4	0	3	1	11	1	216	0	15	4
+639	2017-06-27 23:09:15.317779+08	11	1	266.503055278255999	485	8.98148148148147918	27	21	7	40	1	11	1	485	7	27	21
+640	2017-06-27 23:09:15.324716+08	9	2	265.717758734228028	477	8.83333333333333037	27	21	9	5	1	11	1	477	9	27	21
+641	2017-06-27 23:09:15.326437+08	11	68	150.754825362790996	376	6.26666666666667016	30	6	0	78	1	11	1	376	0	30	6
+642	2017-06-27 23:09:15.327901+08	9	18	222.089479123329994	346	8.2380952380952408	21	12	0	77	1	11	1	346	0	21	12
+643	2017-06-27 23:09:15.329444+08	10	46	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	11	1	35	0	3	0
+644	2017-06-27 23:09:15.330864+08	9	33	203.987771667778986	141	7.83333333333333037	9	4	0	82	1	11	1	141	0	9	4
+645	2017-06-27 23:09:15.332638+08	11	19	221.563371581736988	475	7.91666666666666963	30	19	6	71	1	11	1	475	6	30	19
+647	2017-06-27 23:09:15.337071+08	11	32	204.567460883839999	137	7.61111111111110983	9	5	2	92	1	11	1	137	2	9	5
+648	2017-06-27 23:09:15.33875+08	11	5	246.118873733100997	509	8.48333333333333073	30	20	1	76	1	11	1	509	1	30	20
+650	2017-06-27 23:09:15.346158+08	3	37	201.47926961475099	50	8.33333333333333037	3	3	0	112	1	11	1	50	0	3	3
+651	2017-06-27 23:09:15.348438+08	11	31	205.927400738177994	461	7.68333333333333002	30	16	2	6	1	11	1	461	2	30	16
+652	2017-06-27 23:09:15.350226+08	11	40	195.927869759759005	435	7.25	30	13	0	90	1	11	1	435	0	30	13
+653	2017-06-27 23:09:15.351951+08	10	35	202.16302672744601	210	7	15	4	1	93	1	11	1	210	1	15	4
+654	2017-06-27 23:09:15.353488+08	11	66	155.019984144473	403	6.10606060606060996	33	7	1	81	1	11	1	403	1	33	7
+655	2017-06-27 23:09:15.355028+08	11	10	237.640080279115011	482	8.03333333333332966	30	17	2	7	1	11	1	482	2	30	17
+656	2017-06-27 23:09:15.356368+08	11	20	220.943734130085005	331	7.8809523809523796	21	12	1	89	1	11	1	331	1	21	12
+657	2017-06-27 23:09:15.363075+08	11	12	229.949537715775989	347	8.2619047619047592	21	14	2	72	1	11	1	347	2	21	14
+658	2017-06-27 23:09:15.365475+08	11	15	224.265927759582013	416	7.70370370370369972	27	14	2	73	1	11	1	416	2	27	14
+659	2017-06-27 23:09:15.366915+08	9	9	237.834724741526003	207	8.625	12	9	3	75	1	11	1	207	3	12	9
+660	2017-06-27 23:09:15.368377+08	11	24	217.100225245173988	548	8.30303030303029921	33	19	0	2	1	11	1	548	0	33	19
+661	2017-06-27 23:09:15.369765+08	10	6	241.233026601797008	276	9.19999999999999929	15	11	0	104	1	11	1	276	0	15	11
+662	2017-06-27 23:09:15.371288+08	11	14	224.503545498699992	441	8.16666666666666963	27	17	1	74	1	11	1	441	1	27	17
+663	2017-06-27 23:09:15.372786+08	11	22	218.071140239160002	475	7.91666666666666963	30	21	0	84	1	11	1	475	0	30	21
+664	2017-06-27 23:09:15.377897+08	11	42	194.666666666666998	42	7	3	1	0	100	1	11	1	42	0	3	1
+665	2017-06-27 23:09:15.379431+08	7	17	222.645349614552998	191	7.95833333333333037	12	8	2	59	1	11	1	191	2	12	8
+666	2017-06-27 23:09:15.380783+08	11	61	168.033754806984007	396	6.59999999999999964	30	7	0	55	1	11	1	396	0	30	7
+667	2017-06-27 23:09:15.382097+08	9	27	210.401850260229992	146	8.11111111111111072	9	7	1	52	1	11	1	146	1	9	7
+668	2017-06-27 23:09:15.383342+08	11	23	217.682698239485006	427	7.9074074074074101	27	14	0	53	1	11	1	427	0	27	14
+669	2017-06-27 23:09:15.384549+08	10	41	194.728281835911986	179	7.45833333333333037	12	5	1	56	1	11	1	179	1	12	5
+670	2017-06-27 23:09:15.385943+08	11	21	219.93380515547301	286	7.9444444444444402	18	11	2	58	1	11	1	286	2	18	11
+671	2017-06-27 23:09:15.387268+08	9	60	168.257256379800992	12	2	3	0	0	106	1	11	1	12	0	3	0
+672	2017-06-27 23:09:15.388521+08	5	36	201.715960059383008	51	8.5	3	1	0	60	1	11	1	51	0	3	1
+674	2017-06-27 23:09:15.390864+08	8	11	231.29207732568301	337	8.02380952380952017	21	13	2	57	1	11	1	337	2	21	13
+675	2017-06-27 23:09:15.394602+08	6	65	158.628627282320991	38	3.16666666666667007	6	0	0	96	1	11	1	38	0	6	0
+677	2017-06-27 23:09:15.397304+08	8	53	172.412810678546009	140	5.83333333333333037	12	0	0	109	1	11	1	140	0	12	0
+678	2017-06-27 23:09:15.398645+08	10	63	160.348102365959988	181	6.03333333333332966	15	4	0	83	1	11	1	181	0	15	4
+679	2017-06-27 23:09:15.399891+08	11	8	240.127186330638011	447	8.27777777777778034	27	18	3	1	1	11	1	447	3	27	18
+680	2017-06-27 23:09:15.401222+08	11	47	185.740520599247986	388	7.18518518518518956	27	12	0	80	1	11	1	388	0	27	12
+681	2017-06-27 23:09:15.402395+08	11	62	162.298522116638992	156	6.5	12	1	0	91	1	11	1	156	0	12	1
+683	2017-06-27 23:09:15.404842+08	8	45	191.049484175032006	126	7	9	3	0	108	1	11	1	126	0	9	3
+684	2017-06-27 23:09:15.406037+08	11	56	170.689659719296998	387	6.45000000000000018	30	7	0	79	1	11	1	387	0	30	7
+685	2017-06-27 23:10:42.73484+08	4	35	201.47926961475099	50	8.33333333333333037	3	3	0	112	1	12	1	50	0	3	3
+686	2017-06-27 23:10:42.736042+08	6	43	191.85998403855001	34	5.66666666666666963	3	1	0	111	1	12	1	34	0	3	1
+687	2017-06-27 23:10:42.737295+08	12	37	201.175027003276	483	7.31818181818182012	33	14	0	90	1	12	1	483	0	33	14
+689	2017-06-27 23:10:42.740078+08	12	29	204.789792344393987	511	7.74242424242424043	33	18	2	6	1	12	1	511	2	33	18
+690	2017-06-27 23:10:42.741505+08	12	9	237.857401322632001	391	8.14583333333333037	24	15	2	89	1	12	1	391	2	24	15
+691	2017-06-27 23:10:42.742815+08	12	56	169.522405409174013	463	6.4305555555555598	36	10	1	81	1	12	1	463	1	36	10
+692	2017-06-27 23:10:42.744128+08	12	6	247.979387090077012	542	8.21212121212120927	33	20	4	7	1	12	1	542	4	33	20
+693	2017-06-27 23:10:42.748072+08	10	59	168.584064270858988	187	6.23333333333332984	15	2	0	66	1	12	1	187	0	15	2
+695	2017-06-27 23:10:42.750824+08	3	36	201.289365747165988	87	7.25	6	3	0	113	1	12	1	87	0	6	3
+696	2017-06-27 23:10:42.752191+08	12	51	178.918474579204002	114	6.33333333333333037	9	2	0	64	1	12	1	114	0	9	2
+697	2017-06-27 23:10:42.753494+08	12	67	147.143449827000012	294	6.125	24	4	0	61	1	12	1	294	0	24	4
+698	2017-06-27 23:10:42.754849+08	12	40	197.513003249522001	556	7.72222222222221966	36	16	1	69	1	12	1	556	1	36	16
+699	2017-06-27 23:10:42.756053+08	11	32	202.602192546567011	180	7.5	12	5	1	62	1	12	1	180	1	12	5
+700	2017-06-27 23:10:42.757326+08	6	42	194.624604591753013	180	7.5	12	4	1	65	1	12	1	180	1	12	4
+701	2017-06-27 23:10:42.758713+08	12	31	203.661390277844987	236	7.8666666666666698	15	9	0	63	1	12	1	236	0	15	9
+702	2017-06-27 23:10:42.760107+08	9	58	168.989671164078999	143	5.95833333333333037	12	4	0	107	1	12	1	143	0	12	4
+703	2017-06-27 23:10:42.761448+08	11	69	142.593583947093009	229	5.45238095238094989	21	3	1	105	1	12	1	229	1	21	3
+704	2017-06-27 23:10:42.765557+08	7	64	158.628627282320991	38	3.16666666666667007	6	0	0	96	1	12	1	38	0	6	0
+705	2017-06-27 23:10:42.767105+08	9	47	183.698842011192994	160	6.66666666666666963	12	3	0	108	1	12	1	160	0	12	3
+706	2017-06-27 23:10:42.768603+08	12	11	236.203150629031995	487	8.11666666666667069	30	18	3	1	1	12	1	487	3	30	18
+707	2017-06-27 23:10:42.769913+08	12	61	167.579825106756999	421	6.37878787878787978	33	7	0	79	1	12	1	421	0	33	7
+708	2017-06-27 23:10:42.771174+08	11	65	156.561188133985013	217	6.02777777777778034	18	4	0	83	1	12	1	217	0	18	4
+709	2017-06-27 23:10:42.772416+08	12	48	182.319427883618999	429	7.15000000000000036	30	12	0	80	1	12	1	429	0	30	12
+710	2017-06-27 23:10:42.773878+08	12	50	179.956119090590988	155	6.45833333333333037	12	5	0	87	1	12	1	155	0	12	5
+711	2017-06-27 23:10:42.775306+08	9	54	172.412810678546009	140	5.83333333333333037	12	0	0	109	1	12	1	140	0	12	0
+712	2017-06-27 23:10:42.776517+08	12	63	162.298522116638992	156	6.5	12	1	0	91	1	12	1	156	0	12	1
+713	2017-06-27 23:10:42.779297+08	11	53	173.313492446954001	192	6.40000000000000036	15	3	0	97	1	12	1	192	0	15	3
+714	2017-06-27 23:10:42.783394+08	10	27	209.617622016029998	256	7.11111111111110983	18	5	3	45	1	12	1	256	3	18	5
+715	2017-06-27 23:10:42.784788+08	12	38	200.462088139360986	270	7.5	18	7	0	3	1	12	1	270	0	18	7
+716	2017-06-27 23:10:42.786228+08	12	17	224.804499267338002	384	8	24	14	2	42	1	12	1	384	2	24	14
+718	2017-06-27 23:10:42.790873+08	12	46	184.865107196092993	523	7.26388888888889017	36	15	1	43	1	12	1	523	1	36	15
+719	2017-06-27 23:10:42.792426+08	12	2	257.397032729038983	618	8.58333333333333037	36	25	6	41	1	12	1	618	6	36	25
+720	2017-06-27 23:10:42.793806+08	12	1	265.974422849967993	538	8.96666666666667034	30	24	7	40	1	12	1	538	7	30	24
+722	2017-06-27 23:10:42.802316+08	12	14	230.613581445304987	532	8.06060606060606055	33	22	6	71	1	12	1	532	6	33	22
+723	2017-06-27 23:10:42.803781+08	10	20	222.089479123329994	346	8.2380952380952408	21	12	0	77	1	12	1	346	0	21	12
+724	2017-06-27 23:10:42.80527+08	11	45	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	12	1	35	0	3	0
+725	2017-06-27 23:10:42.806827+08	10	30	203.987771667778986	141	7.83333333333333037	9	4	0	82	1	12	1	141	0	9	4
+726	2017-06-27 23:10:42.808153+08	12	26	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	12	1	97	0	6	3
+727	2017-06-27 23:10:42.809626+08	12	66	153.339681803600996	424	6.42424242424242031	33	7	0	78	1	12	1	424	0	33	7
+728	2017-06-27 23:10:42.810935+08	12	3	256.823319073406992	565	8.56060606060606055	33	23	3	76	1	12	1	565	3	33	23
+729	2017-06-27 23:10:42.81303+08	12	28	208.758313729315006	190	7.91666666666666963	12	7	2	92	1	12	1	190	2	12	7
+730	2017-06-27 23:10:42.817477+08	12	70	103.667676943708003	279	4.65000000000000036	30	1	0	54	1	12	1	279	0	30	1
+731	2017-06-27 23:10:42.819027+08	12	52	175.63856237347801	443	6.71212121212121016	33	8	0	55	1	12	1	443	0	33	8
+732	2017-06-27 23:10:42.820469+08	10	21	221.494075755915986	193	8.04166666666666963	12	9	2	52	1	12	1	193	2	12	9
+733	2017-06-27 23:10:42.821792+08	11	41	194.728281835911986	179	7.45833333333333037	12	5	1	56	1	12	1	179	1	12	5
+734	2017-06-27 23:10:42.823043+08	12	22	219.93380515547301	286	7.9444444444444402	18	11	2	58	1	12	1	286	2	18	11
+735	2017-06-27 23:10:42.824546+08	10	60	168.257256379800992	12	2	3	0	0	106	1	12	1	12	0	3	0
+736	2017-06-27 23:10:42.826647+08	12	44	189.098847619715997	81	6.75	6	2	0	100	1	12	1	81	0	6	2
+737	2017-06-27 23:10:42.828667+08	6	34	201.715960059383008	51	8.5	3	1	0	60	1	12	1	51	0	3	1
+738	2017-06-27 23:10:42.829975+08	12	39	200.062425409087012	451	7.51666666666667016	30	14	0	53	1	12	1	451	0	30	14
+739	2017-06-27 23:10:42.831465+08	8	19	222.645349614552998	191	7.95833333333333037	12	8	2	59	1	12	1	191	2	12	8
+740	2017-06-27 23:10:42.8332+08	9	13	231.29207732568301	337	8.02380952380952017	21	13	2	57	1	12	1	337	2	21	13
+741	2017-06-27 23:10:42.837331+08	11	49	181.056917883990991	163	6.79166666666666963	12	3	0	48	1	12	1	163	0	12	3
+742	2017-06-27 23:10:42.838627+08	12	15	228.331406832959999	522	7.90909090909091006	33	20	6	46	1	12	1	522	6	33	20
+743	2017-06-27 23:10:42.83995+08	8	55	169.828091717569009	231	6.41666666666666963	18	5	1	110	1	12	1	231	1	18	5
+744	2017-06-27 23:10:42.841338+08	12	8	238.070494365506988	497	8.28333333333332966	30	17	4	70	1	12	1	497	4	30	17
+745	2017-06-27 23:10:42.842718+08	12	57	169.275641144411992	397	6.6166666666666698	30	8	0	49	1	12	1	397	0	30	8
+746	2017-06-27 23:10:42.844029+08	12	25	214.870328025585991	328	7.8095238095238102	21	14	0	4	1	12	1	328	0	21	14
+747	2017-06-27 23:10:42.845273+08	12	62	166.754529003892998	434	6.57575757575757969	33	8	0	47	1	12	1	434	0	33	8
+749	2017-06-27 23:10:42.850494+08	12	12	234.988578608440008	473	7.8833333333333302	30	17	3	73	1	12	1	473	3	30	17
+752	2017-06-27 23:10:42.854447+08	11	7	241.233026601797008	276	9.19999999999999929	15	11	0	104	1	12	1	276	0	15	11
+753	2017-06-27 23:10:42.855833+08	12	18	224.503545498699992	441	8.16666666666666963	27	17	1	74	1	12	1	441	1	27	17
+754	2017-06-27 23:10:42.857218+08	12	23	217.147590785879004	526	7.96969696969696972	33	24	0	84	1	12	1	526	0	33	24
+755	2017-06-27 23:10:49.220678+08	8	63	158.628627282320991	38	3.16666666666667007	6	0	0	96	1	13	1	38	0	6	0
+756	2017-06-27 23:10:49.221989+08	13	64	156.788786121004989	453	6.29166666666666963	36	8	0	79	1	13	1	453	0	36	8
+758	2017-06-27 23:10:49.224599+08	13	10	238.383618580854005	532	8.06060606060606055	33	21	4	1	1	13	1	532	4	33	21
+759	2017-06-27 23:10:49.22589+08	12	66	144.493875610859988	242	5.76190476190476009	21	4	0	83	1	13	1	242	0	21	4
+760	2017-06-27 23:10:49.227283+08	10	49	183.698842011192994	160	6.66666666666666963	12	3	0	108	1	13	1	160	0	12	3
+761	2017-06-27 23:10:49.228562+08	13	50	179.956119090590988	155	6.45833333333333037	12	5	0	87	1	13	1	155	0	12	5
+762	2017-06-27 23:10:49.230067+08	13	61	162.298522116638992	156	6.5	12	1	0	91	1	13	1	156	0	12	1
+763	2017-06-27 23:10:49.231358+08	12	53	173.313492446954001	192	6.40000000000000036	15	3	0	97	1	13	1	192	0	15	3
+764	2017-06-27 23:10:49.232861+08	10	46	185.157887728984008	193	6.43333333333333002	15	1	0	109	1	13	1	193	0	15	1
+765	2017-06-27 23:10:49.236741+08	7	43	191.85998403855001	34	5.66666666666666963	3	1	0	111	1	13	1	34	0	3	1
+766	2017-06-27 23:10:49.237988+08	13	39	199.154777832103008	529	7.34722222222221966	36	16	0	90	1	13	1	529	0	36	16
+767	2017-06-27 23:10:49.23917+08	12	27	215.526701477234013	263	7.3055555555555598	18	6	2	93	1	13	1	263	2	18	6
+768	2017-06-27 23:10:49.240478+08	5	36	201.47926961475099	50	8.33333333333333037	3	3	0	112	1	13	1	50	0	3	3
+770	2017-06-27 23:10:49.243245+08	13	62	161.427837801077004	503	6.44871794871794979	39	10	1	81	1	13	1	503	1	39	10
+771	2017-06-27 23:10:49.244435+08	13	6	245.116221173892995	590	8.19444444444443931	36	22	5	7	1	13	1	590	5	36	22
+772	2017-06-27 23:10:49.245808+08	13	11	237.857401322632001	391	8.14583333333333037	24	15	2	89	1	13	1	391	2	24	15
+773	2017-06-27 23:10:49.249355+08	13	15	230.613581445304987	532	8.06060606060606055	33	22	6	71	1	13	1	532	6	33	22
+774	2017-06-27 23:10:49.250724+08	13	65	152.515964416863	468	6.5	36	8	0	78	1	13	1	468	0	36	8
+775	2017-06-27 23:10:49.252508+08	12	45	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	13	1	35	0	3	0
+776	2017-06-27 23:10:49.253945+08	11	32	203.987771667778986	141	7.83333333333333037	9	4	0	82	1	13	1	141	0	9	4
+777	2017-06-27 23:10:49.255229+08	13	29	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	13	1	97	0	6	3
+778	2017-06-27 23:10:49.256551+08	11	13	232.790971614739988	403	8.39583333333333037	24	15	0	77	1	13	1	403	0	24	15
+779	2017-06-27 23:10:49.257811+08	11	3	255.949557508178998	563	8.53030303030302939	33	25	9	5	1	13	1	563	9	33	25
+780	2017-06-27 23:10:49.259034+08	13	5	245.954069614208009	609	8.45833333333333037	36	23	3	76	1	13	1	609	3	36	23
+781	2017-06-27 23:10:49.260308+08	13	25	216.306071405143001	239	7.96666666666667034	15	8	2	92	1	13	1	239	2	15	8
+782	2017-06-27 23:10:49.266014+08	13	14	232.209089373868011	538	8.15151515151515049	33	18	5	70	1	13	1	538	5	33	18
+783	2017-06-27 23:10:49.267333+08	9	55	169.828091717569009	231	6.41666666666666963	18	5	1	110	1	13	1	231	1	18	5
+784	2017-06-27 23:10:49.270297+08	13	19	225.999982447646005	563	7.8194444444444402	36	22	7	46	1	13	1	563	7	36	22
+785	2017-06-27 23:10:49.271909+08	12	48	184.615098325323004	211	7.03333333333332966	15	4	0	48	1	13	1	211	0	15	4
+787	2017-06-27 23:10:49.274654+08	13	60	163.599231207169993	433	6.56060606060605966	33	8	0	49	1	13	1	433	0	33	8
+788	2017-06-27 23:10:49.276281+08	13	28	214.870328025585991	328	7.8095238095238102	21	14	0	4	1	13	1	328	0	21	14
+789	2017-06-27 23:10:49.280855+08	12	41	194.728281835911986	179	7.45833333333333037	12	5	1	56	1	13	1	179	1	12	5
+790	2017-06-27 23:10:49.282109+08	13	24	219.93380515547301	286	7.9444444444444402	18	11	2	58	1	13	1	286	2	18	11
+791	2017-06-27 23:10:49.283297+08	11	59	168.257256379800992	12	2	3	0	0	106	1	13	1	12	0	3	0
+792	2017-06-27 23:10:49.284507+08	13	44	189.098847619715997	81	6.75	6	2	0	100	1	13	1	81	0	6	2
+793	2017-06-27 23:10:49.285805+08	11	31	207.756897750472007	222	7.40000000000000036	15	9	2	52	1	13	1	222	2	15	9
+794	2017-06-27 23:10:49.288129+08	7	35	201.715960059383008	51	8.5	3	1	0	60	1	13	1	51	0	3	1
+795	2017-06-27 23:10:49.289566+08	13	54	171.764104658342006	479	6.65277777777778034	36	8	0	55	1	13	1	479	0	36	8
+797	2017-06-27 23:10:49.292383+08	9	21	222.645349614552998	191	7.95833333333333037	12	8	2	59	1	13	1	191	2	12	8
+798	2017-06-27 23:10:49.293932+08	13	70	94.1596363439468007	298	4.51515151515152002	33	1	0	54	1	13	1	298	0	33	1
+799	2017-06-27 23:10:49.295192+08	10	16	229.727602474988998	378	7.875	24	15	3	57	1	13	1	378	3	24	15
+800	2017-06-27 23:10:49.29909+08	11	9	238.752779482394999	304	8.44444444444443931	18	12	4	75	1	13	1	304	4	18	12
+801	2017-06-27 23:10:49.301055+08	13	18	226.041765439247996	444	8.22222222222221966	27	17	2	72	1	13	1	444	2	27	17
+802	2017-06-27 23:10:49.30314+08	13	26	215.917152751620989	649	8.32051282051281937	39	23	0	2	1	13	1	649	0	39	23
+803	2017-06-27 23:10:49.304757+08	12	7	241.233026601797008	276	9.19999999999999929	15	11	0	104	1	13	1	276	0	15	11
+804	2017-06-27 23:10:49.306107+08	13	20	224.503545498699992	441	8.16666666666666963	27	17	1	74	1	13	1	441	1	27	17
+805	2017-06-27 23:10:49.307512+08	13	8	239.038249774119009	525	7.9545454545454497	33	19	4	73	1	13	1	525	4	33	19
+806	2017-06-27 23:10:49.308923+08	13	12	235.427978697513993	582	8.08333333333333037	36	26	1	84	1	13	1	582	1	36	26
+807	2017-06-27 23:10:49.313216+08	13	67	144.198255338578008	202	5.61111111111110983	18	5	0	67	1	13	1	202	0	18	5
+808	2017-06-27 23:10:49.314453+08	4	37	201.289365747165988	87	7.25	6	3	0	113	1	13	1	87	0	6	3
+809	2017-06-27 23:10:49.315753+08	13	34	201.912322175646011	607	7.78205128205128016	39	17	1	69	1	13	1	607	1	39	17
+810	2017-06-27 23:10:49.317079+08	13	51	178.918474579204002	114	6.33333333333333037	9	2	0	64	1	13	1	114	0	9	2
+811	2017-06-27 23:10:49.318301+08	13	68	143.557769868381996	327	6.0555555555555598	27	4	0	61	1	13	1	327	0	27	4
+812	2017-06-27 23:10:49.319494+08	12	40	195.297450588380002	216	7.20000000000000018	15	5	1	62	1	13	1	216	1	15	5
+813	2017-06-27 23:10:49.320715+08	7	42	194.624604591753013	180	7.5	12	4	1	65	1	13	1	180	1	12	4
+814	2017-06-27 23:10:49.322055+08	13	30	208.073803201501988	284	7.88888888888889017	18	11	0	63	1	13	1	284	0	18	11
+815	2017-06-27 23:10:49.323346+08	10	57	168.989671164078999	143	5.95833333333333037	12	4	0	107	1	13	1	143	0	12	4
+816	2017-06-27 23:10:49.324814+08	11	58	168.584064270858988	187	6.23333333333332984	15	2	0	66	1	13	1	187	0	15	2
+817	2017-06-27 23:10:49.326179+08	12	69	138.500903847600995	258	5.375	24	3	1	105	1	13	1	258	1	24	3
+819	2017-06-27 23:10:49.331077+08	13	4	246.429813105502006	668	8.56410256410256032	39	27	6	41	1	13	1	668	6	39	27
+820	2017-06-27 23:10:49.332335+08	11	23	220.324517467291997	313	7.45238095238094989	21	8	3	45	1	13	1	313	3	21	8
+821	2017-06-27 23:10:49.3337+08	13	17	228.948029046977013	438	8.11111111111111072	27	16	2	42	1	13	1	438	2	27	16
+822	2017-06-27 23:10:49.335046+08	13	47	185.097840700263987	572	7.33333333333333037	39	17	1	43	1	13	1	572	1	39	17
+824	2017-06-27 23:10:49.337562+08	12	2	256.570817369263011	369	8.78571428571429003	21	17	4	44	1	13	1	369	4	21	17
+46	2017-06-27 22:01:15.24172+08	2	20	203.807596953266994	90	7.5	6	3	1	92	1	2	1	90	1	6	3
+59	2017-06-27 22:01:15.268214+08	2	49	169.611029433910005	57	4.75	6	1	0	61	1	2	1	57	0	6	1
+14	2017-06-27 21:48:26.79883+08	1	36	186.96296296296299	33	5.5	3	0	0	67	1	1	1	33	0	3	0
+84	2017-06-27 22:01:15.318751+08	2	24	200.011942080908	45	7.5	3	2	0	87	1	2	1	45	0	3	2
+80	2017-06-27 22:01:15.313251+08	2	32	195.409964129627014	93	7.75	6	3	0	80	1	2	1	93	0	6	3
+113	2017-06-27 22:11:45.415992+08	3	14	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	3	1	97	0	6	3
+827	2017-06-27 23:10:53.030733+08	14	22	220.33486986064699	483	8.05000000000000071	30	17	1	74	1	14	1	483	1	30	17
+828	2017-06-27 23:10:53.031981+08	14	34	203.829081685447989	683	8.1309523809523796	42	24	0	2	1	14	1	683	0	42	24
+829	2017-06-27 23:10:53.033211+08	14	10	239.038249774119009	525	7.9545454545454497	33	19	4	73	1	14	1	525	4	33	19
+830	2017-06-27 23:10:53.034531+08	12	7	249.183101431545992	354	8.4285714285714306	21	14	5	75	1	14	1	354	5	21	14
+831	2017-06-27 23:10:53.035995+08	14	16	230.954739813550987	626	8.02564102564103088	39	27	1	84	1	14	1	626	1	39	27
+832	2017-06-27 23:10:53.039763+08	14	11	237.342424035356004	582	8.08333333333333037	36	24	8	71	1	14	1	582	8	36	24
+833	2017-06-27 23:10:53.041039+08	13	47	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	14	1	35	0	3	0
+834	2017-06-27 23:10:53.042416+08	12	32	203.987771667778986	141	7.83333333333333037	9	4	0	82	1	14	1	141	0	9	4
+835	2017-06-27 23:10:53.04374+08	14	29	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	14	1	97	0	6	3
+836	2017-06-27 23:10:53.045072+08	12	3	258.623875860145006	610	8.47222222222221966	36	27	9	5	1	14	1	610	9	36	27
+837	2017-06-27 23:10:53.046268+08	12	8	247.504948877276007	460	8.51851851851852082	27	18	0	77	1	14	1	460	0	27	18
+838	2017-06-27 23:10:53.047563+08	14	64	154.135062910301002	505	6.47435897435897001	39	8	0	78	1	14	1	505	0	39	8
+839	2017-06-27 23:10:53.048927+08	14	24	216.306071405143001	239	7.96666666666667034	15	8	2	92	1	14	1	239	2	15	8
+840	2017-06-27 23:10:53.050223+08	14	13	234.924860686735002	647	8.29487179487179915	39	24	3	76	1	14	1	647	3	39	24
+841	2017-06-27 23:10:53.054327+08	14	5	251.160682939866007	720	8.5714285714285694	42	29	6	41	1	14	1	720	6	42	29
+842	2017-06-27 23:10:53.055685+08	12	23	220.324517467291997	313	7.45238095238094989	21	8	3	45	1	14	1	313	3	21	8
+843	2017-06-27 23:10:53.056991+08	14	33	203.860668471162995	319	7.59523809523808957	21	9	0	3	1	14	1	319	0	21	9
+845	2017-06-27 23:10:53.060191+08	13	2	261.251153299822988	423	8.8125	24	19	4	44	1	14	1	423	4	24	19
+846	2017-06-27 23:10:53.061679+08	14	17	228.728171706195013	488	8.13333333333332931	30	18	2	42	1	14	1	488	2	30	18
+847	2017-06-27 23:10:53.06297+08	14	46	187.28356281525501	619	7.3690476190476204	42	18	1	43	1	14	1	619	1	42	18
+848	2017-06-27 23:10:53.066748+08	10	56	169.828091717569009	231	6.41666666666666963	18	5	1	110	1	14	1	231	1	18	5
+850	2017-06-27 23:10:53.069283+08	13	50	177.284844463995	246	6.83333333333333037	18	5	0	48	1	14	1	246	0	18	5
+851	2017-06-27 23:10:53.072307+08	14	9	240.715223885877009	587	8.15277777777778034	36	20	5	70	1	14	1	587	5	36	20
+852	2017-06-27 23:10:53.073693+08	14	27	214.870328025585991	328	7.8095238095238102	21	14	0	4	1	14	1	328	0	21	14
+853	2017-06-27 23:10:53.07505+08	14	60	158.255552712836987	501	6.4230769230769198	39	10	0	47	1	14	1	501	0	39	10
+854	2017-06-27 23:10:53.076336+08	14	62	156.606445045279997	464	6.4444444444444402	36	8	0	49	1	14	1	464	0	36	8
+855	2017-06-27 23:10:53.080298+08	9	59	158.628627282320991	38	3.16666666666667007	6	0	0	96	1	14	1	38	0	6	0
+856	2017-06-27 23:10:53.081668+08	11	49	179.816144842987001	233	6.47222222222221966	18	2	0	109	1	14	1	233	0	18	2
+857	2017-06-27 23:10:53.082968+08	13	66	144.493875610859988	242	5.76190476190476009	21	4	0	83	1	14	1	242	0	21	4
+858	2017-06-27 23:10:53.084765+08	11	48	183.698842011192994	160	6.66666666666666963	12	3	0	108	1	14	1	160	0	12	3
+859	2017-06-27 23:10:53.087456+08	14	61	157.976408905941014	497	6.37179487179486959	39	9	0	79	1	14	1	497	0	39	9
+860	2017-06-27 23:10:53.088922+08	14	58	162.298522116638992	156	6.5	12	1	0	91	1	14	1	156	0	12	1
+861	2017-06-27 23:10:53.090156+08	13	53	173.313492446954001	192	6.40000000000000036	15	3	0	97	1	14	1	192	0	15	3
+862	2017-06-27 23:10:53.092169+08	14	55	172.357405244100988	507	7.04166666666666963	36	14	0	80	1	14	1	507	0	36	14
+863	2017-06-27 23:10:53.093619+08	14	4	252.203008973115004	592	8.22222222222221966	36	24	5	1	1	14	1	592	5	36	24
+864	2017-06-27 23:10:53.095134+08	14	51	176.283683075113998	197	6.56666666666666998	15	6	0	87	1	14	1	197	0	15	6
+865	2017-06-27 23:10:53.099389+08	14	68	139.418706609581989	364	6.06666666666666998	30	5	0	61	1	14	1	364	0	30	5
+866	2017-06-27 23:10:53.100607+08	5	37	201.289365747165988	87	7.25	6	3	0	113	1	14	1	87	0	6	3
+867	2017-06-27 23:10:53.101784+08	11	52	175.463588028105988	191	6.3666666666666698	15	6	0	107	1	14	1	191	0	15	6
+868	2017-06-27 23:10:53.103794+08	12	63	154.619020194802005	215	5.97222222222221966	18	3	0	66	1	14	1	215	0	18	3
+869	2017-06-27 23:10:53.105142+08	14	54	172.847325496958007	151	6.29166666666666963	12	3	0	64	1	14	1	151	0	12	3
+870	2017-06-27 23:10:53.106586+08	13	38	195.297450588380002	216	7.20000000000000018	15	5	1	62	1	14	1	216	1	15	5
+872	2017-06-27 23:10:53.109607+08	14	30	208.073803201501988	284	7.88888888888889017	18	11	0	63	1	14	1	284	0	18	11
+873	2017-06-27 23:10:53.11088+08	14	28	214.800794917138006	667	7.9404761904761898	42	20	1	69	1	14	1	667	1	42	20
+874	2017-06-27 23:10:53.11208+08	14	67	144.198255338578008	202	5.61111111111110983	18	5	0	67	1	14	1	202	0	18	5
+875	2017-06-27 23:10:53.113243+08	13	69	138.500903847600995	258	5.375	24	3	1	105	1	14	1	258	1	24	3
+876	2017-06-27 23:10:53.119329+08	14	70	97.3262783579581026	332	4.61111111111110983	36	2	0	54	1	14	1	332	0	36	2
+877	2017-06-27 23:10:53.120743+08	12	57	168.257256379800992	12	2	3	0	0	106	1	14	1	12	0	3	0
+878	2017-06-27 23:10:53.122183+08	14	44	189.098847619715997	81	6.75	6	2	0	100	1	14	1	81	0	6	2
+879	2017-06-27 23:10:53.123562+08	12	31	207.756897750472007	222	7.40000000000000036	15	9	2	52	1	14	1	222	2	15	9
+880	2017-06-27 23:10:53.12502+08	8	35	201.715960059383008	51	8.5	3	1	0	60	1	14	1	51	0	3	1
+882	2017-06-27 23:10:53.127505+08	10	21	222.645349614552998	191	7.95833333333333037	12	8	2	59	1	14	1	191	2	12	8
+883	2017-06-27 23:10:53.128712+08	14	45	188.466037156292998	531	6.80769230769231015	39	10	0	55	1	14	1	531	0	39	10
+884	2017-06-27 23:10:53.130073+08	13	40	194.728281835911986	179	7.45833333333333037	12	5	1	56	1	14	1	179	1	12	5
+885	2017-06-27 23:10:53.131303+08	14	42	192.328447971439999	533	7.40277777777778034	36	15	0	53	1	14	1	533	0	36	15
+886	2017-06-27 23:10:53.132515+08	11	19	226.743649766647991	424	7.85185185185185031	27	17	3	57	1	14	1	424	3	27	17
+45	2017-06-27 22:01:15.240334+08	2	4	220.954461267576988	109	9.08333333333333037	6	5	0	76	1	2	1	109	0	6	5
+3	2017-06-27 21:48:26.775309+08	1	26	195.901477832512001	42	7	3	1	0	7	1	1	1	42	0	3	1
+39	2017-06-27 21:48:26.855184+08	1	14	204.559706959707	46	7.66666666666666963	3	1	0	92	1	1	1	46	0	3	1
+75	2017-06-27 22:01:15.301621+08	2	35	194.666666666666998	42	7	3	1	0	100	1	2	1	42	0	3	1
+115	2017-06-27 22:11:45.41923+08	1	24	202.613548575534992	47	7.83333333333333037	3	1	0	82	1	3	1	47	0	3	1
+103	2017-06-27 22:11:45.382162+08	3	28	200.011942080908	45	7.5	3	2	0	87	1	3	1	45	0	3	2
+144	2017-06-27 22:11:45.490195+08	1	56	168.257256379800992	12	2	3	0	0	106	1	3	1	12	0	3	0
+194	2017-06-27 22:24:29.515179+08	4	20	208.656434680403009	93	7.75	6	3	0	72	1	4	1	93	0	6	3
+208	2017-06-27 22:24:29.538887+08	4	49	185.545948402917986	119	6.61111111111110983	9	2	0	49	1	4	1	119	0	9	2
+232	2017-06-27 22:26:18.533625+08	4	8	229.959130983422995	165	9.16666666666666963	9	7	0	104	1	5	1	165	0	9	7
+265	2017-06-27 22:26:18.593212+08	2	44	191.201452338244991	35	5.83333333333333037	3	1	0	108	1	5	1	35	0	3	1
+343	2017-06-27 22:26:25.554822+08	7	60	173.218758768174013	191	6.3666666666666698	15	4	0	49	1	7	1	191	0	15	4
+287	2017-06-27 22:26:21.723419+08	5	44	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	6	1	35	0	3	0
+319	2017-06-27 22:26:21.781616+08	5	29	200.84386433127699	137	7.61111111111110983	9	4	1	56	1	6	1	137	1	9	4
+365	2017-06-27 22:26:25.592444+08	7	25	208.52827369985701	279	7.75	18	8	0	90	1	7	1	279	0	18	8
+370	2017-06-27 22:26:25.600927+08	7	63	161.326195702717996	259	6.16666666666666963	21	4	0	81	1	7	1	259	0	21	4
+888	2017-06-27 23:10:53.137792+08	14	39	194.774953264662997	575	7.37179487179486959	39	18	0	90	1	14	1	575	0	39	18
+889	2017-06-27 23:10:53.138926+08	14	26	215.096250756954987	606	7.76923076923077005	39	21	4	6	1	14	1	606	4	39	21
+890	2017-06-27 23:10:53.140285+08	6	36	201.47926961475099	50	8.33333333333333037	3	3	0	112	1	14	1	50	0	3	3
+891	2017-06-27 23:10:53.141663+08	8	43	191.85998403855001	34	5.66666666666666963	3	1	0	111	1	14	1	34	0	3	1
+892	2017-06-27 23:10:53.143054+08	14	65	153.427201907779988	537	6.39285714285713969	42	10	1	81	1	14	1	537	1	42	10
+893	2017-06-27 23:10:53.144318+08	14	14	233.845327520599994	440	8.14814814814815058	27	17	2	89	1	14	1	440	2	27	17
+894	2017-06-27 23:10:53.145628+08	14	6	250.66666654497601	647	8.29487179487179915	39	25	6	7	1	14	1	647	6	39	25
+98	2017-06-27 22:11:45.36305+08	2	43	190.303493986219991	32	5.33333333333333037	3	0	0	105	1	3	1	32	0	3	0
+162	2017-06-27 22:24:29.455827+08	4	14	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	4	1	97	0	6	3
+174	2017-06-27 22:24:29.47655+08	4	61	164.945166183103993	97	5.38888888888889017	9	1	0	61	1	4	1	97	0	9	1
+193	2017-06-27 22:24:29.513408+08	3	7	229.959130983422995	165	9.16666666666666963	9	7	0	104	1	4	1	165	0	9	7
+160	2017-06-27 22:24:29.450188+08	4	8	224.640362440417988	200	8.33333333333333037	12	8	1	7	1	4	1	200	1	12	8
+253	2017-06-27 22:26:18.573626+08	4	37	197.483599825688998	85	7.08333333333333037	6	2	0	93	1	5	1	85	0	6	2
+251	2017-06-27 22:26:18.570823+08	5	41	193.763798424263001	176	7.33333333333333037	12	5	0	90	1	5	1	176	0	12	5
+266	2017-06-27 22:26:18.598786+08	4	46	187.202829948345993	35	5.83333333333333037	3	0	0	103	1	5	1	35	0	3	0
+347	2017-06-27 22:26:25.562542+08	7	13	220.416800283604999	332	7.90476190476191043	21	12	1	69	1	7	1	332	1	21	12
+307	2017-06-27 22:26:21.760266+08	6	24	208.187605872523989	283	7.86111111111110983	18	12	0	4	1	6	1	283	0	18	12
+316	2017-06-27 22:26:21.777525+08	6	65	125.347475908912003	125	4.16666666666666963	15	0	0	54	1	6	1	125	0	15	0
+339	2017-06-27 22:26:21.816421+08	6	26	205.115874949918009	186	7.75	12	6	1	42	1	6	1	186	1	12	6
+382	2017-06-27 22:26:25.625599+08	7	11	224.02314483149101	248	8.26666666666666927	15	10	1	58	1	7	1	248	1	15	10
+404	2017-06-27 22:26:25.662755+08	7	44	188.34818034483601	311	7.40476190476191043	21	9	1	43	1	7	1	311	1	21	9
+403	2017-06-27 22:26:25.661498+08	7	2	270.196076863043004	383	9.1190476190476204	21	16	4	41	1	7	1	383	4	21	16
+415	2017-06-27 22:26:29.841585+08	6	32	202.613548575534992	47	7.83333333333333037	3	1	0	82	1	8	1	47	0	3	1
+456	2017-06-27 22:26:29.915444+08	8	68	117.134493182186006	149	4.13888888888889017	18	0	0	54	1	8	1	149	0	18	0
+473	2017-06-27 22:26:29.942467+08	7	47	183.813891301973996	74	6.16666666666666963	6	0	0	97	1	8	1	74	0	6	0
+421	2017-06-27 22:26:29.849327+08	8	10	230.018061424955988	333	7.92857142857142971	21	13	5	71	1	8	1	333	5	21	13
+495	2017-06-27 22:26:36.297497+08	9	62	166.283987855340001	353	6.53703703703703987	27	7	0	47	1	9	1	353	0	27	7
+556	2017-06-27 22:26:40.077477+08	10	44	190.151925312038998	391	7.24074074074073959	27	12	0	90	1	10	1	391	0	27	12
+552	2017-06-27 22:26:40.072303+08	4	42	191.85998403855001	34	5.66666666666666963	3	1	0	111	1	10	1	34	0	3	1
+571	2017-06-27 22:26:40.10517+08	6	15	222.645349614552998	191	7.95833333333333037	12	8	2	59	1	10	1	191	2	12	8
+606	2017-06-27 22:26:40.168735+08	10	53	179.956119090590988	155	6.45833333333333037	12	5	0	87	1	10	1	155	0	12	5
+288	2017-06-27 22:26:21.724723+08	4	28	202.613548575534992	47	7.83333333333333037	3	1	0	82	1	6	1	47	0	3	1
+340	2017-06-27 22:26:25.550908+08	3	59	173.940955318065988	17	2.83333333333332993	3	0	0	110	1	7	1	17	0	3	0
+619	2017-06-27 23:09:15.271534+08	2	38	201.289365747165988	87	7.25	6	3	0	113	1	11	1	87	0	6	3
+646	2017-06-27 23:09:15.334472+08	11	26	212.503100225878001	97	8.08333333333333037	6	3	0	88	1	11	1	97	0	6	3
+673	2017-06-27 23:09:15.389698+08	11	70	114.534611177798993	256	4.74074074074073959	27	1	0	54	1	11	1	256	0	27	1
+676	2017-06-27 23:09:15.395912+08	11	49	179.956119090590988	155	6.45833333333333037	12	5	0	87	1	11	1	155	0	12	5
+694	2017-06-27 23:10:42.749371+08	12	68	144.198255338578008	202	5.61111111111110983	18	5	0	67	1	12	1	202	0	18	5
+721	2017-06-27 23:10:42.80067+08	10	4	254.545387293327991	514	8.56666666666666998	30	23	9	5	1	12	1	514	9	30	23
+748	2017-06-27 23:10:42.849204+08	12	16	225.218562854525999	394	8.20833333333333037	24	15	2	72	1	12	1	394	2	24	15
+751	2017-06-27 23:10:42.853127+08	10	10	237.730941560664007	257	8.56666666666666998	15	10	4	75	1	12	1	257	4	15	10
+769	2017-06-27 23:10:49.241826+08	13	22	221.118961972056013	564	7.83333333333333037	36	20	4	6	1	13	1	564	4	36	20
+796	2017-06-27 23:10:49.290972+08	13	33	203.694373596051008	501	7.59090909090908994	33	15	0	53	1	13	1	501	0	33	15
+823	2017-06-27 23:10:49.336348+08	13	1	265.974422849967993	538	8.96666666666667034	30	24	7	40	1	13	1	538	7	30	24
+826	2017-06-27 23:10:53.029452+08	13	12	236.82566247031599	320	8.88888888888888928	18	13	0	104	1	14	1	320	0	18	13
+844	2017-06-27 23:10:53.058529+08	14	1	265.974422849967993	538	8.96666666666667034	30	24	7	40	1	14	1	538	7	30	24
+871	2017-06-27 23:10:53.108081+08	8	41	194.624604591753013	180	7.5	12	4	1	65	1	14	1	180	1	12	4
+401	2017-06-27 22:26:25.65908+08	7	1	284.565249769472018	400	9.52380952380952017	21	19	5	40	1	7	1	400	5	21	19
+426	2017-06-27 22:26:29.858296+08	8	6	241.694675663693999	309	8.58333333333333037	18	13	1	74	1	8	1	309	1	18	13
+438	2017-06-27 22:26:29.881331+08	2	38	198.254188944806003	87	7.25	6	1	1	65	1	8	1	87	1	6	1
+461	2017-06-27 22:26:29.925078+08	8	60	169.805460692796004	231	6.41666666666666963	18	5	0	49	1	8	1	231	0	18	5
+502	2017-06-27 22:26:36.311117+08	8	36	200.84386433127699	137	7.61111111111110983	9	4	1	56	1	9	1	137	1	9	4
+509	2017-06-27 22:26:36.325572+08	8	7	241.233026601797008	276	9.19999999999999929	15	11	0	104	1	9	1	276	0	15	11
+536	2017-06-27 22:26:36.372207+08	9	57	171.744242019165	316	6.58333333333333037	24	4	0	78	1	9	1	316	0	24	4
+575	2017-06-27 22:26:40.111235+08	8	61	168.257256379800992	12	2	3	0	0	106	1	10	1	12	0	3	0
+588	2017-06-27 22:26:40.134332+08	10	39	199.080948602027007	177	7.375	12	4	0	3	1	10	1	177	0	12	4
+558	2017-06-27 22:26:40.080258+08	10	12	229.912082724648002	432	8	27	15	2	7	1	10	1	432	2	27	15
+563	2017-06-27 22:26:40.089818+08	10	54	178.918474579204002	114	6.33333333333333037	9	2	0	64	1	10	1	114	0	9	2
+620	2017-06-27 23:09:15.273227+08	11	50	178.918474579204002	114	6.33333333333333037	9	2	0	64	1	11	1	114	0	9	2
+649	2017-06-27 23:09:15.344425+08	5	44	191.85998403855001	34	5.66666666666666963	3	1	0	111	1	11	1	34	0	3	1
+682	2017-06-27 23:09:15.403632+08	10	52	173.313492446954001	192	6.40000000000000036	15	3	0	97	1	11	1	192	0	15	3
+688	2017-06-27 23:10:42.73861+08	11	33	202.16302672744601	210	7	15	4	1	93	1	12	1	210	1	15	4
+717	2017-06-27 23:10:42.787612+08	11	5	254.515386314283006	319	8.86111111111111072	18	15	4	44	1	12	1	319	4	18	15
+750	2017-06-27 23:10:42.851817+08	12	24	215.040049351315986	594	8.25	36	21	0	2	1	12	1	594	0	36	21
+757	2017-06-27 23:10:49.223319+08	13	52	173.537372708240014	463	7.01515151515152002	33	13	0	80	1	13	1	463	0	33	13
+786	2017-06-27 23:10:49.273041+08	13	56	169.105134340603001	474	6.58333333333333037	36	10	0	47	1	13	1	474	0	36	10
+818	2017-06-27 23:10:49.329836+08	13	38	200.462088139360986	270	7.5	18	7	0	3	1	13	1	270	0	18	7
+825	2017-06-27 23:10:53.028192+08	14	20	226.041765439247996	444	8.22222222222221966	27	17	2	72	1	14	1	444	2	27	17
+849	2017-06-27 23:10:53.068053+08	14	18	227.890818715684986	612	7.84615384615385025	39	24	7	46	1	14	1	612	7	39	24
+881	2017-06-27 23:10:53.126327+08	14	15	231.279909083250004	340	8.09523809523808957	21	13	5	58	1	14	1	340	5	21	13
+887	2017-06-27 23:10:53.136391+08	13	25	215.526701477234013	263	7.3055555555555598	18	6	2	93	1	14	1	263	2	18	6
+523	2017-06-27 22:26:36.349844+08	6	43	189.630931051211007	80	6.66666666666666963	6	2	0	108	1	9	1	80	0	6	2
 \.
 
 
@@ -7918,119 +8169,119 @@ SELECT pg_catalog.setval('stats_playerranking_id_seq', 894, true);
 -- Data for Name: stats_teamranking; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY stats_teamranking (id, date, serial_id, ranking, elo_points, raw_points, handicap, clearances, matches_played, matches_won, legs_played, legs_won, league_id, season_id, team_id, week_id) FROM stdin;
-3	2017-06-27 21:26:43.228678+08	1	7	\N	180	\N	0	1	0	7	1	1	1	8	1
-2	2017-06-27 21:26:43.226535+08	1	4	\N	242	\N	0	1	1	7	4	1	1	1	1
-7	2017-06-27 21:26:43.236172+08	1	8	\N	164	\N	0	1	0	7	0	1	1	6	1
-6	2017-06-27 21:26:43.234416+08	1	3	\N	246	\N	3	1	1	7	5	1	1	3	1
-4	2017-06-27 21:26:43.2309+08	1	2	\N	259	\N	0	1	1	7	6	1	1	2	1
-1	2017-06-27 21:26:43.222927+08	1	5	\N	229	\N	0	1	0	7	3	1	1	7	1
-8	2017-06-27 21:26:43.237748+08	1	1	\N	262	\N	0	1	1	7	7	1	1	5	1
-13	2017-06-27 22:01:15.280696+08	2	6	\N	505	\N	0	2	1	14	6	1	1	2	2
-12	2017-06-27 22:01:15.265445+08	2	8	\N	394	\N	0	2	0	14	2	1	1	8	2
-22	2017-06-27 22:11:45.447072+08	3	1	\N	738	\N	5	3	3	21	16	1	1	3	3
-14	2017-06-27 22:01:15.294033+08	2	5	\N	450	\N	1	2	1	14	7	1	1	6	2
-15	2017-06-27 22:01:15.306248+08	2	7	\N	450	\N	0	2	1	14	4	1	1	1	2
-16	2017-06-27 22:01:15.320156+08	2	2	\N	491	\N	1	2	1	14	9	1	1	4	2
-9	2017-06-27 22:01:15.229046+08	2	4	\N	472	\N	3	2	1	14	8	1	1	5	2
-10	2017-06-27 22:01:15.243038+08	2	2	\N	491	\N	2	2	1	14	9	1	1	7	2
-11	2017-06-27 22:01:15.25402+08	2	1	\N	502	\N	4	2	2	14	11	1	1	3	2
-20	2017-06-27 22:11:45.406545+08	3	4	\N	696	\N	4	3	1	21	10	1	1	5	3
-29	2017-06-27 22:24:29.48751+08	4	8	\N	850	\N	0	4	1	28	6	1	1	1	4
-23	2017-06-27 22:11:45.463102+08	3	3	\N	716	\N	2	3	2	21	14	1	1	7	3
-24	2017-06-27 22:11:45.481304+08	3	5	\N	662	\N	2	3	1	21	9	1	1	6	3
-17	2017-06-27 22:11:45.336647+08	3	7	\N	664	\N	0	3	1	21	7	1	1	8	3
-18	2017-06-27 22:11:45.368417+08	3	8	\N	682	\N	0	3	1	21	6	1	1	1	3
-19	2017-06-27 22:11:45.389865+08	3	2	\N	749	\N	2	3	2	21	14	1	1	4	3
-28	2017-06-27 22:24:29.468189+08	4	7	\N	874	\N	0	4	1	28	8	1	1	8	4
-37	2017-06-27 22:26:18.55088+08	5	7	\N	1089	\N	0	5	1	35	10	1	1	8	5
-30	2017-06-27 22:24:29.503664+08	4	4	\N	987	\N	1	4	2	28	15	1	1	2	4
-31	2017-06-27 22:24:29.517981+08	4	6	\N	878	\N	3	4	1	28	11	1	1	6	4
-32	2017-06-27 22:24:29.532357+08	4	2	\N	998	\N	3	4	3	28	19	1	1	4	4
-25	2017-06-27 22:24:29.426885+08	4	1	\N	993	\N	9	4	4	28	22	1	1	3	4
-26	2017-06-27 22:24:29.442204+08	4	5	\N	909	\N	3	4	2	28	15	1	1	7	4
-27	2017-06-27 22:24:29.452828+08	4	3	\N	952	\N	5	4	2	28	16	1	1	5	4
-36	2017-06-27 22:26:18.537535+08	5	5	\N	1162	\N	7	5	3	35	19	1	1	4	5
-42	2017-06-27 22:26:21.718105+08	6	4	\N	1410	\N	8	6	2	42	21	1	1	5	6
-38	2017-06-27 22:26:18.56775+08	5	3	\N	1153	\N	3	5	3	35	20	1	1	7	5
-39	2017-06-27 22:26:18.579121+08	5	8	\N	1084	\N	0	5	2	35	10	1	1	1	5
-40	2017-06-27 22:26:18.594916+08	5	4	\N	1187	\N	8	5	2	35	19	1	1	5	5
-33	2017-06-27 22:26:18.498009+08	5	6	\N	1097	\N	3	5	1	35	13	1	1	6	5
-34	2017-06-27 22:26:18.513767+08	5	1	\N	1258	\N	10	5	5	35	27	1	1	3	5
-35	2017-06-27 22:26:18.525184+08	5	2	\N	1248	\N	2	5	3	35	22	1	1	2	5
-52	2017-06-27 22:26:25.588499+08	7	3	\N	1635	\N	6	7	4	49	29	1	1	7	7
-53	2017-06-27 22:26:25.602397+08	7	8	\N	1490	\N	2	7	2	49	11	1	1	1	7
-55	2017-06-27 22:26:25.63971+08	7	5	\N	1614	\N	10	7	2	49	22	1	1	5	7
-56	2017-06-27 22:26:25.656281+08	7	1	\N	1763	\N	15	7	7	49	39	1	1	3	7
-49	2017-06-27 22:26:25.548176+08	7	4	\N	1605	\N	9	7	4	49	24	1	1	4	7
-50	2017-06-27 22:26:25.559865+08	7	7	\N	1524	\N	3	7	2	49	17	1	1	8	7
-63	2017-06-27 22:26:29.919769+08	8	5	\N	1839	\N	10	8	5	56	28	1	1	4	8
-58	2017-06-27 22:26:29.838953+08	8	3	\N	1887	\N	11	8	3	56	29	1	1	5	8
-59	2017-06-27 22:26:29.853343+08	8	2	\N	2003	\N	4	8	6	56	39	1	1	2	8
-60	2017-06-27 22:26:29.865595+08	8	7	\N	1753	\N	3	8	2	56	17	1	1	8	8
-61	2017-06-27 22:26:29.88609+08	8	1	\N	1959	\N	17	8	7	56	41	1	1	3	8
-62	2017-06-27 22:26:29.899523+08	8	6	\N	1850	\N	6	8	3	56	27	1	1	6	8
-67	2017-06-27 22:26:36.289122+08	9	4	\N	2070	\N	10	9	6	63	32	1	1	4	9
-64	2017-06-27 22:26:29.931138+08	8	8	\N	1714	\N	3	8	2	56	14	1	1	1	8
-57	2017-06-27 22:26:29.827304+08	8	4	\N	1829	\N	6	8	4	56	29	1	1	7	8
-77	2017-06-27 22:26:40.121033+08	10	1	\N	2428	\N	19	10	9	70	51	1	1	3	10
-68	2017-06-27 22:26:36.301474+08	9	6	\N	2076	\N	6	9	3	63	30	1	1	6	9
-69	2017-06-27 22:26:36.322713+08	9	2	\N	2282	\N	7	9	7	63	45	1	1	2	9
-70	2017-06-27 22:26:36.336231+08	9	8	\N	1937	\N	3	9	2	63	15	1	1	1	9
-71	2017-06-27 22:26:36.354212+08	9	7	\N	1973	\N	4	9	2	63	18	1	1	8	9
-72	2017-06-27 22:26:36.369716+08	9	3	\N	2149	\N	13	9	4	63	35	1	1	5	9
-65	2017-06-27 22:26:36.263195+08	9	5	\N	2042	\N	7	9	4	63	31	1	1	7	9
-66	2017-06-27 22:26:36.276318+08	9	1	\N	2196	\N	18	9	8	63	46	1	1	3	9
-76	2017-06-27 22:26:40.100864+08	10	6	\N	2298	\N	7	10	3	70	33	1	1	6	10
-78	2017-06-27 22:26:40.135827+08	10	2	\N	2501	\N	8	10	7	70	47	1	1	2	10
-80	2017-06-27 22:26:40.164918+08	10	8	\N	2174	\N	3	10	2	70	18	1	1	1	10
-73	2017-06-27 22:26:40.058249+08	10	5	\N	2293	\N	10	10	6	70	34	1	1	4	10
-74	2017-06-27 22:26:40.069816+08	10	4	\N	2283	\N	7	10	5	70	36	1	1	7	10
-75	2017-06-27 22:26:40.083285+08	10	7	\N	2211	\N	4	10	3	70	22	1	1	8	10
-5	2017-06-27 21:26:43.232633+08	1	6	\N	191	\N	1	1	0	7	2	1	1	4	1
-43	2017-06-27 22:26:21.732777+08	6	2	\N	1489	\N	2	6	4	42	27	1	1	2	6
-44	2017-06-27 22:26:21.745337+08	6	3	\N	1397	\N	5	6	4	42	27	1	1	7	6
-45	2017-06-27 22:26:21.757636+08	6	5	\N	1357	\N	8	6	3	42	19	1	1	4	6
-46	2017-06-27 22:26:21.77134+08	6	7	\N	1324	\N	3	6	1	42	15	1	1	6	6
-47	2017-06-27 22:26:21.788978+08	6	6	\N	1337	\N	1	6	2	42	15	1	1	8	6
-48	2017-06-27 22:26:21.80553+08	6	1	\N	1516	\N	14	6	6	42	33	1	1	3	6
-41	2017-06-27 22:26:21.701916+08	6	8	\N	1286	\N	2	6	2	42	11	1	1	1	6
-51	2017-06-27 22:26:25.575982+08	7	2	\N	1732	\N	3	7	5	49	32	1	1	2	7
-21	2017-06-27 22:11:45.429991+08	3	6	\N	709	\N	0	3	1	21	8	1	1	2	3
-54	2017-06-27 22:26:25.621049+08	7	6	\N	1587	\N	4	7	2	49	22	1	1	6	7
-79	2017-06-27 22:26:40.149065+08	10	3	\N	2395	\N	15	10	5	70	39	1	1	5	10
-81	2017-06-27 23:09:15.257825+08	11	7	\N	2428	\N	4	11	4	77	27	1	1	8	11
-82	2017-06-27 23:09:15.284456+08	11	6	\N	2472	\N	11	11	6	77	36	1	1	4	11
-83	2017-06-27 23:09:15.301152+08	11	1	\N	2647	\N	22	11	10	77	56	1	1	3	11
-84	2017-06-27 23:09:15.319797+08	11	3	\N	2611	\N	18	11	5	77	41	1	1	5	11
-85	2017-06-27 23:09:15.340817+08	11	4	\N	2520	\N	7	11	6	77	40	1	1	7	11
-86	2017-06-27 23:09:15.357784+08	11	2	\N	2722	\N	8	11	7	77	50	1	1	2	11
-87	2017-06-27 23:09:15.374454+08	11	5	\N	2533	\N	8	11	4	77	37	1	1	6	11
-88	2017-06-27 23:09:15.392092+08	11	8	\N	2396	\N	3	11	2	77	21	1	1	1	11
-89	2017-06-27 23:10:42.732227+08	12	4	\N	2798	\N	10	12	7	84	47	1	1	7	12
-90	2017-06-27 23:10:42.74541+08	12	7	\N	2618	\N	4	12	4	84	27	1	1	8	12
-91	2017-06-27 23:10:42.762842+08	12	8	\N	2617	\N	3	12	2	84	23	1	1	1	12
-92	2017-06-27 23:10:42.780775+08	12	1	\N	2920	\N	23	12	11	84	61	1	1	3	12
-93	2017-06-27 23:10:42.797018+08	12	3	\N	2862	\N	20	12	6	84	47	1	1	5	12
-94	2017-06-27 23:10:42.814454+08	12	6	\N	2743	\N	9	12	4	84	38	1	1	6	12
-95	2017-06-27 23:10:42.834684+08	12	5	\N	2710	\N	11	12	6	84	39	1	1	4	12
-96	2017-06-27 23:10:42.846619+08	12	2	\N	2973	\N	10	12	8	84	54	1	1	2	12
-97	2017-06-27 23:10:49.217983+08	13	8	\N	2824	\N	4	13	2	91	25	1	1	1	13
-98	2017-06-27 23:10:49.234245+08	13	3	\N	3038	\N	14	13	8	91	52	1	1	7	13
-99	2017-06-27 23:10:49.246974+08	13	4	\N	3105	\N	20	13	7	91	51	1	1	5	13
-100	2017-06-27 23:10:49.261563+08	13	5	\N	2940	\N	13	13	6	91	42	1	1	4	13
-101	2017-06-27 23:10:49.277698+08	13	6	\N	2954	\N	10	13	4	91	39	1	1	6	13
-102	2017-06-27 23:10:49.296431+08	13	2	\N	3233	\N	12	13	9	91	60	1	1	2	13
-103	2017-06-27 23:10:49.310527+08	13	7	\N	2845	\N	4	13	4	91	28	1	1	8	13
-104	2017-06-27 23:10:49.327345+08	13	1	\N	3180	\N	23	13	12	91	67	1	1	3	13
-105	2017-06-27 23:10:53.025575+08	14	2	\N	3447	\N	13	14	9	98	62	1	1	2	14
-106	2017-06-27 23:10:53.037315+08	14	3	\N	3346	\N	22	14	8	98	56	1	1	5	14
-107	2017-06-27 23:10:53.051708+08	14	1	\N	3432	\N	23	14	13	98	72	1	1	3	14
-108	2017-06-27 23:10:53.064226+08	14	5	\N	3155	\N	13	14	6	98	44	1	1	4	14
-109	2017-06-27 23:10:53.077685+08	14	8	\N	3054	\N	5	14	3	98	29	1	1	1	14
-110	2017-06-27 23:10:53.096667+08	14	7	\N	3067	\N	4	14	4	98	31	1	1	8	14
-111	2017-06-27 23:10:53.114448+08	14	6	\N	3196	\N	13	14	5	98	43	1	1	6	14
-112	2017-06-27 23:10:53.133814+08	14	4	\N	3266	\N	15	14	8	98	55	1	1	7	14
+COPY stats_teamranking (id, date, serial_id, ranking, elo_points, total_points, handicap, season_clearances, season_matches_played, season_matches_won, season_legs_played, season_legs_won, league_id, season_id, team_id, week_id, season_points, total_clearances, total_legs_played, total_legs_won, total_matches_played, total_matches_won) FROM stdin;
+7	2017-06-27 21:26:43.236172+08	1	8	\N	164	\N	0	1	0	7	0	1	1	6	1	164	0	7	0	1	0
+6	2017-06-27 21:26:43.234416+08	1	3	\N	246	\N	3	1	1	7	5	1	1	3	1	246	3	7	5	1	1
+4	2017-06-27 21:26:43.2309+08	1	2	\N	259	\N	0	1	1	7	6	1	1	2	1	259	0	7	6	1	1
+1	2017-06-27 21:26:43.222927+08	1	5	\N	229	\N	0	1	0	7	3	1	1	7	1	229	0	7	3	1	0
+13	2017-06-27 22:01:15.280696+08	2	6	\N	505	\N	0	2	1	14	6	1	1	2	2	505	0	14	6	2	1
+12	2017-06-27 22:01:15.265445+08	2	8	\N	394	\N	0	2	0	14	2	1	1	8	2	394	0	14	2	2	0
+22	2017-06-27 22:11:45.447072+08	3	1	\N	738	\N	5	3	3	21	16	1	1	3	3	738	5	21	16	3	3
+14	2017-06-27 22:01:15.294033+08	2	5	\N	450	\N	1	2	1	14	7	1	1	6	2	450	1	14	7	2	1
+15	2017-06-27 22:01:15.306248+08	2	7	\N	450	\N	0	2	1	14	4	1	1	1	2	450	0	14	4	2	1
+16	2017-06-27 22:01:15.320156+08	2	2	\N	491	\N	1	2	1	14	9	1	1	4	2	491	1	14	9	2	1
+9	2017-06-27 22:01:15.229046+08	2	4	\N	472	\N	3	2	1	14	8	1	1	5	2	472	3	14	8	2	1
+10	2017-06-27 22:01:15.243038+08	2	2	\N	491	\N	2	2	1	14	9	1	1	7	2	491	2	14	9	2	1
+20	2017-06-27 22:11:45.406545+08	3	4	\N	696	\N	4	3	1	21	10	1	1	5	3	696	4	21	10	3	1
+29	2017-06-27 22:24:29.48751+08	4	8	\N	850	\N	0	4	1	28	6	1	1	1	4	850	0	28	6	4	1
+23	2017-06-27 22:11:45.463102+08	3	3	\N	716	\N	2	3	2	21	14	1	1	7	3	716	2	21	14	3	2
+24	2017-06-27 22:11:45.481304+08	3	5	\N	662	\N	2	3	1	21	9	1	1	6	3	662	2	21	9	3	1
+17	2017-06-27 22:11:45.336647+08	3	7	\N	664	\N	0	3	1	21	7	1	1	8	3	664	0	21	7	3	1
+18	2017-06-27 22:11:45.368417+08	3	8	\N	682	\N	0	3	1	21	6	1	1	1	3	682	0	21	6	3	1
+19	2017-06-27 22:11:45.389865+08	3	2	\N	749	\N	2	3	2	21	14	1	1	4	3	749	2	21	14	3	2
+28	2017-06-27 22:24:29.468189+08	4	7	\N	874	\N	0	4	1	28	8	1	1	8	4	874	0	28	8	4	1
+30	2017-06-27 22:24:29.503664+08	4	4	\N	987	\N	1	4	2	28	15	1	1	2	4	987	1	28	15	4	2
+31	2017-06-27 22:24:29.517981+08	4	6	\N	878	\N	3	4	1	28	11	1	1	6	4	878	3	28	11	4	1
+32	2017-06-27 22:24:29.532357+08	4	2	\N	998	\N	3	4	3	28	19	1	1	4	4	998	3	28	19	4	3
+25	2017-06-27 22:24:29.426885+08	4	1	\N	993	\N	9	4	4	28	22	1	1	3	4	993	9	28	22	4	4
+26	2017-06-27 22:24:29.442204+08	4	5	\N	909	\N	3	4	2	28	15	1	1	7	4	909	3	28	15	4	2
+27	2017-06-27 22:24:29.452828+08	4	3	\N	952	\N	5	4	2	28	16	1	1	5	4	952	5	28	16	4	2
+36	2017-06-27 22:26:18.537535+08	5	5	\N	1162	\N	7	5	3	35	19	1	1	4	5	1162	7	35	19	5	3
+39	2017-06-27 22:26:18.579121+08	5	8	\N	1084	\N	0	5	2	35	10	1	1	1	5	1084	0	35	10	5	2
+40	2017-06-27 22:26:18.594916+08	5	4	\N	1187	\N	8	5	2	35	19	1	1	5	5	1187	8	35	19	5	2
+33	2017-06-27 22:26:18.498009+08	5	6	\N	1097	\N	3	5	1	35	13	1	1	6	5	1097	3	35	13	5	1
+34	2017-06-27 22:26:18.513767+08	5	1	\N	1258	\N	10	5	5	35	27	1	1	3	5	1258	10	35	27	5	5
+35	2017-06-27 22:26:18.525184+08	5	2	\N	1248	\N	2	5	3	35	22	1	1	2	5	1248	2	35	22	5	3
+52	2017-06-27 22:26:25.588499+08	7	3	\N	1635	\N	6	7	4	49	29	1	1	7	7	1635	6	49	29	7	4
+53	2017-06-27 22:26:25.602397+08	7	8	\N	1490	\N	2	7	2	49	11	1	1	1	7	1490	2	49	11	7	2
+55	2017-06-27 22:26:25.63971+08	7	5	\N	1614	\N	10	7	2	49	22	1	1	5	7	1614	10	49	22	7	2
+49	2017-06-27 22:26:25.548176+08	7	4	\N	1605	\N	9	7	4	49	24	1	1	4	7	1605	9	49	24	7	4
+50	2017-06-27 22:26:25.559865+08	7	7	\N	1524	\N	3	7	2	49	17	1	1	8	7	1524	3	49	17	7	2
+63	2017-06-27 22:26:29.919769+08	8	5	\N	1839	\N	10	8	5	56	28	1	1	4	8	1839	10	56	28	8	5
+58	2017-06-27 22:26:29.838953+08	8	3	\N	1887	\N	11	8	3	56	29	1	1	5	8	1887	11	56	29	8	3
+59	2017-06-27 22:26:29.853343+08	8	2	\N	2003	\N	4	8	6	56	39	1	1	2	8	2003	4	56	39	8	6
+60	2017-06-27 22:26:29.865595+08	8	7	\N	1753	\N	3	8	2	56	17	1	1	8	8	1753	3	56	17	8	2
+61	2017-06-27 22:26:29.88609+08	8	1	\N	1959	\N	17	8	7	56	41	1	1	3	8	1959	17	56	41	8	7
+62	2017-06-27 22:26:29.899523+08	8	6	\N	1850	\N	6	8	3	56	27	1	1	6	8	1850	6	56	27	8	3
+64	2017-06-27 22:26:29.931138+08	8	8	\N	1714	\N	3	8	2	56	14	1	1	1	8	1714	3	56	14	8	2
+57	2017-06-27 22:26:29.827304+08	8	4	\N	1829	\N	6	8	4	56	29	1	1	7	8	1829	6	56	29	8	4
+77	2017-06-27 22:26:40.121033+08	10	1	\N	2428	\N	19	10	9	70	51	1	1	3	10	2428	19	70	51	10	9
+68	2017-06-27 22:26:36.301474+08	9	6	\N	2076	\N	6	9	3	63	30	1	1	6	9	2076	6	63	30	9	3
+69	2017-06-27 22:26:36.322713+08	9	2	\N	2282	\N	7	9	7	63	45	1	1	2	9	2282	7	63	45	9	7
+70	2017-06-27 22:26:36.336231+08	9	8	\N	1937	\N	3	9	2	63	15	1	1	1	9	1937	3	63	15	9	2
+71	2017-06-27 22:26:36.354212+08	9	7	\N	1973	\N	4	9	2	63	18	1	1	8	9	1973	4	63	18	9	2
+72	2017-06-27 22:26:36.369716+08	9	3	\N	2149	\N	13	9	4	63	35	1	1	5	9	2149	13	63	35	9	4
+66	2017-06-27 22:26:36.276318+08	9	1	\N	2196	\N	18	9	8	63	46	1	1	3	9	2196	18	63	46	9	8
+76	2017-06-27 22:26:40.100864+08	10	6	\N	2298	\N	7	10	3	70	33	1	1	6	10	2298	7	70	33	10	3
+78	2017-06-27 22:26:40.135827+08	10	2	\N	2501	\N	8	10	7	70	47	1	1	2	10	2501	8	70	47	10	7
+80	2017-06-27 22:26:40.164918+08	10	8	\N	2174	\N	3	10	2	70	18	1	1	1	10	2174	3	70	18	10	2
+73	2017-06-27 22:26:40.058249+08	10	5	\N	2293	\N	10	10	6	70	34	1	1	4	10	2293	10	70	34	10	6
+74	2017-06-27 22:26:40.069816+08	10	4	\N	2283	\N	7	10	5	70	36	1	1	7	10	2283	7	70	36	10	5
+5	2017-06-27 21:26:43.232633+08	1	6	\N	191	\N	1	1	0	7	2	1	1	4	1	191	1	7	2	1	0
+44	2017-06-27 22:26:21.745337+08	6	3	\N	1397	\N	5	6	4	42	27	1	1	7	6	1397	5	42	27	6	4
+45	2017-06-27 22:26:21.757636+08	6	5	\N	1357	\N	8	6	3	42	19	1	1	4	6	1357	8	42	19	6	3
+46	2017-06-27 22:26:21.77134+08	6	7	\N	1324	\N	3	6	1	42	15	1	1	6	6	1324	3	42	15	6	1
+47	2017-06-27 22:26:21.788978+08	6	6	\N	1337	\N	1	6	2	42	15	1	1	8	6	1337	1	42	15	6	2
+2	2017-06-27 21:26:43.226535+08	1	4	\N	242	\N	0	1	1	7	4	1	1	1	1	242	0	7	4	1	1
+42	2017-06-27 22:26:21.718105+08	6	4	\N	1410	\N	8	6	2	42	21	1	1	5	6	1410	8	42	21	6	2
+75	2017-06-27 22:26:40.083285+08	10	7	\N	2211	\N	4	10	3	70	22	1	1	8	10	2211	4	70	22	10	3
+48	2017-06-27 22:26:21.80553+08	6	1	\N	1516	\N	14	6	6	42	33	1	1	3	6	1516	14	42	33	6	6
+41	2017-06-27 22:26:21.701916+08	6	8	\N	1286	\N	2	6	2	42	11	1	1	1	6	1286	2	42	11	6	2
+51	2017-06-27 22:26:25.575982+08	7	2	\N	1732	\N	3	7	5	49	32	1	1	2	7	1732	3	49	32	7	5
+21	2017-06-27 22:11:45.429991+08	3	6	\N	709	\N	0	3	1	21	8	1	1	2	3	709	0	21	8	3	1
+79	2017-06-27 22:26:40.149065+08	10	3	\N	2395	\N	15	10	5	70	39	1	1	5	10	2395	15	70	39	10	5
+81	2017-06-27 23:09:15.257825+08	11	7	\N	2428	\N	4	11	4	77	27	1	1	8	11	2428	4	77	27	11	4
+3	2017-06-27 21:26:43.228678+08	1	7	\N	180	\N	0	1	0	7	1	1	1	8	1	180	0	7	1	1	0
+8	2017-06-27 21:26:43.237748+08	1	1	\N	262	\N	0	1	1	7	7	1	1	5	1	262	0	7	7	1	1
+11	2017-06-27 22:01:15.25402+08	2	1	\N	502	\N	4	2	2	14	11	1	1	3	2	502	4	14	11	2	2
+37	2017-06-27 22:26:18.55088+08	5	7	\N	1089	\N	0	5	1	35	10	1	1	8	5	1089	0	35	10	5	1
+38	2017-06-27 22:26:18.56775+08	5	3	\N	1153	\N	3	5	3	35	20	1	1	7	5	1153	3	35	20	5	3
+56	2017-06-27 22:26:25.656281+08	7	1	\N	1763	\N	15	7	7	49	39	1	1	3	7	1763	15	49	39	7	7
+67	2017-06-27 22:26:36.289122+08	9	4	\N	2070	\N	10	9	6	63	32	1	1	4	9	2070	10	63	32	9	6
+65	2017-06-27 22:26:36.263195+08	9	5	\N	2042	\N	7	9	4	63	31	1	1	7	9	2042	7	63	31	9	4
+43	2017-06-27 22:26:21.732777+08	6	2	\N	1489	\N	2	6	4	42	27	1	1	2	6	1489	2	42	27	6	4
+54	2017-06-27 22:26:25.621049+08	7	6	\N	1587	\N	4	7	2	49	22	1	1	6	7	1587	4	49	22	7	2
+82	2017-06-27 23:09:15.284456+08	11	6	\N	2472	\N	11	11	6	77	36	1	1	4	11	2472	11	77	36	11	6
+83	2017-06-27 23:09:15.301152+08	11	1	\N	2647	\N	22	11	10	77	56	1	1	3	11	2647	22	77	56	11	10
+84	2017-06-27 23:09:15.319797+08	11	3	\N	2611	\N	18	11	5	77	41	1	1	5	11	2611	18	77	41	11	5
+85	2017-06-27 23:09:15.340817+08	11	4	\N	2520	\N	7	11	6	77	40	1	1	7	11	2520	7	77	40	11	6
+86	2017-06-27 23:09:15.357784+08	11	2	\N	2722	\N	8	11	7	77	50	1	1	2	11	2722	8	77	50	11	7
+87	2017-06-27 23:09:15.374454+08	11	5	\N	2533	\N	8	11	4	77	37	1	1	6	11	2533	8	77	37	11	4
+88	2017-06-27 23:09:15.392092+08	11	8	\N	2396	\N	3	11	2	77	21	1	1	1	11	2396	3	77	21	11	2
+89	2017-06-27 23:10:42.732227+08	12	4	\N	2798	\N	10	12	7	84	47	1	1	7	12	2798	10	84	47	12	7
+90	2017-06-27 23:10:42.74541+08	12	7	\N	2618	\N	4	12	4	84	27	1	1	8	12	2618	4	84	27	12	4
+91	2017-06-27 23:10:42.762842+08	12	8	\N	2617	\N	3	12	2	84	23	1	1	1	12	2617	3	84	23	12	2
+92	2017-06-27 23:10:42.780775+08	12	1	\N	2920	\N	23	12	11	84	61	1	1	3	12	2920	23	84	61	12	11
+93	2017-06-27 23:10:42.797018+08	12	3	\N	2862	\N	20	12	6	84	47	1	1	5	12	2862	20	84	47	12	6
+94	2017-06-27 23:10:42.814454+08	12	6	\N	2743	\N	9	12	4	84	38	1	1	6	12	2743	9	84	38	12	4
+95	2017-06-27 23:10:42.834684+08	12	5	\N	2710	\N	11	12	6	84	39	1	1	4	12	2710	11	84	39	12	6
+96	2017-06-27 23:10:42.846619+08	12	2	\N	2973	\N	10	12	8	84	54	1	1	2	12	2973	10	84	54	12	8
+97	2017-06-27 23:10:49.217983+08	13	8	\N	2824	\N	4	13	2	91	25	1	1	1	13	2824	4	91	25	13	2
+98	2017-06-27 23:10:49.234245+08	13	3	\N	3038	\N	14	13	8	91	52	1	1	7	13	3038	14	91	52	13	8
+99	2017-06-27 23:10:49.246974+08	13	4	\N	3105	\N	20	13	7	91	51	1	1	5	13	3105	20	91	51	13	7
+100	2017-06-27 23:10:49.261563+08	13	5	\N	2940	\N	13	13	6	91	42	1	1	4	13	2940	13	91	42	13	6
+101	2017-06-27 23:10:49.277698+08	13	6	\N	2954	\N	10	13	4	91	39	1	1	6	13	2954	10	91	39	13	4
+102	2017-06-27 23:10:49.296431+08	13	2	\N	3233	\N	12	13	9	91	60	1	1	2	13	3233	12	91	60	13	9
+103	2017-06-27 23:10:49.310527+08	13	7	\N	2845	\N	4	13	4	91	28	1	1	8	13	2845	4	91	28	13	4
+104	2017-06-27 23:10:49.327345+08	13	1	\N	3180	\N	23	13	12	91	67	1	1	3	13	3180	23	91	67	13	12
+105	2017-06-27 23:10:53.025575+08	14	2	\N	3447	\N	13	14	9	98	62	1	1	2	14	3447	13	98	62	14	9
+106	2017-06-27 23:10:53.037315+08	14	3	\N	3346	\N	22	14	8	98	56	1	1	5	14	3346	22	98	56	14	8
+107	2017-06-27 23:10:53.051708+08	14	1	\N	3432	\N	23	14	13	98	72	1	1	3	14	3432	23	98	72	14	13
+108	2017-06-27 23:10:53.064226+08	14	5	\N	3155	\N	13	14	6	98	44	1	1	4	14	3155	13	98	44	14	6
+109	2017-06-27 23:10:53.077685+08	14	8	\N	3054	\N	5	14	3	98	29	1	1	1	14	3054	5	98	29	14	3
+110	2017-06-27 23:10:53.096667+08	14	7	\N	3067	\N	4	14	4	98	31	1	1	8	14	3067	4	98	31	14	4
+111	2017-06-27 23:10:53.114448+08	14	6	\N	3196	\N	13	14	5	98	43	1	1	6	14	3196	13	98	43	14	5
+112	2017-06-27 23:10:53.133814+08	14	4	\N	3266	\N	15	14	8	98	55	1	1	7	14	3266	15	98	55	14	8
 \.
 
 

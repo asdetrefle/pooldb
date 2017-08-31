@@ -82,7 +82,7 @@
         <tr>
             <td align="center"> {{ forloop.counter }} </td>
             <td align="left"> 
-                {% if match.match_date < eow %}
+                {% if match.match_date != eow %}
                     <a href="{% url 'match_view' "LeagueMatch" match.pk %}">
                         {{ match.home }} vs. {{ match.away }} 
                     </a>

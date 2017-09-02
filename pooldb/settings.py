@@ -29,6 +29,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
+EMAIL_BACKEND = "sgbackend.SendGridBackend"
 SENDGRID_API_KEY = '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'
 
 # Application definition
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
     'mathfilters',
     'storages',
     'guardian',
+    'sendgrid',
 ]
 
 MIDDLEWARE = [

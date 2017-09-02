@@ -145,8 +145,8 @@ def initialize(request, match_id, type_):
                 """ % getattr(match, side[:4])
 
                 m = MailManager(subject="Team %s successfully submitted the roster" % getattr(match, side[:4]), content=msg)
-                #print match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email
-                m.add_bcc(match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email)
+                print match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email
+                #m.add_bcc(match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email)
                 m.add_bcc('qjchv@protonmail.ch')
                 m.send()
 

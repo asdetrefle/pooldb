@@ -16,6 +16,7 @@ pillow==4.1.1
 django-storages==1.5.2
 boto==2.47.0
 sendgrid==3.5
+django-sendgrid==1.0.1
 sendgrid-django==4.0.4
 simplejson==3.11.1
 django-realtime==1.1

@@ -50,7 +50,6 @@ INSTALLED_APPS = [
     'mathfilters',
     'storages',
     'guardian',
-    'sendgrid',
 ]
 
 MIDDLEWARE = [

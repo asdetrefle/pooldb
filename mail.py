@@ -16,17 +16,20 @@ class MailManager(object):
         self.mail.add_content(Content("text/plain", kwargs.get('content',"")))
 
     def add_to(self, *args):
-        for r in args:
+        uargs = set(args)
+        for r in uargs:
             self.personalization.add_to(Email(r))
         return
 
     def add_cc(self, *args):
-        for c in args:
+        uargs = set(args)
+        for c in uargs:
             self.personalization.add_cc(Email(c))
         return
 
     def add_bcc(self, *args):
-        for bc in args:
+        uargs = set(args)
+        for bc in uargs:
             self.personalization.add_bcc(Email(bc))
         return
 

@@ -377,8 +377,8 @@ class LeagueMatch(AbstractMatch):
 
         #print away_handicap, home_handicap
 
-        away_handicap = [round(x,1) for x in away_handicap if x > 0]
-        home_handicap = [round(x,1) for x in home_handicap if x > 0]
+        away_handicap = [x if x > 0 else 10 for x in away_handicap]
+        home_handicap = [x if x > 0 else 10 for x in home_handicap]
 
         away_handicap.sort()
         home_handicap.sort()

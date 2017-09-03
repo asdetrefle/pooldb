@@ -85,8 +85,8 @@ def initialize(request, match_id, type_):
         #if match.match_date>=end_of_week():
         #    raise Http404
 
-        home_players = match.home.member_set.all().order_by('-season_matches_played')
-        away_players = match.away.member_set.all().order_by('-season_matches_played')
+        home_players = match.home.member_set.exclude(cancel_date__isnull=False).order_by('-season_matches_played')
+        away_players = match.away.member_set.exclude(cancel_date__isnull=False).order_by('-season_matches_played')
 
         _submitted = match._get_ordered_players()
         nb_selected_players = 5
@@ -146,8 +146,7 @@ def initialize(request, match_id, type_):
 
                 m = MailManager(subject="Team %s successfully submitted the roster" % getattr(match, side[:4]), content=msg)
                 print match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email
-                m.add_bcc(match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email)
-                #m.add_bcc('qjchv@protonmail.ch')
+                m.add_bcc(match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email, 'qjchv@protonmail.ch')
                 m.send()
 
                 return render(request, 'base_site.html', {'content': 'Successfully submitted.'})

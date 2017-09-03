@@ -3,7 +3,7 @@
 --
 
 -- Dumped from database version 9.6.3
--- Dumped by pg_dump version 9.6.3
+-- Dumped by pg_dump version 9.6.5
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1457,6 +1457,7 @@ COPY administration_member (id, create_date, cancel_date, points, ranking, _poin
 40	2017-02-26 22:05:05+08	2017-08-22 23:59:59+08	265.974422849999996	1	0	30	24	7	30	24	7	3	10	538	8.96666666666999923
 1	2017-02-07 21:32:51+08	2017-08-22 23:59:59+08	252.20300897300001	4	0	36	24	5	36	24	5	1	5	592	8.22222222221999921
 126	2017-08-27 17:39:17+08	2017-08-23 00:00:00+08	200	0	0	0	0	0	0	0	0	3	82	0	-1
+127	2017-09-03 16:39:18+08	\N	200	0	0	0	0	0	0	0	0	1	83	0	-1
 \.
 
 
@@ -1464,7 +1465,7 @@ COPY administration_member (id, create_date, cancel_date, points, ranking, _poin
 -- Name: administration_member_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('administration_member_id_seq', 126, true);
+SELECT pg_catalog.setval('administration_member_id_seq', 127, true);
 
 
 --
@@ -1495,7 +1496,6 @@ COPY administration_player (id, name, username, sex, phone, email, nb_groups, us
 27	James Law	jamesl	M	\N	\N	0	\N
 28	Katrina Leung	katrinal	F			0	\N
 29	Ankit Jain	ankitj	M	\N	\N	0	\N
-30	Nick Fong	nickf	M	\N	\N	0	\N
 31	Simon Yeung	simony	M	\N	\N	0	\N
 33	Louis Poon	louisp	M	\N	\N	0	\N
 34	Olive Lai	olivel	F			0	\N
@@ -1553,6 +1553,8 @@ COPY administration_player (id, name, username, sex, phone, email, nb_groups, us
 80	Anthony Chu	anthonyc	M	\N	\N	0	\N
 81	Jessica Wong	jessicaw	F	\N	\N	0	\N
 82	Chris Win	chrisw	M	\N	\N	0	\N
+30	Nick Fong	nickf	M	\N	\N	0	14
+83	Patrick Ng	patrickn	M	\N	\N	0	\N
 \.
 
 
@@ -1560,7 +1562,7 @@ COPY administration_player (id, name, username, sex, phone, email, nb_groups, us
 -- Name: administration_player_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('administration_player_id_seq', 82, true);
+SELECT pg_catalog.setval('administration_player_id_seq', 83, true);
 
 
 --
@@ -1747,19 +1749,20 @@ SELECT pg_catalog.setval('auth_permission_id_seq', 86, true);
 --
 
 COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-3	pbkdf2_sha256$36000$pMsLyFM21O1v$f2UW4aH73gJd6yEI24m60QBlCeHpdY3XxWGB1GjPj64=	2017-06-17 16:41:08+08	t	asdetrefle	Qj	Chv	qjchv@protonmail.ch	t	t	2017-06-17 16:38:01+08
 2	pbkdf2_sha256$30000$qqNZ3YwKlCB1$usTEYFKh0glaZuPPpVgBbnr4Hwfnw3NpjVuqAcorn5w=	2017-05-30 10:59:15+08	f	scorer				f	t	2017-05-30 10:56:11+08
 4	pbkdf2_sha256$36000$NSLSkC9BRwhz$GnNyafwV1TGgR+zkQc+x+jTksNqUNrTOsIfeRCNC2ZQ=	2017-06-17 16:52:21.10197+08	f	kawangl	Kawang	Lau		f	t	2017-06-17 16:44:44+08
 7	!VktNRiQTeiJfXONLtVYQ3V27wWxmxy154sE3Es4L	\N	f	AnonymousUser				f	t	2017-08-23 11:48:01.348948+08
 8	pbkdf2_sha256$36000$FbhINbusgBFW$pzW3jqWV5S5cDWxDqFzgMSySqjTcAxMfZtsaOUmOa0Q=	\N	f	mancyh	Mancy	Howe	mancy312@hotmail.com	f	t	2017-08-26 23:46:37+08
 9	pbkdf2_sha256$36000$CD7GFDtY2POE$3AROVbqYNM+afosntJzO9Nn6AV/IAmuB359/sDpf/vI=	\N	f	jhunj	Jhun	Jimeno	emjimeno@gmail.com	f	t	2017-08-26 23:48:54+08
 10	pbkdf2_sha256$36000$UH2fxxYDnFHG$Mfv331OpQtRQGAZNQISe0WKx4sNAtcSGFwUMHqC+L1E=	\N	f	litol	Lito	Labra	labrapro@yahoo.com	f	t	2017-08-26 23:49:49+08
-11	pbkdf2_sha256$36000$1elopmEDXrUn$Lh33++TzlvYqvAIE/i3c+Nsc4FWMVS7hfM3cKMI8HdA=	\N	f	catherinef	Catherine	Fu	catherinefu217@hotmail.com	f	t	2017-08-26 23:50:53+08
-12	pbkdf2_sha256$36000$QUOxvaCp0K6a$+i+2QTk2U6CzPkq+gg7YUAKdw4uCMnF15TCXY4n068g=	\N	f	andrewh	Andrew	H	eclipsehk@ymail.com	f	t	2017-08-26 23:52:14+08
 5	pbkdf2_sha256$36000$QeZ0gMBBBnzv$mbuEpsnNDr2Ak6OQke9Gjaxup/tooGVap6BRDfsI+PQ=	2017-08-27 17:27:32.757499+08	f	deepv	Deep	Vaswani	deepvaswani@gmail.com	f	t	2017-07-04 19:56:51+08
-1	pbkdf2_sha256$36000$6dyXjCgP2DuE$UMqKctZVwQdQuOSliAD8mfSE6y31cFFrv3BQR6paavg=	2017-08-30 21:37:46.148948+08	t	admin			admin@hkpl.com	t	t	2017-02-07 21:18:36.653+08
-6	pbkdf2_sha256$36000$u5rMzSRfmMKV$fwYAUKgX75Hy9Cd2+ViTCeTD7Cbbe2z0OXytsvuUtpQ=	2017-08-30 21:41:21.913776+08	f	bradt	Brad	Tsui	bradleytsui@gmail.com	f	t	2017-07-04 20:39:53+08
-13	pbkdf2_sha256$36000$9CWsWGmnJNVU$BxQ+V+D/ffrxLQ2JspwBREmClPMIv6J+XEl+qZRvYLk=	2017-08-30 21:45:13.883844+08	f	clarencey	Clarence	Yung	clarencey32@gmail.com	f	t	2017-08-26 23:53:06+08
+3	pbkdf2_sha256$36000$AIbzVkiUaCaH$+wZU4FIo3JeTLwFuENP50jXTx+2Q48BrRzEolDG1aPk=	2017-06-17 16:41:08+08	t	asdetrefle	Qj	Chv	qjchv@protonmail.ch	t	t	2017-06-17 16:38:01+08
+14	pbkdf2_sha256$36000$BZbhoqGqiNNA$ZPQGH15g9paT3UnQ/hXsVg7r5i8bI2ntnq1C589fOQc=	\N	f	nickf	Nick	Fong	nicholasafong@gmail.com	f	t	2017-09-03 12:21:08+08
+11	pbkdf2_sha256$36000$2sP2KnVYwp47$G//Rax+5d8PpusNVkZzGov2HHFgjgjiz4s4GZe/ESCg=	2017-09-03 16:08:04.555817+08	f	catherinef	Catherine	Fu	catherinefu217@hotmail.com	f	t	2017-08-26 23:50:53+08
+6	pbkdf2_sha256$36000$9igWMFy6tWJB$ysgUYYSB+XNbHovCHfCk8QaftcHkJBSNPkQUpIhQFdA=	2017-09-03 18:17:33.000116+08	f	bradt	Brad	Tsui	bradleytsui@gmail.com	f	t	2017-07-04 20:39:53+08
+12	pbkdf2_sha256$36000$OB6xg4DsAPRn$UDje2tinMOndRwBZs+EveG7i30kHdcLsni5f4B2GUpI=	2017-09-03 23:08:32.222498+08	f	andrewh	Andrew	H	eclipsehk@ymail.com	f	t	2017-08-26 23:52:14+08
+13	pbkdf2_sha256$36000$Twy803Kw1QrU$DciXrQB4WbAr05B755d/Spus1/27mw4CowER5DKzAyU=	2017-09-03 23:08:38.501077+08	f	clarencey	Clarence	Yung	clarencey32@gmail.com	f	t	2017-08-26 23:53:06+08
+1	pbkdf2_sha256$36000$6dyXjCgP2DuE$UMqKctZVwQdQuOSliAD8mfSE6y31cFFrv3BQR6paavg=	2017-09-03 23:40:09.832322+08	t	admin			admin@hkpl.com	t	t	2017-02-07 21:18:36.653+08
 \.
 
 
@@ -1782,7 +1785,7 @@ SELECT pg_catalog.setval('auth_user_groups_id_seq', 1, false);
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('auth_user_id_seq', 13, true);
+SELECT pg_catalog.setval('auth_user_id_seq', 14, true);
 
 
 --
@@ -2473,8 +2476,11 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 660	2017-08-27 17:37:56.142656+08	1	Henrik Pedersen (That's a Beautiful Rack)	2	[{"changed": {"fields": ["cancel_date", "points", "handicap"]}}]	5	1
 661	2017-08-27 17:39:12.284658+08	82	Chris Win	1	[{"added": {}}]	3	1
 662	2017-08-27 17:39:55.347657+08	126	Chris Win (Anything is Fine)	1	[{"added": {}}]	5	1
-663	2017-08-29 22:53:22.850511+08	113	2017-09-05 The Blazers vs. Anything is Fine	2	[{"changed": {"fields": ["_home_ordered_players"]}}]	7	1
-664	2017-08-30 20:47:00.168278+08	113	2017-09-05 The Blazers vs. Anything is Fine	2	[{"changed": {"fields": ["_home_ordered_players", "_away_ordered_players"]}}]	7	1
+663	2017-09-03 12:21:08.158653+08	14	nickf	1	[{"added": {}}]	15	1
+664	2017-09-03 12:21:44.133564+08	14	nickf	2	[{"changed": {"fields": ["first_name", "last_name", "email"]}}]	15	1
+665	2017-09-03 12:22:11.240515+08	30	Nick Fong	2	[{"changed": {"fields": ["user"]}}]	3	1
+666	2017-09-03 16:39:09.281674+08	83	Patrick Ng	1	[{"added": {}}]	3	1
+667	2017-09-03 16:39:31.614812+08	127	Patrick Ng (That's a Beautiful Rack)	1	[{"added": {}}]	5	1
 \.
 
 
@@ -2482,7 +2488,7 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('django_admin_log_id_seq', 664, true);
+SELECT pg_catalog.setval('django_admin_log_id_seq', 667, true);
 
 
 --
@@ -2689,7 +2695,14 @@ x0ym7r3igodgwah17yr4cxts5l1issp9	MzUwMmEyNTQ4MTUxYmM2MTIyNjViOTMwOWVlNjdhNGY1NjR
 qk142lk0ayenaaoyx3yyndegvfmwq6z8	MzU2MzM1NGE0MTE0YWJmODRlN2Y4ZDc0YzEyOGZlYjAxNDA0NGNjMTp7Il9hdXRoX3VzZXJfaGFzaCI6IjU1MWI2OTIxY2ZhZTFmNTk0Y2Q2YTg5NjFkZTM0YjhhNmFjNWU1ZWMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-07-09 14:19:15.213145+08
 leg7bsv3qxvwl40nbf78fppdtwt215ge	MzU2MzM1NGE0MTE0YWJmODRlN2Y4ZDc0YzEyOGZlYjAxNDA0NGNjMTp7Il9hdXRoX3VzZXJfaGFzaCI6IjU1MWI2OTIxY2ZhZTFmNTk0Y2Q2YTg5NjFkZTM0YjhhNmFjNWU1ZWMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-07-18 21:02:04.130452+08
 w31bk6r90l61c3hjg6qc38zq7zerr4tg	MzU2MzM1NGE0MTE0YWJmODRlN2Y4ZDc0YzEyOGZlYjAxNDA0NGNjMTp7Il9hdXRoX3VzZXJfaGFzaCI6IjU1MWI2OTIxY2ZhZTFmNTk0Y2Q2YTg5NjFkZTM0YjhhNmFjNWU1ZWMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-09-06 11:55:36.263575+08
-rh1injj7prtszpx3s85h83vlui145pfq	YzMxYTliZTgxZDUwMmJjMmM1MGE5MzJiYzc0NTk5MGM5NjcxZmFmNjp7Il9hdXRoX3VzZXJfaGFzaCI6IjA1YTY2YmRkZGFhYmMwNGE0ZTI2YzdiNTAyMjk4M2VlMzc5NjdhOWEiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxMyJ9	2017-09-13 21:45:13.886112+08
+pbbw9rallzgtqbicz6o3hs45ojhwupgv	OGU2ZWM5ZWM2YjhlYTY4YjVkMWI4MDY1ZjIxNmE0NTAyNmJiNGI3NTp7Il9hdXRoX3VzZXJfaGFzaCI6IjUxYWM4YjIyMTkzYmVkYmM0MzY0OTRiM2IxNjBkMjRjNGNlZmY1ZDciLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiI2In0=	2017-09-10 17:40:28.218838+08
+bcb4e6394a4739w4r37uqfd8i1bloezk	YjYyNzVhYzYzZTYzOGIxNDY0NWI5OTRjODVmNDE1ZGU4MmE2ZGI2Njp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9oYXNoIjoiNTUxYjY5MjFjZmFlMWY1OTRjZDZhODk2MWRlMzRiOGE2YWM1ZTVlYyIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIn0=	2017-09-17 11:52:20.163521+08
+6osq3ahxsdoaqy9stbf8mbwhxqzb96or	NTk0ZTRjZWMyZTlkZjk5Zjc5YzdjM2IyZGRlZDg5MDA0M2U1ZTQzYjp7Il9hdXRoX3VzZXJfaWQiOiIxMSIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIiwiX2F1dGhfdXNlcl9oYXNoIjoiZjA1MjlhYjQ2N2MwYTlmOWY1ODRkMGI5Zjg1OGQ0ZDA5ZmU3Y2ZhNyJ9	2017-09-17 16:08:04.560375+08
+wrkojhzywutqcs85h26p2m6n4pmyrnw5	ZjVjNDdhMzg3ZjRkMmU2M2U5Y2NkMzA3YWIyMzZlYzc2YzhjZWUzYTp7Il9hdXRoX3VzZXJfaGFzaCI6IjA2YjAzYzY1YTQ5OWY4ODNhY2ZkN2Y4OWFjNTY2YzY5N2U4ZTljZDgiLCJfYXV0aF91c2VyX2lkIjoiNiIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIn0=	2017-09-17 18:17:33.004118+08
+hadzc1089y0gx4e2nwkkb3joamtd34fy	MzU2MzM1NGE0MTE0YWJmODRlN2Y4ZDc0YzEyOGZlYjAxNDA0NGNjMTp7Il9hdXRoX3VzZXJfaGFzaCI6IjU1MWI2OTIxY2ZhZTFmNTk0Y2Q2YTg5NjFkZTM0YjhhNmFjNWU1ZWMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-09-17 19:00:41.449656+08
+3qss062wswmml1quy7luu8i86vicam92	MTk5MzcwMWMzNDA1ZDBhYWNlYjRmODdkOGFmYTM4MjI5YjA5NWE2Mjp7Il9hdXRoX3VzZXJfaGFzaCI6IjFlZWI1N2YyZjU1MzFlM2FiMGVlOWU0YjQ1OGUyYTAxZjQyMGZhNWMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxMiJ9	2017-09-17 23:08:32.234475+08
+lwf6vq4vl5p7jkskucv4yoyzkr8ojv4m	YzIxM2Y3YjA2NTRkNDdjYTNiMjc4YmNlYmEzOTExZDM5MTU5ZjhmNzp7Il9hdXRoX3VzZXJfaGFzaCI6ImIyMDkwMWM3ZGNkZDk1MTY3YWVjODEzYTAyMmU0MmZkMzAxNmE4NWIiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxMyJ9	2017-09-17 23:08:38.530206+08
+tkzmgfgxhqhf0av5798ai104da00i037	MzU2MzM1NGE0MTE0YWJmODRlN2Y4ZDc0YzEyOGZlYjAxNDA0NGNjMTp7Il9hdXRoX3VzZXJfaGFzaCI6IjU1MWI2OTIxY2ZhZTFmNTk0Y2Q2YTg5NjFkZTM0YjhhNmFjNWU1ZWMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-09-17 23:40:09.835027+08
 \.
 
 
@@ -6318,7 +6331,6 @@ COPY recording_leaguematch (id, venue, match_date, number_frames, table_size, is
 106	Billidart	2017-05-31 20:00:00+08	0	9	t	t	8-Ball	P	1	6	211	260	6	6	2	6	13	2	t	84_72_2_75_73	53_55_54_57_52	A	1	1
 105	Racks	2017-05-30 20:00:00+08	0	9	t	t	8-Ball	P	1	6	227	260	6	5	3	8	13	3	t	42_44_43_45_41	63_69_61_62_105	A	1	1
 110	Racks	2017-06-06 20:00:00+08	0	9	t	t	8-Ball	P	4	3	242	228	6	4	7	6	14	6	t	7_6_81_89_90	57_58_54_53_55	A	1	1
-114	Racks	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	8	1	15	\N	f	\N	\N	A	2	\N
 115	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	5	7	15	\N	f	\N	\N	A	2	\N
 116	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	2	6	15	\N	f	\N	\N	A	2	\N
 117	Racks	2017-09-12 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	6	5	16	\N	f	\N	\N	A	2	\N
@@ -6373,7 +6385,8 @@ COPY recording_leaguematch (id, venue, match_date, number_frames, table_size, is
 166	Racks	2017-12-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	8	7	28	\N	f	\N	\N	A	2	\N
 167	Billidart	2017-12-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	10	3	28	\N	f	\N	\N	A	2	\N
 168	Billidart	2017-12-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	5	6	28	\N	f	\N	\N	A	2	\N
-113	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	3	10	15	\N	f	41_43_42_126_45	114_115_120_116_117	A	2	\N
+114	Racks	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	8	1	15	\N	f	\N	79_127_83_80_87	A	2	\N
+113	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	3	10	15	\N	f	42_44_43_3_41	116_114_115_117_120	A	2	\N
 \.
 
 

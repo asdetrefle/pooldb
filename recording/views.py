@@ -103,7 +103,7 @@ def initialize(request, match_id, type_):
             rest = set(away_players_map.keys()) - set(_submitted['away'])
             away_players = [away_players_map[pk] for pk in list(_submitted['away'])+list(rest)]
 
-        if request.user.is_staff:
+        if request.user.has_perm('recording.record_leaguematch', match):
             return render(request, 'initialize_match.html', {'match': match,
                                                                 'home_players': home_players,
                                                                 'away_players': away_players,
@@ -146,8 +146,8 @@ def initialize(request, match_id, type_):
 
                 m = MailManager(subject="Team %s successfully submitted the roster" % getattr(match, side[:4]), content=msg)
                 print match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email
-                #m.add_bcc(match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email)
-                m.add_bcc('qjchv@protonmail.ch')
+                m.add_bcc(match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email)
+                #m.add_bcc('qjchv@protonmail.ch')
                 m.send()
 
                 return render(request, 'base_site.html', {'content': 'Successfully submitted.'})

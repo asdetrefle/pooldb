@@ -96,6 +96,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'pooldb.wsgi.application'
 
 
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/home/'
+
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 

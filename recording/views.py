@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required, permission_required a
 from mail import MailManager
 
 
-_need_login = login_required(login_url='/login/')
+_need_login = login_required()
 
 
 def load_players(raw_file):

@@ -7,7 +7,7 @@
 {% block extrahead %}
 {% load staticfiles %}
 
-{% if not match.is_completed and not user.is_active %}
+{% if not match.is_completed and not record_leaguematch %}
 <meta http-equiv="refresh" content="60">
 {% endif %}
 <style>
@@ -30,7 +30,7 @@
     .frame_win   {font-weight:bold; color:dodgerblue;}
     td {vertical-align: middle}
     #add_new_frame {padding: 4pt}
-    .edit_score {width: 20px; height: 7px; {% if not user.is_active or match.is_completed %}display: none{% endif %};}
+    .edit_score {width: 20px; height: 7px; {% if not record_leaguematch or match.is_completed %}display: none{% endif %};}
     #header_div {
         height: 100px;
         vertical-align: middle;
@@ -48,17 +48,24 @@
         margin-top: 40px;
         vertical-align: middle;
         float: left;
-        display: {% if has_blank_fields and user.is_active %}inline-block{% else %}none{% endif %}
+        display: {% if has_blank_fields and record_leaguematch %}inline-block{% else %}none{% endif %}
     }
     .clear_mark {
         content: url({% static "eight_ball.png" %});
         width: 16px;
         height: 16px;
         -webkit-transition: all 0.5s ease;
+        -webkit-filter: opacity(100%); /* Safari 6.0 - 9.0 */
+        filter: opacity(100%);
         -moz-transition: all 0.5s ease;
         -o-transition: all 0.5s ease;
         transition: all 0.5s ease;
     }
+    .runout {
+        -webkit-filter: opacity(100)%); /* Safari 6.0 - 9.0 */
+        filter: opacity(100%);
+    }
+
     .unselected {
         -webkit-filter: opacity(20%); /* Safari 6.0 - 9.0 */
         filter: opacity(20%);
@@ -88,7 +95,7 @@
 
         #submit_edit {
             margin-top:10px;
-            display: {% if has_blank_fields and user.is_active %}inline-block{% else %}none{% endif %}
+            display: {% if has_blank_fields and record_leaguematch %}inline-block{% else %}none{% endif %}
             width:auto;
         }
         .header, .header_win, .header_loss {
@@ -150,7 +157,7 @@
 
         $(".frame_score").click(function () {
             var is_completed = {{ match.is_completed|yesno:"true,false" }};
-            is_completed = is_completed || {{ user.is_active|yesno:"false,true" }};
+            is_completed = is_completed || {{ record_leaguematch|yesno:"false,true" }};
             //console.log(is_completed)
             if (is_completed) {
                 return 
@@ -184,7 +191,7 @@
         
         $(".clear_mark").click(function() {
             var is_completed = {{ match.is_completed|yesno:"true,false" }};
-            is_completed = is_completed || {{ user.is_active|yesno:"false,true" }};
+            is_completed = is_completed || {{ record_leaguematch|yesno:"false,true" }};
             //console.log(is_completed)
             if (is_completed) {
                 return 
@@ -310,7 +317,7 @@
                 {% endif %}
                 <td align="center"> <span class="leg-id"> {{f.leg_number}} </span> </td>
                 <td align="center"> <span class="first-name"> {{ f.home_player.player|first_name }} </span> <span class="last-name"> {{ f.home_player.player|last_name }}</span> </td>
-                <td align="right"> <img class="clear_mark {% if f.cleared_by != f.home_player %}unselected{% endif %}" id="{{ f.id }}_clear_home" style="{% if f.home_score == None and user.is_active and not match.is_completed %}display:inline-block{% endif %}"/></td>
+                <td align="right"> <img class="clear_mark {% if f.cleared_by != f.home_player %}unselected{% endif %}" id="{{ f.id }}_clear_home" style="{% if f.home_score == None and record_leaguematch and not match.is_completed %}display:inline-block{% endif %}"/></td>
                 <td align="right"> 
                     {% if f.home_score == None %} 
                         <input type="text" pattern="\d*" name="{{ f.id }} home" id="{{ f.id }}_home_score" value="" class="edit_score" />
@@ -326,7 +333,7 @@
                         <span class="{% if f.away_score > f.home_score %}frame_win{% endif %} frame_score" id="{{ f.id }}_away_score" value="{{ f.id }} away"> {{ f.away_score }} </span>
                     {% endif %} 
                 </td>
-                <td align="left"> <img class="clear_mark {% if f.cleared_by != f.away_player %}unselected{% endif %}" id="{{ f.id }}_clear_away" style="{% if f.away_score == None and user.is_active and not match.is_completed %}display:inline-block{% endif %}"/></td>
+                <td align="left"> <img class="clear_mark {% if f.cleared_by != f.away_player %}unselected{% endif %}" id="{{ f.id }}_clear_away" style="{% if f.away_score == None and record_leaguematch and not match.is_completed %}display:inline-block{% endif %}"/></td>
                 <td align="center">  <span class="first-name"> {{ f.away_player.player|first_name }} </span> <span class="last-name"> {{ f.away_player.player|last_name }}</span> </td>
             {% endfor %}
             </tr>
@@ -350,6 +357,13 @@
 </table>
 </div>
 </form>
+
+{% if approve_leaguematch and not has_blank_fields %}
+<form action="{% url 'match_approve' 'LeagueMatch' match.id %}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Approve Match">
+</form>
+{% endif %}
 
 {% endblock %}
 

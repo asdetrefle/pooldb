@@ -1442,18 +1442,10 @@ COPY administration_member (id, create_date, cancel_date, points, ranking, _poin
 7	2017-01-07 07:07:07+08	\N	250.66666654497601	6	0	39	25	6	39	25	6	7	7	647	8.29487179487179915
 110	2017-04-29 19:12:58+08	2017-08-22 23:59:59+08	169.828091717569009	56	0	18	5	1	18	5	1	4	76	231	6.41666666666666963
 49	2017-02-26 22:05:05.653+08	2017-08-22 23:59:59+08	156.606445045279997	62	0	36	8	0	36	8	0	4	19	464	6.4444444444444402
-114	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	10	37	0	-1
-115	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	10	17	0	-1
-116	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	10	16	0	-1
-117	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	10	19	0	-1
-118	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	10	18	0	-1
 119	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	10	21	0	-1
 120	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	10	20	0	-1
 121	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	10	80	0	-1
 122	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	10	81	0	-1
-123	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	7	9	0	-1
-124	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	2	27	0	-1
-125	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	2	22	0	-1
 40	2017-02-26 22:05:05+08	2017-08-22 23:59:59+08	265.974422849999996	1	0	30	24	7	30	24	7	3	10	538	8.96666666666999923
 1	2017-02-07 21:32:51+08	2017-08-22 23:59:59+08	252.20300897300001	4	0	36	24	5	36	24	5	1	5	592	8.22222222221999921
 127	2017-09-03 16:39:18+08	\N	200	0	0	0	0	0	0	0	0	1	83	0	-1
@@ -1465,6 +1457,16 @@ COPY administration_member (id, create_date, cancel_date, points, ranking, _poin
 133	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	6	89	0	-1
 134	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	6	90	0	-1
 126	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	3	82	0	-1
+123	2017-08-23 00:00:00+08	\N	139.418706609581989	68	0	30	5	0	0	0	0	7	9	364	6.06666666666666998
+116	2017-08-23 00:00:00+08	\N	227.890818715684986	18	0	39	24	7	0	0	0	10	16	612	7.84615384615385025
+115	2017-08-23 00:00:00+08	\N	158.255552712836987	60	0	39	10	0	0	0	0	10	17	501	6.4230769230769198
+118	2017-08-23 00:00:00+08	\N	177.284844463995	50	0	18	5	0	0	0	0	10	18	246	6.83333333333333037
+117	2017-08-23 00:00:00+08	\N	156.606445045279997	62	0	36	8	0	0	0	0	10	19	464	6.4444444444444402
+125	2017-08-23 00:00:00+08	\N	192.328447971439999	42	0	36	15	0	0	0	0	2	22	533	7.40277777777778034
+124	2017-08-23 00:00:00+08	\N	222.645349614552998	21	0	12	8	2	0	0	0	2	27	191	7.95833333333333037
+114	2017-08-23 00:00:00+08	\N	240.715223885877009	9	0	36	20	5	0	0	0	10	37	587	8.15277777777778034
+135	2017-09-04 22:12:50+08	\N	200	0	0	0	0	0	0	0	0	6	91	0	-1
+137	2017-09-04 22:14:10+08	\N	200	0	0	0	0	0	0	0	0	6	92	0	-1
 \.
 
 
@@ -1472,7 +1474,7 @@ COPY administration_member (id, create_date, cancel_date, points, ranking, _poin
 -- Name: administration_member_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('administration_member_id_seq', 134, true);
+SELECT pg_catalog.setval('administration_member_id_seq', 137, true);
 
 
 --
@@ -1526,7 +1528,6 @@ COPY administration_player (id, name, username, sex, phone, email, nb_groups, us
 56	Milan Putik	milanp	M	\N	\N	0	\N
 57	Samson Cheung	samsonc	M	\N	\N	0	\N
 59	Jaden Law	jadenl	M	\N	\N	0	\N
-60	Joel Buenafe	joelb	M	\N	\N	0	\N
 61	Cyrus Wu	cyrusw	M	\N	\N	0	\N
 62	Carol Navea	caroln	F	\N	\N	0	\N
 63	Damon Howe	damonh	M	\N	\N	0	\N
@@ -1569,6 +1570,9 @@ COPY administration_player (id, name, username, sex, phone, email, nb_groups, us
 88	Jeremy Lewis	jeremyl	M	\N	\N	0	\N
 89	Graham Clark	grahamc	M	\N	\N	0	\N
 90	Serin Yam	seriny	F	\N	\N	0	\N
+60	Joel Buenafe	joelb	M	\N	\N	0	16
+91	Gil Mandigma	gilm	M	\N	\N	0	\N
+92	Lode Van Leuven	lodevl	M	\N	\N	0	\N
 \.
 
 
@@ -1576,7 +1580,7 @@ COPY administration_player (id, name, username, sex, phone, email, nb_groups, us
 -- Name: administration_player_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('administration_player_id_seq', 90, true);
+SELECT pg_catalog.setval('administration_player_id_seq', 92, true);
 
 
 --
@@ -1764,20 +1768,21 @@ SELECT pg_catalog.setval('auth_permission_id_seq', 86, true);
 
 COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
 2	pbkdf2_sha256$30000$qqNZ3YwKlCB1$usTEYFKh0glaZuPPpVgBbnr4Hwfnw3NpjVuqAcorn5w=	2017-05-30 10:59:15+08	f	scorer				f	t	2017-05-30 10:56:11+08
-4	pbkdf2_sha256$36000$NSLSkC9BRwhz$GnNyafwV1TGgR+zkQc+x+jTksNqUNrTOsIfeRCNC2ZQ=	2017-06-17 16:52:21.10197+08	f	kawangl	Kawang	Lau		f	t	2017-06-17 16:44:44+08
 7	!VktNRiQTeiJfXONLtVYQ3V27wWxmxy154sE3Es4L	\N	f	AnonymousUser				f	t	2017-08-23 11:48:01.348948+08
-8	pbkdf2_sha256$36000$FbhINbusgBFW$pzW3jqWV5S5cDWxDqFzgMSySqjTcAxMfZtsaOUmOa0Q=	\N	f	mancyh	Mancy	Howe	mancy312@hotmail.com	f	t	2017-08-26 23:46:37+08
-9	pbkdf2_sha256$36000$CD7GFDtY2POE$3AROVbqYNM+afosntJzO9Nn6AV/IAmuB359/sDpf/vI=	\N	f	jhunj	Jhun	Jimeno	emjimeno@gmail.com	f	t	2017-08-26 23:48:54+08
 10	pbkdf2_sha256$36000$UH2fxxYDnFHG$Mfv331OpQtRQGAZNQISe0WKx4sNAtcSGFwUMHqC+L1E=	\N	f	litol	Lito	Labra	labrapro@yahoo.com	f	t	2017-08-26 23:49:49+08
-5	pbkdf2_sha256$36000$QeZ0gMBBBnzv$mbuEpsnNDr2Ak6OQke9Gjaxup/tooGVap6BRDfsI+PQ=	2017-08-27 17:27:32.757499+08	f	deepv	Deep	Vaswani	deepvaswani@gmail.com	f	t	2017-07-04 19:56:51+08
-3	pbkdf2_sha256$36000$AIbzVkiUaCaH$+wZU4FIo3JeTLwFuENP50jXTx+2Q48BrRzEolDG1aPk=	2017-06-17 16:41:08+08	t	asdetrefle	Qj	Chv	qjchv@protonmail.ch	t	t	2017-06-17 16:38:01+08
 14	pbkdf2_sha256$36000$BZbhoqGqiNNA$ZPQGH15g9paT3UnQ/hXsVg7r5i8bI2ntnq1C589fOQc=	\N	f	nickf	Nick	Fong	nicholasafong@gmail.com	f	t	2017-09-03 12:21:08+08
 11	pbkdf2_sha256$36000$2sP2KnVYwp47$G//Rax+5d8PpusNVkZzGov2HHFgjgjiz4s4GZe/ESCg=	2017-09-03 16:08:04.555817+08	f	catherinef	Catherine	Fu	catherinefu217@hotmail.com	f	t	2017-08-26 23:50:53+08
 6	pbkdf2_sha256$36000$9igWMFy6tWJB$ysgUYYSB+XNbHovCHfCk8QaftcHkJBSNPkQUpIhQFdA=	2017-09-03 18:17:33.000116+08	f	bradt	Brad	Tsui	bradleytsui@gmail.com	f	t	2017-07-04 20:39:53+08
 12	pbkdf2_sha256$36000$OB6xg4DsAPRn$UDje2tinMOndRwBZs+EveG7i30kHdcLsni5f4B2GUpI=	2017-09-03 23:08:32.222498+08	f	andrewh	Andrew	H	eclipsehk@ymail.com	f	t	2017-08-26 23:52:14+08
 13	pbkdf2_sha256$36000$Twy803Kw1QrU$DciXrQB4WbAr05B755d/Spus1/27mw4CowER5DKzAyU=	2017-09-03 23:08:38.501077+08	f	clarencey	Clarence	Yung	clarencey32@gmail.com	f	t	2017-08-26 23:53:06+08
-1	pbkdf2_sha256$36000$6dyXjCgP2DuE$UMqKctZVwQdQuOSliAD8mfSE6y31cFFrv3BQR6paavg=	2017-09-04 00:34:15.848463+08	t	admin			admin@hkpl.com	t	t	2017-02-07 21:18:36.653+08
 15	pbkdf2_sha256$36000$LAyd7v3j6vTl$bsHhW4/0KgR/v+JHSgnDhu6WdI7/vbbZ+2sgoND+9Xw=	2017-09-04 00:33:36+08	t	trishl	Trish	Lee	poke.n.hope.hk@gmail.com	t	t	2017-09-04 00:27:12+08
+16	pbkdf2_sha256$36000$rH0MqZP4dpoY$tVNdxaiq6b1n2GH9e1pxD5qj0TMymz7W5zLMhf43yBI=	\N	f	joelb	Joel	Buenafe	jngbuenafe@yahoo.com	f	t	2017-09-04 08:11:08+08
+5	pbkdf2_sha256$36000$bWQNaAuVyAxm$xmWAjjmW437Vk93T+YU50zc561EtOVH4mQ+dTyf+D/g=	2017-09-04 09:05:45.644865+08	f	deepv	Deep	Vaswani	deepvaswani@gmail.com	f	t	2017-07-04 19:56:51+08
+9	pbkdf2_sha256$36000$ZRTpA9l08qZ1$jrhJFqs3IDqOkHCFZmi7RhX3JZUuU8cG8/msV8oH+Hc=	2017-09-04 10:37:22.357183+08	f	jhunj	Jhun	Jimeno	emjimeno@gmail.com	f	t	2017-08-26 23:48:54+08
+8	pbkdf2_sha256$36000$q9uhQP2ESgGb$Ex9hCtTFsemCNZiM/Oze6MwUmDgnVGLdmQP/DM8wvFc=	2017-09-04 11:02:30.860105+08	f	mancyh	Mancy	Howe	mancy312@hotmail.com	f	t	2017-08-26 23:46:37+08
+4	pbkdf2_sha256$36000$NSLSkC9BRwhz$GnNyafwV1TGgR+zkQc+x+jTksNqUNrTOsIfeRCNC2ZQ=	2017-09-04 22:47:51.979658+08	f	kawangl	Kawang	Lau		f	t	2017-06-17 16:44:44+08
+1	pbkdf2_sha256$36000$6dyXjCgP2DuE$UMqKctZVwQdQuOSliAD8mfSE6y31cFFrv3BQR6paavg=	2017-09-04 22:50:00.2222+08	t	admin			admin@hkpl.com	t	t	2017-02-07 21:18:36.653+08
+3	pbkdf2_sha256$36000$AIbzVkiUaCaH$+wZU4FIo3JeTLwFuENP50jXTx+2Q48BrRzEolDG1aPk=	2017-09-04 23:00:45.249758+08	t	asdetrefle	Qj	Chv	qjchv@protonmail.ch	t	t	2017-06-17 16:38:01+08
 \.
 
 
@@ -1800,7 +1805,7 @@ SELECT pg_catalog.setval('auth_user_groups_id_seq', 1, false);
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('auth_user_id_seq', 15, true);
+SELECT pg_catalog.setval('auth_user_id_seq', 16, true);
 
 
 --
@@ -2516,6 +2521,15 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 685	2017-09-04 00:30:08.017446+08	15	trishl	2	[{"changed": {"fields": ["username", "first_name", "last_name", "email"]}}]	15	1
 686	2017-09-04 00:31:27.336162+08	15	trishl	2	[{"changed": {"fields": ["is_staff"]}}]	15	1
 687	2017-09-04 00:34:30.941148+08	15	trishl	2	[{"changed": {"fields": ["is_superuser"]}}]	15	1
+688	2017-09-04 08:11:08.799085+08	16	joelb	1	[{"added": {}}]	15	1
+689	2017-09-04 08:12:16.904157+08	16	joelb	2	[{"changed": {"fields": ["first_name", "last_name", "email"]}}]	15	1
+690	2017-09-04 08:13:08.487473+08	60	Joel Buenafe	2	[{"changed": {"fields": ["user"]}}]	3	1
+691	2017-09-04 22:12:12.27396+08	91	Gil Mandigma	1	[{"added": {}}]	3	1
+692	2017-09-04 22:12:45.260004+08	92	Lode Van Leuven	1	[{"added": {}}]	3	1
+693	2017-09-04 22:13:21.793809+08	135	Gil Mandigma (Dram Good Shots)	1	[{"added": {}}]	5	1
+694	2017-09-04 22:13:22.182936+08	136	Gil Mandigma (Dram Good Shots)	1	[{"added": {}}]	5	1
+695	2017-09-04 22:14:01.671856+08	136	Gil Mandigma (Dram Good Shots)	3		5	1
+696	2017-09-04 22:14:21.404123+08	137	Lode Van Leuven (Dram Good Shots)	1	[{"added": {}}]	5	1
 \.
 
 
@@ -2523,7 +2537,7 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('django_admin_log_id_seq', 687, true);
+SELECT pg_catalog.setval('django_admin_log_id_seq', 696, true);
 
 
 --
@@ -2737,6 +2751,10 @@ hadzc1089y0gx4e2nwkkb3joamtd34fy	MzU2MzM1NGE0MTE0YWJmODRlN2Y4ZDc0YzEyOGZlYjAxNDA
 3qss062wswmml1quy7luu8i86vicam92	MTk5MzcwMWMzNDA1ZDBhYWNlYjRmODdkOGFmYTM4MjI5YjA5NWE2Mjp7Il9hdXRoX3VzZXJfaGFzaCI6IjFlZWI1N2YyZjU1MzFlM2FiMGVlOWU0YjQ1OGUyYTAxZjQyMGZhNWMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxMiJ9	2017-09-17 23:08:32.234475+08
 lwf6vq4vl5p7jkskucv4yoyzkr8ojv4m	YzIxM2Y3YjA2NTRkNDdjYTNiMjc4YmNlYmEzOTExZDM5MTU5ZjhmNzp7Il9hdXRoX3VzZXJfaGFzaCI6ImIyMDkwMWM3ZGNkZDk1MTY3YWVjODEzYTAyMmU0MmZkMzAxNmE4NWIiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxMyJ9	2017-09-17 23:08:38.530206+08
 eojtkt6aw82gvtvjzfdt5wxvwe0531up	ZDJjYjlmMjJhN2UyM2ZlYmM3YmY3ZmZiMGU3MjUzMTFkNDk3ZWE1Yjp7Il9hdXRoX3VzZXJfaGFzaCI6IjU1MWI2OTIxY2ZhZTFmNTk0Y2Q2YTg5NjFkZTM0YjhhNmFjNWU1ZWMiLCJfYXV0aF91c2VyX2lkIjoiMSIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIn0=	2017-09-18 00:34:15.853215+08
+o0qs8ys4si5mtsuxc2wfmsjej4f4k6ud	MTIzM2Q5ZDdiZDk3OTVmYzZmYmRlNWViZjA1MzMyYzhlNTVhYTJjOTp7Il9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIiwiX2F1dGhfdXNlcl9pZCI6IjEiLCJfYXV0aF91c2VyX2hhc2giOiI1NTFiNjkyMWNmYWUxZjU5NGNkNmE4OTYxZGUzNGI4YTZhYzVlNWVjIn0=	2017-09-18 08:19:54.107949+08
+nryuu7nbq8gqvfnn6o5zn0b6vz8g1vre	MDFmMzY2MTNjZGM3NTYyZTVlZmNmYmI5NzgyM2YzOGI4MTI1MzViMzp7Il9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIiwiX2F1dGhfdXNlcl9oYXNoIjoiZGVmODRmY2Q3Yjg3ZDZkNzFhNDIxODU4YzYxODIzODhhYzMzNjk2YiIsIl9hdXRoX3VzZXJfaWQiOiI4In0=	2017-09-18 11:02:30.863434+08
+g1vmc66mm3s0ze7ok3ee1zwjr4tl00q0	NGI2NjM3MDBmNmRhYzkzYmZmNGY3MWI4ZjgwNTc1MWEwNDk4MWRmNTp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiI1NTFiNjkyMWNmYWUxZjU5NGNkNmE4OTYxZGUzNGI4YTZhYzVlNWVjIn0=	2017-09-18 13:17:11.765561+08
+39go0yz9pfnz0dfyuclo1k7wvxlkuezy	NzMzYzg2ZGEzM2QxNWY3NzU5OWUwMDNhZTA4NTEyYzQ4NDkzOWVjZjp7Il9hdXRoX3VzZXJfaGFzaCI6IjVmMmQ2Y2IzNzUxZTE0OWU1YmI1MTMxYTAxZjBiOTc1ZTM2NzA4NjYiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIzIn0=	2017-09-18 23:00:45.253011+08
 \.
 
 
@@ -4606,6 +4624,66 @@ COPY recording_frame (id, frame_number, home_score, away_score, is_clearance, br
 1810	1	5	10	f	87	\N	890
 1791	2	6	10	f	107	\N	880
 1799	2	10	4	f	107	\N	884
+1812	1	\N	\N	f	116	\N	891
+1813	2	\N	\N	f	42	\N	891
+1814	1	\N	\N	f	114	\N	892
+1815	2	\N	\N	f	44	\N	892
+1816	1	\N	\N	f	115	\N	893
+1817	2	\N	\N	f	43	\N	893
+1818	1	\N	\N	f	117	\N	894
+1819	2	\N	\N	f	3	\N	894
+1820	1	\N	\N	f	120	\N	895
+1821	2	\N	\N	f	41	\N	895
+1822	1	\N	\N	f	116	\N	896
+1823	2	\N	\N	f	44	\N	896
+1824	1	\N	\N	f	114	\N	897
+1825	2	\N	\N	f	43	\N	897
+1826	1	\N	\N	f	115	\N	898
+1827	2	\N	\N	f	3	\N	898
+1828	1	\N	\N	f	117	\N	899
+1829	2	\N	\N	f	41	\N	899
+1830	1	\N	\N	f	120	\N	900
+1831	2	\N	\N	f	42	\N	900
+1832	1	\N	\N	f	116	\N	901
+1833	2	\N	\N	f	43	\N	901
+1834	1	\N	\N	f	114	\N	902
+1835	2	\N	\N	f	3	\N	902
+1836	1	\N	\N	f	115	\N	903
+1837	2	\N	\N	f	41	\N	903
+1838	1	\N	\N	f	117	\N	904
+1839	2	\N	\N	f	42	\N	904
+1840	1	\N	\N	f	120	\N	905
+1841	2	\N	\N	f	44	\N	905
+1842	1	\N	\N	f	7	\N	906
+1843	2	\N	\N	f	76	\N	906
+1844	1	\N	\N	f	123	\N	907
+1845	2	\N	\N	f	78	\N	907
+1846	1	\N	\N	f	6	\N	908
+1847	2	\N	\N	f	5	\N	908
+1848	1	\N	\N	f	81	\N	909
+1849	2	\N	\N	f	71	\N	909
+1850	1	\N	\N	f	93	\N	910
+1851	2	\N	\N	f	92	\N	910
+1852	1	\N	\N	f	7	\N	911
+1853	2	\N	\N	f	78	\N	911
+1854	1	\N	\N	f	123	\N	912
+1855	2	\N	\N	f	5	\N	912
+1856	1	\N	\N	f	6	\N	913
+1857	2	\N	\N	f	71	\N	913
+1858	1	\N	\N	f	81	\N	914
+1859	2	\N	\N	f	92	\N	914
+1860	1	\N	\N	f	93	\N	915
+1861	2	\N	\N	f	76	\N	915
+1862	1	\N	\N	f	7	\N	916
+1863	2	\N	\N	f	5	\N	916
+1864	1	\N	\N	f	123	\N	917
+1865	2	\N	\N	f	71	\N	917
+1866	1	\N	\N	f	6	\N	918
+1867	2	\N	\N	f	92	\N	918
+1868	1	\N	\N	f	81	\N	919
+1869	2	\N	\N	f	76	\N	919
+1870	1	\N	\N	f	93	\N	920
+1871	2	\N	\N	f	78	\N	920
 \.
 
 
@@ -4613,7 +4691,7 @@ COPY recording_frame (id, frame_number, home_score, away_score, is_clearance, br
 -- Name: recording_frame_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('recording_frame_id_seq', 1811, true);
+SELECT pg_catalog.setval('recording_frame_id_seq', 1871, true);
 
 
 --
@@ -6301,6 +6379,66 @@ COPY recording_leagueframe (frame_ptr_id, leg_number, away_player_id, home_playe
 1791	2	107	87	111
 1789	2	66	1	111
 1786	1	61	80	111
+1812	1	42	116	113
+1813	2	42	116	113
+1814	1	44	114	113
+1815	2	44	114	113
+1816	1	43	115	113
+1817	2	43	115	113
+1818	1	3	117	113
+1819	2	3	117	113
+1820	1	41	120	113
+1821	2	41	120	113
+1822	3	44	116	113
+1823	4	44	116	113
+1824	3	43	114	113
+1825	4	43	114	113
+1826	3	3	115	113
+1827	4	3	115	113
+1828	3	41	117	113
+1829	4	41	117	113
+1830	3	42	120	113
+1831	4	42	120	113
+1832	5	43	116	113
+1833	6	43	116	113
+1834	5	3	114	113
+1835	6	3	114	113
+1836	5	41	115	113
+1837	6	41	115	113
+1838	5	42	117	113
+1839	6	42	117	113
+1840	5	44	120	113
+1841	6	44	120	113
+1842	1	76	7	115
+1843	2	76	7	115
+1844	1	78	123	115
+1845	2	78	123	115
+1846	1	5	6	115
+1847	2	5	6	115
+1848	1	71	81	115
+1849	2	71	81	115
+1850	1	92	93	115
+1851	2	92	93	115
+1852	3	78	7	115
+1853	4	78	7	115
+1854	3	5	123	115
+1855	4	5	123	115
+1856	3	71	6	115
+1857	4	71	6	115
+1858	3	92	81	115
+1859	4	92	81	115
+1860	3	76	93	115
+1861	4	76	93	115
+1862	5	5	7	115
+1863	6	5	7	115
+1864	5	71	123	115
+1865	6	71	123	115
+1866	5	92	6	115
+1867	6	92	6	115
+1868	5	76	81	115
+1869	6	76	81	115
+1870	5	78	93	115
+1871	6	78	93	115
 \.
 
 
@@ -6365,8 +6503,6 @@ COPY recording_leaguematch (id, venue, match_date, number_frames, table_size, is
 106	Billidart	2017-05-31 20:00:00+08	0	9	t	t	8-Ball	P	1	6	211	260	6	6	2	6	13	2	t	84_72_2_75_73	53_55_54_57_52	A	1	1
 105	Racks	2017-05-30 20:00:00+08	0	9	t	t	8-Ball	P	1	6	227	260	6	5	3	8	13	3	t	42_44_43_45_41	63_69_61_62_105	A	1	1
 110	Racks	2017-06-06 20:00:00+08	0	9	t	t	8-Ball	P	4	3	242	228	6	4	7	6	14	6	t	7_6_81_89_90	57_58_54_53_55	A	1	1
-115	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	5	7	15	\N	f	\N	\N	A	2	\N
-116	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	2	6	15	\N	f	\N	\N	A	2	\N
 117	Racks	2017-09-12 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	6	5	16	\N	f	\N	\N	A	2	\N
 118	Racks	2017-09-13 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	7	2	16	\N	f	\N	\N	A	2	\N
 119	Billidart	2017-09-13 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	1	3	16	\N	f	\N	\N	A	2	\N
@@ -6420,7 +6556,9 @@ COPY recording_leaguematch (id, venue, match_date, number_frames, table_size, is
 167	Billidart	2017-12-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	10	3	28	\N	f	\N	\N	A	2	\N
 168	Billidart	2017-12-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	5	6	28	\N	f	\N	\N	A	2	\N
 114	Racks	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	8	1	15	\N	f	\N	79_127_83_80_87	A	2	\N
-113	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	3	10	15	\N	f	42_44_43_3_41	116_114_115_117_120	A	2	\N
+116	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	0	2	6	15	\N	f	2_125_84_73_72	\N	A	2	\N
+113	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	2	3	10	15	\N	t	42_44_43_3_41	116_114_115_117_120	A	2	\N
+115	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	0	0	6	3	5	7	15	\N	t	76_78_5_71_92	7_123_6_81_93	A	2	\N
 \.
 
 
@@ -7279,6 +7417,36 @@ COPY recording_match (id, venue, match_date, number_frames, table_size, is_compl
 852	Billidart	2017-06-07 20:00:00+08	2	9	t	t	8-Ball	P	20	8	2	E	47	44	\N	44	f	A	\N
 185	Billidart	2017-03-22 20:00:00+08	2	9	t	t	8-Ball	P	6	20	2	E	44	73	\N	44	f	A	1
 201	Racks	2017-03-22 20:00:00+08	2	9	t	t	8-Ball	P	20	11	2	E	79	69	\N	69	f	A	1
+891	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	42	116	\N	\N	f	A	\N
+892	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	44	114	\N	\N	f	A	\N
+893	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	43	115	\N	\N	f	A	\N
+894	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	3	117	\N	\N	f	A	\N
+895	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	41	120	\N	\N	f	A	\N
+896	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	44	116	\N	\N	f	A	\N
+897	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	43	114	\N	\N	f	A	\N
+898	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	3	115	\N	\N	f	A	\N
+899	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	41	117	\N	\N	f	A	\N
+900	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	42	120	\N	\N	f	A	\N
+901	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	43	116	\N	\N	f	A	\N
+902	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	3	114	\N	\N	f	A	\N
+903	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	41	115	\N	\N	f	A	\N
+904	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	42	117	\N	\N	f	A	\N
+905	Racks	2017-09-05 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	44	120	\N	\N	f	A	\N
+906	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	76	7	\N	\N	f	A	\N
+907	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	78	123	\N	\N	f	A	\N
+908	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	5	6	\N	\N	f	A	\N
+909	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	71	81	\N	\N	f	A	\N
+910	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	92	93	\N	\N	f	A	\N
+911	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	78	7	\N	\N	f	A	\N
+912	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	5	123	\N	\N	f	A	\N
+913	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	71	6	\N	\N	f	A	\N
+914	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	92	81	\N	\N	f	A	\N
+915	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	76	93	\N	\N	f	A	\N
+916	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	5	7	\N	\N	f	A	\N
+917	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	71	123	\N	\N	f	A	\N
+918	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	92	6	\N	\N	f	A	\N
+919	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	76	81	\N	\N	f	A	\N
+920	Billidart	2017-09-06 20:00:00+08	0	9	f	f	8-Ball	P	0	0	2	E	78	93	\N	\N	f	A	\N
 \.
 
 
@@ -7286,7 +7454,7 @@ COPY recording_match (id, venue, match_date, number_frames, table_size, is_compl
 -- Name: recording_match_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('recording_match_id_seq', 890, true);
+SELECT pg_catalog.setval('recording_match_id_seq', 920, true);
 
 
 --

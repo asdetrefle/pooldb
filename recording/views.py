@@ -149,7 +149,7 @@ def initialize(request, match_id, type_):
                 m.add_bcc(match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email, 'qjchv@protonmail.ch')
                 m.send()
 
-                return render(request, 'base_site.html', {'content': 'Successfully submitted.'})
+                return render(request, 'base_site.html', {'content': 'Permission Denied.'})
 
             if side == 'home_players':
                 is_opponent_sub = ('away' in _submitted)
@@ -162,7 +162,7 @@ def initialize(request, match_id, type_):
                 players = away_players
                 side = 'away_players'
             else:
-                return render(request, 'base_site.html', {'content': 'Permission Denied'})
+                return render(request, 'base_site.html', {'content': 'Permission Denied.'})
 
             return render(request, 'submit_players.html', {'match_id': match.id,
                                                            'team': team,
@@ -208,7 +208,7 @@ def init_submit(request, type_, match_id):
     # TODO: after each edit, the league match view is loaded again: this makes it inconvenient to go back to match list
     match = get_object_or_404(LeagueMatch, pk=match_id)
     if not request.user.has_perm('recording.init_leaguematch', match):
-        return render(request, 'base_site.html', {'content': 'Permission denied.'})
+        return render(request, 'base_site.html', {'content': 'Permission Denied.'})
 
     if request.method == 'POST':
         selected_home_players = []
@@ -252,9 +252,8 @@ def match_view(request, type_, match_id):
         home_seasonal = match.home.teamseasonal_set.get(season=match.season)
         away_seasonal = match.away.teamseasonal_set.get(season=match.season)
 
-        print home_seasonal
-
-        print away_seasonal
+        #print home_seasonal
+        #print away_seasonal
 
         #print match._has_blank(), 'toto'
         return render(request, 'leaguematch.html', {
@@ -263,7 +262,9 @@ def match_view(request, type_, match_id):
             'summary': summary,
             'home_seasonal': home_seasonal,
             'away_seasonal' : away_seasonal,
-            'has_blank_fields': match._has_blank()
+            'has_blank_fields': match._has_blank(),
+            'record_leaguematch': request.user.has_perm('recording.record_leaguematch', match),
+            'approve_leaguematch': request.user.has_perm('recording.approve_leaguematch', match)
         })
     elif type_ == 'Match':
         match = get_object_or_404(Match, pk=match_id)
@@ -302,7 +303,7 @@ def edit(request, type_, match_id):
     if request.method == 'POST':
         match = get_object_or_404(LeagueMatch, pk=match_id)
         if not request.user.has_perm('recording.record_leaguematch', match):
-            return render(request, 'base_site.html', {'content': 'Permission denied.'})
+            return render(request, 'base_site.html', {'content': 'Permission Denied.'})
 
         if match.is_completed:
             return redirect('match_view', type_=type_, match_id=match_id)
@@ -349,3 +350,64 @@ def edit(request, type_, match_id):
         return redirect('match_view', type_=type_, match_id=match_id)
     else:
         raise Http404
+
+
+@_need_login
+def approve(request, match_id, type_):
+    # currently only provide initialize method for LeagueMatch
+    # initialize method is also useful for Match in case of a tournament.
+    # We know all matchs ahead but will only know players before the Match
+    # TODO: use django model form; add validation; how to represent properly the lists of players via POST?
+    if type_ == 'LeagueMatch':
+        match = get_object_or_404(LeagueMatch.objects.select_related("home__captain__player__user", "away__captain__player__user"), pk=match_id)
+        if not request.user.has_perm('recording.approve_leaguematch', match):
+            return render(request, 'base_site.html', {'content': 'Permission Denied.'})
+
+        if match._has_blank():
+            return redirect('match_view', type_=type_, match_id=match_id)
+
+        home_players = match.home.member_set.exclude(cancel_date__isnull=False).order_by('-season_matches_played')
+        away_players = match.away.member_set.exclude(cancel_date__isnull=False).order_by('-season_matches_played')
+
+        side = None
+
+        p = request.user.player
+
+        if p in {p.player for p in home_players}:
+            side = 'home_players'
+        elif p in {p.player for p in away_players}:
+            side = 'away_players'
+        else:
+            return render(request, 'base_site.html', {'content': 'Permission Denied.'})
+
+        #if 'home' in _submitted and 'away' in _submitted:
+        #    return render(request, 'base_site.html', {'content': 'Both teams have already submitted. You are no longer able to modify team roster.'})
+
+        if request.method == 'POST':
+            print "toto"
+
+            msg = """
+            Hello,
+
+            Team %s has just approved the match '%s'!
+
+            Once you have done so, you agree that the match scores are correct and are no longer able to change any.
+
+            We suggest you to take a screenshot if you would like to check later.
+
+            Thanks,
+            Poke n Hope
+            """ % (getattr(match, side[:4]), match, match.match_date.date())
+
+            m = MailManager(subject="Team %s approved the match." % getattr(match, side[:4]), content=msg)
+            m.add_bcc(match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email, 'qjchv@protonmail.ch')
+            #m.add_bcc('qjchv@protonmail.ch')
+            m.send()
+
+            return render(request, 'base_site.html', {'content': 'Successfully approved. You will receive an email for confirmation.'})
+        else:
+            raise Http404
+    else:
+        raise Http404
+
+

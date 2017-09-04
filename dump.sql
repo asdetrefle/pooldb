@@ -1456,8 +1456,15 @@ COPY administration_member (id, create_date, cancel_date, points, ranking, _poin
 125	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	2	22	0	-1
 40	2017-02-26 22:05:05+08	2017-08-22 23:59:59+08	265.974422849999996	1	0	30	24	7	30	24	7	3	10	538	8.96666666666999923
 1	2017-02-07 21:32:51+08	2017-08-22 23:59:59+08	252.20300897300001	4	0	36	24	5	36	24	5	1	5	592	8.22222222221999921
-126	2017-08-27 17:39:17+08	2017-08-23 00:00:00+08	200	0	0	0	0	0	0	0	0	3	82	0	-1
 127	2017-09-03 16:39:18+08	\N	200	0	0	0	0	0	0	0	0	1	83	0	-1
+129	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	8	85	0	-1
+128	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	8	84	0	-1
+130	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	8	86	0	-1
+131	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	6	87	0	-1
+132	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	6	88	0	-1
+133	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	6	89	0	-1
+134	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	6	90	0	-1
+126	2017-08-23 00:00:00+08	\N	200	0	0	0	0	0	0	0	0	3	82	0	-1
 \.
 
 
@@ -1465,7 +1472,7 @@ COPY administration_member (id, create_date, cancel_date, points, ranking, _poin
 -- Name: administration_member_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('administration_member_id_seq', 127, true);
+SELECT pg_catalog.setval('administration_member_id_seq', 134, true);
 
 
 --
@@ -1555,6 +1562,13 @@ COPY administration_player (id, name, username, sex, phone, email, nb_groups, us
 82	Chris Win	chrisw	M	\N	\N	0	\N
 30	Nick Fong	nickf	M	\N	\N	0	14
 83	Patrick Ng	patrickn	M	\N	\N	0	\N
+84	Ann Wang	annw	F	\N	\N	0	\N
+85	Sharon Wong	sharonw	M	\N	\N	0	\N
+86	Rinky H	rinkyh	F	\N	\N	0	\N
+87	Jude Sequeira	judes	M	\N	\N	0	\N
+88	Jeremy Lewis	jeremyl	M	\N	\N	0	\N
+89	Graham Clark	grahamc	M	\N	\N	0	\N
+90	Serin Yam	seriny	F	\N	\N	0	\N
 \.
 
 
@@ -1562,7 +1576,7 @@ COPY administration_player (id, name, username, sex, phone, email, nb_groups, us
 -- Name: administration_player_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('administration_player_id_seq', 83, true);
+SELECT pg_catalog.setval('administration_player_id_seq', 90, true);
 
 
 --
@@ -1762,7 +1776,8 @@ COPY auth_user (id, password, last_login, is_superuser, username, first_name, la
 6	pbkdf2_sha256$36000$9igWMFy6tWJB$ysgUYYSB+XNbHovCHfCk8QaftcHkJBSNPkQUpIhQFdA=	2017-09-03 18:17:33.000116+08	f	bradt	Brad	Tsui	bradleytsui@gmail.com	f	t	2017-07-04 20:39:53+08
 12	pbkdf2_sha256$36000$OB6xg4DsAPRn$UDje2tinMOndRwBZs+EveG7i30kHdcLsni5f4B2GUpI=	2017-09-03 23:08:32.222498+08	f	andrewh	Andrew	H	eclipsehk@ymail.com	f	t	2017-08-26 23:52:14+08
 13	pbkdf2_sha256$36000$Twy803Kw1QrU$DciXrQB4WbAr05B755d/Spus1/27mw4CowER5DKzAyU=	2017-09-03 23:08:38.501077+08	f	clarencey	Clarence	Yung	clarencey32@gmail.com	f	t	2017-08-26 23:53:06+08
-1	pbkdf2_sha256$36000$6dyXjCgP2DuE$UMqKctZVwQdQuOSliAD8mfSE6y31cFFrv3BQR6paavg=	2017-09-03 23:40:09.832322+08	t	admin			admin@hkpl.com	t	t	2017-02-07 21:18:36.653+08
+1	pbkdf2_sha256$36000$6dyXjCgP2DuE$UMqKctZVwQdQuOSliAD8mfSE6y31cFFrv3BQR6paavg=	2017-09-04 00:34:15.848463+08	t	admin			admin@hkpl.com	t	t	2017-02-07 21:18:36.653+08
+15	pbkdf2_sha256$36000$LAyd7v3j6vTl$bsHhW4/0KgR/v+JHSgnDhu6WdI7/vbbZ+2sgoND+9Xw=	2017-09-04 00:33:36+08	t	trishl	Trish	Lee	poke.n.hope.hk@gmail.com	t	t	2017-09-04 00:27:12+08
 \.
 
 
@@ -1785,7 +1800,7 @@ SELECT pg_catalog.setval('auth_user_groups_id_seq', 1, false);
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('auth_user_id_seq', 14, true);
+SELECT pg_catalog.setval('auth_user_id_seq', 15, true);
 
 
 --
@@ -2315,6 +2330,7 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 496	2017-05-24 23:56:41.243507+08	61	Clara Szeto (The Meanions)	2	[{"changed": {"fields": ["points", "raw_points", "handicap", "total_matches_played", "season_matches_played", "season_matches_won"]}}]	5	1
 497	2017-05-25 00:28:00.786499+08	101	2017-05-23 Holy Strokes (3) vs. The Meanions (2)	2	[{"changed": {"fields": ["away_points_raw"]}}]	7	1
 498	2017-05-25 21:21:59.016397+08	96	2017-05-10 The Abangers (6) vs. That's a Beautiful Rack (7)	2	[{"changed": {"fields": ["_away_ordered_players"]}}]	7	1
+675	2017-09-04 00:10:58.421269+08	87	Jude Sequeira	1	[{"added": {}}]	3	1
 499	2017-05-25 21:22:57.820821+08	647	2017-05-10 Levis Santos (The Abangers) vs. Will Zhang (That's a Beautiful Rack) 	2	[{"changed": {"fields": ["away"]}}]	6	1
 500	2017-05-25 21:23:20.10606+08	643	2017-05-10 Bertha Yeung (The Abangers) vs. Will Zhang (That's a Beautiful Rack) 	2	[{"changed": {"fields": ["away", "winner"]}}]	6	1
 501	2017-05-25 21:23:43.417493+08	639	2017-05-10 Mark Morillo (The Abangers) vs. Will Zhang (That's a Beautiful Rack) 	2	[{"changed": {"fields": ["away", "winner"]}}]	6	1
@@ -2481,6 +2497,25 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 665	2017-09-03 12:22:11.240515+08	30	Nick Fong	2	[{"changed": {"fields": ["user"]}}]	3	1
 666	2017-09-03 16:39:09.281674+08	83	Patrick Ng	1	[{"added": {}}]	3	1
 667	2017-09-03 16:39:31.614812+08	127	Patrick Ng (That's a Beautiful Rack)	1	[{"added": {}}]	5	1
+668	2017-09-03 23:43:48.06244+08	84	Ann Wang	1	[{"added": {}}]	3	1
+669	2017-09-03 23:44:39.169306+08	85	Sharon Wong	1	[{"added": {}}]	3	1
+670	2017-09-03 23:45:08.812485+08	86	Rinky H	1	[{"added": {}}]	3	1
+671	2017-09-03 23:45:33.618614+08	128	Ann Wang (The Meanions)	1	[{"added": {}}]	5	1
+672	2017-09-03 23:45:59.570434+08	129	Sharon Wong (The Meanions)	1	[{"added": {}}]	5	1
+673	2017-09-03 23:46:17.277971+08	128	Ann Wang (The Meanions)	2	[{"changed": {"fields": ["create_date", "cancel_date"]}}]	5	1
+674	2017-09-03 23:46:38.299157+08	130	Rinky H (The Meanions)	1	[{"added": {}}]	5	1
+676	2017-09-04 00:11:21.929441+08	88	Jeremy Lewis	1	[{"added": {}}]	3	1
+677	2017-09-04 00:11:39.892365+08	89	Graham Clark	1	[{"added": {}}]	3	1
+678	2017-09-04 00:11:58.665193+08	90	Serin Yam	1	[{"added": {}}]	3	1
+679	2017-09-04 00:12:33.461329+08	131	Jude Sequeira (Dram Good Shots)	1	[{"added": {}}]	5	1
+680	2017-09-04 00:12:55.616353+08	132	Jeremy Lewis (Dram Good Shots)	1	[{"added": {}}]	5	1
+681	2017-09-04 00:13:16.643828+08	133	Graham Clark (Dram Good Shots)	1	[{"added": {}}]	5	1
+682	2017-09-04 00:13:49.293009+08	134	Serin Yam (Dram Good Shots)	1	[{"added": {}}]	5	1
+683	2017-09-04 00:24:49.027167+08	126	Chris Win (Anything is Fine)	2	[{"changed": {"fields": ["create_date", "cancel_date"]}}]	5	1
+684	2017-09-04 00:27:12.550664+08	15	trish	1	[{"added": {}}]	15	1
+685	2017-09-04 00:30:08.017446+08	15	trishl	2	[{"changed": {"fields": ["username", "first_name", "last_name", "email"]}}]	15	1
+686	2017-09-04 00:31:27.336162+08	15	trishl	2	[{"changed": {"fields": ["is_staff"]}}]	15	1
+687	2017-09-04 00:34:30.941148+08	15	trishl	2	[{"changed": {"fields": ["is_superuser"]}}]	15	1
 \.
 
 
@@ -2488,7 +2523,7 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('django_admin_log_id_seq', 667, true);
+SELECT pg_catalog.setval('django_admin_log_id_seq', 687, true);
 
 
 --
@@ -2696,13 +2731,12 @@ qk142lk0ayenaaoyx3yyndegvfmwq6z8	MzU2MzM1NGE0MTE0YWJmODRlN2Y4ZDc0YzEyOGZlYjAxNDA
 leg7bsv3qxvwl40nbf78fppdtwt215ge	MzU2MzM1NGE0MTE0YWJmODRlN2Y4ZDc0YzEyOGZlYjAxNDA0NGNjMTp7Il9hdXRoX3VzZXJfaGFzaCI6IjU1MWI2OTIxY2ZhZTFmNTk0Y2Q2YTg5NjFkZTM0YjhhNmFjNWU1ZWMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-07-18 21:02:04.130452+08
 w31bk6r90l61c3hjg6qc38zq7zerr4tg	MzU2MzM1NGE0MTE0YWJmODRlN2Y4ZDc0YzEyOGZlYjAxNDA0NGNjMTp7Il9hdXRoX3VzZXJfaGFzaCI6IjU1MWI2OTIxY2ZhZTFmNTk0Y2Q2YTg5NjFkZTM0YjhhNmFjNWU1ZWMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-09-06 11:55:36.263575+08
 pbbw9rallzgtqbicz6o3hs45ojhwupgv	OGU2ZWM5ZWM2YjhlYTY4YjVkMWI4MDY1ZjIxNmE0NTAyNmJiNGI3NTp7Il9hdXRoX3VzZXJfaGFzaCI6IjUxYWM4YjIyMTkzYmVkYmM0MzY0OTRiM2IxNjBkMjRjNGNlZmY1ZDciLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiI2In0=	2017-09-10 17:40:28.218838+08
-bcb4e6394a4739w4r37uqfd8i1bloezk	YjYyNzVhYzYzZTYzOGIxNDY0NWI5OTRjODVmNDE1ZGU4MmE2ZGI2Njp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9oYXNoIjoiNTUxYjY5MjFjZmFlMWY1OTRjZDZhODk2MWRlMzRiOGE2YWM1ZTVlYyIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIn0=	2017-09-17 11:52:20.163521+08
 6osq3ahxsdoaqy9stbf8mbwhxqzb96or	NTk0ZTRjZWMyZTlkZjk5Zjc5YzdjM2IyZGRlZDg5MDA0M2U1ZTQzYjp7Il9hdXRoX3VzZXJfaWQiOiIxMSIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIiwiX2F1dGhfdXNlcl9oYXNoIjoiZjA1MjlhYjQ2N2MwYTlmOWY1ODRkMGI5Zjg1OGQ0ZDA5ZmU3Y2ZhNyJ9	2017-09-17 16:08:04.560375+08
 wrkojhzywutqcs85h26p2m6n4pmyrnw5	ZjVjNDdhMzg3ZjRkMmU2M2U5Y2NkMzA3YWIyMzZlYzc2YzhjZWUzYTp7Il9hdXRoX3VzZXJfaGFzaCI6IjA2YjAzYzY1YTQ5OWY4ODNhY2ZkN2Y4OWFjNTY2YzY5N2U4ZTljZDgiLCJfYXV0aF91c2VyX2lkIjoiNiIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIn0=	2017-09-17 18:17:33.004118+08
 hadzc1089y0gx4e2nwkkb3joamtd34fy	MzU2MzM1NGE0MTE0YWJmODRlN2Y4ZDc0YzEyOGZlYjAxNDA0NGNjMTp7Il9hdXRoX3VzZXJfaGFzaCI6IjU1MWI2OTIxY2ZhZTFmNTk0Y2Q2YTg5NjFkZTM0YjhhNmFjNWU1ZWMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-09-17 19:00:41.449656+08
 3qss062wswmml1quy7luu8i86vicam92	MTk5MzcwMWMzNDA1ZDBhYWNlYjRmODdkOGFmYTM4MjI5YjA5NWE2Mjp7Il9hdXRoX3VzZXJfaGFzaCI6IjFlZWI1N2YyZjU1MzFlM2FiMGVlOWU0YjQ1OGUyYTAxZjQyMGZhNWMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxMiJ9	2017-09-17 23:08:32.234475+08
 lwf6vq4vl5p7jkskucv4yoyzkr8ojv4m	YzIxM2Y3YjA2NTRkNDdjYTNiMjc4YmNlYmEzOTExZDM5MTU5ZjhmNzp7Il9hdXRoX3VzZXJfaGFzaCI6ImIyMDkwMWM3ZGNkZDk1MTY3YWVjODEzYTAyMmU0MmZkMzAxNmE4NWIiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxMyJ9	2017-09-17 23:08:38.530206+08
-tkzmgfgxhqhf0av5798ai104da00i037	MzU2MzM1NGE0MTE0YWJmODRlN2Y4ZDc0YzEyOGZlYjAxNDA0NGNjMTp7Il9hdXRoX3VzZXJfaGFzaCI6IjU1MWI2OTIxY2ZhZTFmNTk0Y2Q2YTg5NjFkZTM0YjhhNmFjNWU1ZWMiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-09-17 23:40:09.835027+08
+eojtkt6aw82gvtvjzfdt5wxvwe0531up	ZDJjYjlmMjJhN2UyM2ZlYmM3YmY3ZmZiMGU3MjUzMTFkNDk3ZWE1Yjp7Il9hdXRoX3VzZXJfaGFzaCI6IjU1MWI2OTIxY2ZhZTFmNTk0Y2Q2YTg5NjFkZTM0YjhhNmFjNWU1ZWMiLCJfYXV0aF91c2VyX2lkIjoiMSIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIn0=	2017-09-18 00:34:15.853215+08
 \.
 
 

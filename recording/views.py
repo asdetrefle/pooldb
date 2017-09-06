@@ -402,6 +402,7 @@ def approve(request, match_id, type_):
             m = MailManager(subject="Team %s approved the match." % getattr(match, side[:4]), content=msg)
             m.add_bcc(match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email, 'qjchv@protonmail.ch')
             #m.add_bcc('qjchv@protonmail.ch')
+            print "tata"
             m.send()
 
             return render(request, 'base_site.html', {'content': 'Successfully approved. You will receive an email for confirmation.'})

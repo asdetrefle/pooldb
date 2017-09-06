@@ -35,8 +35,10 @@ class MailManager(object):
 
     def send(self, *args, **kwargs):
         self.mail.add_personalization(self.personalization)
+        print("yo")
         sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
         data = self.mail.get()
+        print("titi")
         response = sg.client.mail.send.post(request_body=data)
         print(response.status_code)
         print(response.body)

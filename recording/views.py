@@ -397,7 +397,7 @@ def approve(request, match_id, type_):
 
             Thanks,
             Poke n Hope
-            """ % (getattr(match, side[:4]), match, match.match_date.date())
+            """ % (getattr(match, side[:4]), match)
 
             m = MailManager(subject="Team %s approved the match." % getattr(match, side[:4]), content=msg)
             m.add_bcc(match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email, 'qjchv@protonmail.ch')

@@ -15,9 +15,9 @@ def default_season():
 
 
 def calc_elo(result, opp, sef):
-    if sef < 2100:
+    if sef <= 210:
         K=32.
-    elif sef < 2400:
+    elif sef <= 240:
         K=24.
     else:
         K=16.

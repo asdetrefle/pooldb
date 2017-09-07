@@ -125,6 +125,16 @@ class League(models.Model):
         return
 
 
+    def update_players_handicap(self):
+        rh = lg.playerranking_set.all().values('player', 'player__player_id', 'serial_id', 'season_points', 'total_points', 'season_matches_played', 'total_matches_played')
+
+        id_dict = {}
+
+        for l in rh:
+            id_dict.setdefault(l[1], {})[serial_id] = [l[3], l[4], l[5], l[6]]
+        pass
+
+
     def create_ranking(self, wn, s=default_season()):
         season = Season.objects.get(season=s)
         w = s.matchweek_set.get(week_number=wn)
@@ -204,7 +214,7 @@ class League(models.Model):
         members = []
 
         for t in ts:
-            for m in t.member_set.filter(season_matches_played__gt=0):
+            for m in t.member_set.filter(handicap__gt=-1, cancel_date__isnull=True):
                 members.append(m)
 
         members.sort(key=lambda m: m.ranking)
@@ -356,20 +366,21 @@ class Team(Group):
             points += m.away_points_raw
         self.season_points = points
 
-        mbs = self.member_set.all()
+        mbs = self.member_set.exclude(cancel_date__isnull=False)
 
         data = []
         for mb in mbs:
             if mb.handicap<0:
                 continue
             data.append([mb.raw_points, mb.season_clearances, mb.handicap])
+        print self.team_number, data
 
         data = np.array(data)
 
         if len(data)>0:
-            self.season_leg_average = data[:,0].sum() / (self.total_matches_played * 6)
-            self.clearances = data[:,1].sum()
-            self.median_average = np.median(data[:, 2], axis=None)
+            self.season_leg_average = data[:,0].sum() / (self.season_matches_played * 6)
+            self.season_clearances = data[:,1].sum()
+            self.season_median = np.median(data[:, 2], axis=None)
 
         self.save()
         return

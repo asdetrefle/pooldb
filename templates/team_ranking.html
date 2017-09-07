@@ -98,6 +98,7 @@
     <col width="200">
     <col width="100">
     <col width="100">
+    <col width="100">
     <col width="128">
     <col width="128">
     <col width="128">
@@ -107,6 +108,7 @@
         <th class="unsorted">Rank</th>
         <th class="unsorted">Team</th>
         <th class="sortable desc">Legs</th>
+        <th class="sortable unsorted">Points</th>
         <th class="sortable unsorted">Leg Avg</th>
         <th class="sortable unsorted">Clearances</th>
         <th class="sortable unsorted">Median Avg</th>
@@ -120,6 +122,7 @@
         <td align="center"> {{ m.ranking }} </td>
         <td align="center"> <a href="{% url 'team_summary' m.pk %}"> {{ m.name }} </a> </td>
         <td align="center"> {{ m.season_legs_won }} </td>
+        <td align="center"> {{ m.season_points }} </td>
         <td align="center"> {{ summary|get_item:m.pk|get_item:"leg_average"|floatformat:"1" }} </td>
         <td align="center"> {{ summary|get_item:m.pk|get_item:"clearances"|floatformat:"0" }} </td>
         <td align="center"> {{ summary|get_item:m.pk|get_item:"median"|floatformat:"1" }} </td>

@@ -223,7 +223,7 @@ class League(models.Model):
     def get_ranked_teams(self):
         ts = list(self.team_set.exclude(close_date__isnull=False));
 
-        ts.sort(key=lambda m: m.ranking)
+        ts.sort(key=lambda m: (m.ranking, -m.season_points))
         return ts
 
     def get_weekly_summary(self):

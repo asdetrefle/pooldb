@@ -66,7 +66,7 @@ def make_leaguematch(season, md):
 
             mdate = w.start_date + datetime.timedelta(days=k[0], hours=20)
 
-            nm = LeagueMatch(venue=VENUE[k[1]], season=s, week=w, match_date=mdate, home=th, away=ta, score_type='P', break_type='A')
+            nm = LeagueMatch(venue=VENUE[k[1]], season=s, week=w, match_date=mdate, home=th, away=ta, score_type='P', break_type='A', league=lg)
             print w, mdate, nm
             nm.save()
 

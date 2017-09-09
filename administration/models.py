@@ -79,9 +79,9 @@ class League(models.Model):
         pk_set = []
         point_set = []
         for t in ts:
-            for m in t.member_set.filter(season_matches_played__gt=0):
+            for m in t.member_set.filter(handicap__gt=-1, cancel_date__isnull=True):
                 m._update_points()
-                m._update_handicap()
+                #m._update_handicap()
                 pk_set.append(m.pk)
                 # scipy rankdata only ranks from smallest to highest so here needs the minus sign.
                 point_set.append(-m.points)
@@ -139,11 +139,11 @@ class League(models.Model):
         season = Season.objects.get(season=s)
         w = s.matchweek_set.get(week_number=wn)
 
-        team_sid = self.teamranking_set.all().values('team_id', 'serial_id', 'date', 'raw_points', 'season_points').distinct('team_id').order_by('team_id', '-date')
-        player_sid = self.playerranking_set.all().values('player_id', 'serial_id', 'date', 'raw_points', 'season_points').distinct('player_id').order_by('player_id', '-date')
+        team_sid = self.teamranking_set.all().values('team_id', 'serial_id', 'date', 'total_points', 'season_points').distinct('team_id').order_by('team_id', '-date')
+        player_sid = self.playerranking_set.all().values('player_id', 'serial_id', 'date', 'total_points', 'season_points').distinct('player_id').order_by('player_id', '-date')
 
-        team_sid = {x['team_id']: [x['serial_id'], x['raw_points'] - x['season_points']] for x in team_sid}
-        player_sid = {x['player_id']: [x['serial_id'], x['raw_points'] - x['season_points']] for x in player_sid}
+        team_sid = {x['team_id']: [x['serial_id'], x['total_points'] - x['season_points']] for x in team_sid}
+        player_sid = {x['player_id']: [x['serial_id'], x['total_points'] - x['season_points']] for x in player_sid}
         print team_sid
         print player_sid
 
@@ -157,12 +157,17 @@ class League(models.Model):
                                         serial_id=t_prev[0]+1,
                                         ranking=t.ranking,
                                         season_points=t.season_points,
-                                        raw_points=t_prev[1]+t.season_points,
-                                        clearances=t.season_clearances,
-                                        matches_played=t.season_matches_played,
-                                        matches_won=t.season_matches_won,
-                                        legs_played=t.season_legs_played,
-                                        legs_won=t.season_legs_won)
+                                        total_points=t.total_points,
+                                        season_clearances=t.season_clearances,
+                                        total_clearances=t.total_clearances,
+                                        season_matches_played=t.season_matches_played,
+                                        total_matches_played=t.total_matches_played,
+                                        season_matches_won=t.season_matches_won,
+                                        total_matches_won=t.total_matches_won,
+                                        season_legs_played=t.season_legs_played,
+                                        total_legs_played=t.total_legs_played,
+                                        season_legs_won=t.season_legs_won,
+                                        total_legs_won=t.total_legs_won)
             """
             tr = self.teamranking_set.get(team=t, week=w)
             tr.ranking=t.ranking
@@ -175,7 +180,7 @@ class League(models.Model):
             tr.save()
             """
 
-            for m in t.member_set.filter(season_matches_played__gt=0):
+            for m in t.member_set.filter(total_matches_played__gt=0, cancel_date__isnull=True):
 
                 p_prev = player_sid.get(m.id, [0, 0])
                 self.playerranking_set.create(player=m,
@@ -185,11 +190,14 @@ class League(models.Model):
                                               ranking=m.ranking,
                                               elo_points=m.points,
                                               season_points=m.season_points,
-                                              raw_points=p_prev[1]+m.season_points,
+                                              total_points=m.total_points,
                                               handicap=m.handicap,
-                                              clearances=m.season_clearances,
-                                              matches_played=m.season_matches_played,
-                                              matches_won=m.season_matches_won)
+                                              season_clearances=m.season_clearances,
+                                              total_clearances=m.total_clearances,
+                                              season_matches_played=m.season_matches_played,
+                                              total_matches_played=m.total_matches_played,
+                                              season_matches_won=m.season_matches_won,
+                                              total_matches_won=m.total_matches_won)
                 """
                 pr = self.playerranking_set.get(player=m, week=w)
                 pr.ranking=m.ranking
@@ -305,7 +313,9 @@ class Team(Group):
     team_number = models.IntegerField(default=0)
 
     season_points = models.IntegerField(default=0)
+    total_points = models.IntegerField(default=0)
     season_clearances = models.IntegerField(default=0)
+    total_clearances = models.IntegerField(default=0)
     season_leg_average  = models.FloatField(default=0)
     season_median       = models.FloatField(default=0)
 
@@ -440,7 +450,8 @@ class Member(models.Model):
     cancel_date = models.DateTimeField('Date quitted', blank=True, null=True)
 
     points  = models.FloatField(default=200.)
-    raw_points = models.IntegerField(default=0)
+    season_points = models.IntegerField(default=0)
+    total_points = models.IntegerField(default=0)
     ranking = models.IntegerField(default=0)
     # -1 is a new player flag. handicap will become >=0 when at least 1 match played
     handicap = models.FloatField(default=-1)
@@ -470,11 +481,11 @@ class Member(models.Model):
         return
 
     def _update_handicap(self):
-        if self.season_matches_played==0:
-            return
+        #if self.season_matches_played==0:
+        #    return
 
-        self.handicap = float(self.raw_points) / (self.season_matches_played * 2.)
-        self.save()
+        #self.handicap = float(self.raw_points) / (self.season_matches_played * 2.)
+        #self.save()
         return
 
     def update_all(self):

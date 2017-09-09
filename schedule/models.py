@@ -14,6 +14,7 @@ class Season(models.Model):
 
 
 class MatchWeek(models.Model):
+    serial_id = models.IntegerField(default=0)
     week_number = models.IntegerField()
     season = models.ForeignKey(Season)
     start_date = models.DateTimeField()

@@ -53,7 +53,7 @@ def ranking_teams(request, s=default_season(), league_name='Poke n Hope HK 8-Bal
     summary = {}
     for t in ranking:
         summary[t.pk] = t.stats_summary()
-    print summary
+
     return render(request, 'team_ranking.html', {'ranking': ranking, 'summary': summary, 'last_update': lg.last_update})
 
 

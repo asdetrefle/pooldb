@@ -4,7 +4,7 @@ from django.db import models
 from django.utils import timezone
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
-from schedule.models import Season
+from schedule.models import Season, MatchWeek
 import datetime
 import scipy.stats as ss
 from utils import default_season
@@ -125,14 +125,26 @@ class League(models.Model):
         return
 
 
-    def update_players_handicap(self):
-        rh = lg.playerranking_set.all().values('player', 'player__player_id', 'serial_id', 'season_points', 'total_points', 'season_matches_played', 'total_matches_played')
+    def update_players_handicap(self, wn, s=default_season(), window=14):
+        w = MatchWeek.objects.get(season__season=s, week_number=wn)
 
-        id_dict = {}
-
+        rh = self.playerranking_set.filter(week__serial_id=(w.serial_id-window)).values('player__player_id', 'season_points', 'total_points', 'season_matches_played', 'total_matches_played')
+        rh_dict = {}
         for l in rh:
-            id_dict.setdefault(l[1], {})[serial_id] = [l[3], l[4], l[5], l[6]]
-        pass
+            i = l.pop('player__player_id')
+            rh_dict[i] = l
+
+        ts = self.team_set.prefetch_related('member_set')
+
+        for t in ts:
+            for m in t.member_set.filter(cancel_date__isnull=True):
+                try:
+                    h = float(m.total_points - rh_dict.get(m.player_id, {}).get('total_points', 0)) / (m.total_matches_played - rh_dict.get(m.player_id, {}).get('total_matches_played', 0)) / 2.
+                except ZeroDivisionError:
+                    h = -1.
+                m.handicap = h
+                m.save()
+        return
 
 
     def create_ranking(self, wn, s=default_season()):
@@ -366,15 +378,15 @@ class Team(Group):
 
     def update_stats(self):
         season = Season.objects.get(season=default_season())
-        points = 0
-        ms_home = self.leaguematch_home.filter(season=season, is_submitted=True)
-        for m in ms_home:
-            points += m.home_points_raw
+        #points = 0
+        #ms_home = self.leaguematch_home.filter(season=season, is_submitted=True)
+        #for m in ms_home:
+        #    points += m.home_points_raw
 
-        ms_away = self.leaguematch_away.filter(season=season, is_submitted=True)
-        for m in ms_away:
-            points += m.away_points_raw
-        self.season_points = points
+        #ms_away = self.leaguematch_away.filter(season=season, is_submitted=True)
+        #for m in ms_away:
+        #    points += m.away_points_raw
+        #self.season_points = points
 
         mbs = self.member_set.exclude(cancel_date__isnull=False)
 
@@ -383,13 +395,14 @@ class Team(Group):
             if mb.handicap<0:
                 continue
             data.append([mb.raw_points, mb.season_clearances, mb.handicap])
-        print self.team_number, data
+        #print self.team_number, data
 
         data = np.array(data)
 
         if len(data)>0:
-            self.season_leg_average = data[:,0].sum() / (self.season_matches_played * 6)
+            self.total_clearances += data[:,1].sum() - self.season_clearances
             self.season_clearances = data[:,1].sum()
+            self.season_leg_average = data[:,0].sum() / (self.season_matches_played * 6)
             self.season_median = np.median(data[:, 2], axis=None)
 
         self.save()

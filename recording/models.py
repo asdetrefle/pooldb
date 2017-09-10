@@ -216,8 +216,8 @@ class Match(AbstractMatch):
             self.away.total_matches_won += 1
             self.away.season_matches_won += 1
 
-        print self.home, self.home.total_matches_played
-        print self.away, self.away.total_matches_played
+        #print self.home, self.home.total_matches_played
+        #print self.away, self.away.total_matches_played
         # add clearance info to players
         for f in self.frames():
             if f.is_clearance:
@@ -232,8 +232,10 @@ class Match(AbstractMatch):
         home_score_ = self.home_score
         away_score_ = self.away_score
 
-        self.home.raw_points += home_score_
-        self.away.raw_points += away_score_
+        self.home.season_points += home_score_
+        self.away.season_points += away_score_
+        self.home.total_points += home_score_
+        self.away.total_points += away_score_
         self.home._point_adj += calc_elo(float(home_score_) / (home_score_ + away_score_),
                                                 self.away.points,
                                                 self.home.points)
@@ -242,7 +244,7 @@ class Match(AbstractMatch):
                                                 self.away.points)
         self.home.save()
         self.away.save()
-        print " tata", self.home._point_adj
+        print " tata", self.home._point_adj, self.away._point_adj
         self.is_submitted = True
         self.save()
         return
@@ -540,6 +542,11 @@ class LeagueMatch(AbstractMatch):
 
         if self.is_submitted:
             return
+
+        self.home.total_points += self.home_points_raw
+        self.home.season_points += self.home_points_raw
+        self.away.total_points += self.away_points_raw
+        self.away.season_points += self.away_points_raw
 
         self.home.total_matches_played += 1
         self.home.season_matches_played += 1

@@ -9,6 +9,7 @@ import re, ast
 from utils import end_of_week
 from django.contrib.auth.decorators import login_required, permission_required as _need_perm
 from mail import MailManager
+from django.utils import timezone
 
 
 _need_login = login_required()
@@ -120,7 +121,7 @@ def initialize(request, match_id, type_):
             elif p in {p.player for p in away_players}:
                 side = 'away_players'
             else:
-                return render(request, 'base_site.html', {'content': 'Successfully submitted.'})
+                return render(request, 'base_site.html', {'content': 'Permission Denied.'})
 
             if request.method == 'POST':
                 print "toto"
@@ -131,25 +132,27 @@ def initialize(request, match_id, type_):
                 kwargs = {side: selected_players}
                 match._create_ordered_players(**kwargs)
 
-                msg = """
-                Hello,
+                # only send mail for the first time
+                if side[:4] not in _submitted:
+                    msg = """
+                    Hello,
 
-                Team %s has just submitted their roster for this week's match!
+                    Team %s has just submitted their roster for this week's match!
 
-                The roster needs to be submitted before 7pm of D-Day. If you have any technical difficulty, Please contact the admin.
+                    The roster needs to be submitted before 7pm of D-Day. If you have any technical difficulty, Please contact the admin.
 
-                Ignore this mail if you have already done so.
+                    Ignore this mail if you have already done so.
 
-                Thanks,
-                Poke n Hope
-                """ % getattr(match, side[:4])
+                    Thanks,
+                    Poke n Hope
+                    """ % getattr(match, side[:4])
 
-                m = MailManager(subject="Team %s successfully submitted the roster" % getattr(match, side[:4]), content=msg)
-                print match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email
-                m.add_bcc(match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email, 'qjchv@protonmail.ch')
-                m.send()
+                    m = MailManager(subject="Team %s successfully submitted the roster" % getattr(match, side[:4]), content=msg)
+                    print match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email
+                    m.add_bcc(match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email, 'qjchv@protonmail.ch')
+                    m.send()
 
-                return render(request, 'base_site.html', {'content': 'Permission Denied.'})
+                return render(request, 'base_site.html', {'content': 'Successfully Submitted.'})
 
             if side == 'home_players':
                 is_opponent_sub = ('away' in _submitted)
@@ -264,7 +267,7 @@ def match_view(request, type_, match_id):
             'away_seasonal' : away_seasonal,
             'has_blank_fields': match._has_blank(),
             'record_leaguematch': request.user.has_perm('recording.record_leaguematch', match),
-            'approve_leaguematch': request.user.has_perm('recording.approve_leaguematch', match)
+            'approve_leaguematch': request.user.has_perm('recording.approve_leaguematch', match) and not match.is_completed,
         })
     elif type_ == 'Match':
         match = get_object_or_404(Match, pk=match_id)
@@ -375,10 +378,17 @@ def approve(request, match_id, type_):
 
         if p in {p.player for p in home_players}:
             side = 'home_players'
+            match.home_approved = timezone.now()
+            match.save()
         elif p in {p.player for p in away_players}:
             side = 'away_players'
+            match.away_approved = timezone.now()
+            match.save()
         else:
             return render(request, 'base_site.html', {'content': 'Permission Denied.'})
+
+        if match.home_approved is not None and match.away_approved is not None:
+            match.completes()
 
         #if 'home' in _submitted and 'away' in _submitted:
         #    return render(request, 'base_site.html', {'content': 'Both teams have already submitted. You are no longer able to modify team roster.'})

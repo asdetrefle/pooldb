@@ -18,19 +18,28 @@ class MailManager(object):
     def add_to(self, *args):
         uargs = set(args)
         for r in uargs:
-            self.personalization.add_to(Email(r))
+            if r==u'' or r is None:
+                continue
+            else:
+                self.personalization.add_to(Email(r))
         return
 
     def add_cc(self, *args):
         uargs = set(args)
         for c in uargs:
-            self.personalization.add_cc(Email(c))
+            if c==u'' or c is None:
+                continue
+            else:
+                self.personalization.add_cc(Email(c))
         return
 
     def add_bcc(self, *args):
         uargs = set(args)
         for bc in uargs:
-            self.personalization.add_bcc(Email(bc))
+            if bc==u'' or bc is None:
+                continue
+            else:
+                self.personalization.add_bcc(Email(bc))
         return
 
     def send(self, *args, **kwargs):

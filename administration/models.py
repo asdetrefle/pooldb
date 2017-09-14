@@ -79,7 +79,7 @@ class League(models.Model):
         pk_set = []
         point_set = []
         for t in ts:
-            for m in t.member_set.filter(handicap__gt=-1, cancel_date__isnull=True):
+            for m in t.member_set.filter(total_matches_played__gt=0, cancel_date__isnull=True):
                 m._update_points()
                 #m._update_handicap()
                 pk_set.append(m.pk)

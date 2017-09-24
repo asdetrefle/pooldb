@@ -332,7 +332,7 @@ class LeagueMatch(AbstractMatch):
         return
 
 
-    def initialize(self, away_players, home_players, matching=None):
+    def initialize(self, away_players, home_players, matching=None, lag=None):
         self._create_ordered_players(away_players, home_players)
 
         rounds = self.legs / 2
@@ -343,11 +343,13 @@ class LeagueMatch(AbstractMatch):
                 order = range(num_players)
                 return order[round_-1:] + order[:round_-1]
 
+        lag_offset = 1 if lag=='away' else 0
+
         for r in range(1, rounds+1):
             l = matching(num_players, r)
             for i, p in enumerate(l):
-                players = [Member.objects.get(pk=away_players[p]),
-                           Member.objects.get(pk=home_players[i])]
+                players = [Member.objects.get(pk=home_players[i]),
+                           Member.objects.get(pk=away_players[p])]
                 nm = Match(venue=self.venue,
                            match_date=self.match_date,
                            table_size=self.table_size,
@@ -356,15 +358,15 @@ class LeagueMatch(AbstractMatch):
                            break_type=self.break_type,
                            race_to=2,
                            match_type='E',
-                           away=players[0],
-                           home=players[1])
+                           home=players[0],
+                           away=players[1])
                 nm.save()
                 for j in range(2):
                     nlf = self.leagueframe_set.create(match=nm,
-                                                      break_player=players[(j+1)%2],
+                                                      break_player=players[(j+lag_offset)%2],
                                                       frame_number=j+1,
-                                                      away_player=players[0],
-                                                      home_player=players[1],
+                                                      home_player=players[0],
+                                                      away_player=players[1],
                                                       leg_number=2*r+j-1)
                     nlf.save()
 

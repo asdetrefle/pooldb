@@ -60,8 +60,8 @@ def ranking_teams(request, s=default_season(), league_name='Poke n Hope HK 8-Bal
 def team_summary(request, team_pk):
     t = Team.objects.get(pk=team_pk)
 
-    members = t.member_set.filter(ranking__gt=0).order_by('ranking')
-    additional = t.member_set.filter(ranking=0)
+    members = t.member_set.filter(cancel_date__isnull=True, ranking__gt=0).order_by('ranking')
+    additional = t.member_set.filter(cancel_date__isnull=True, ranking=0)
     ranking = list(members) + list(additional)
     return render(request, 'ranking.html', {'ranking': ranking, 'last_update': ""})
 
@@ -145,7 +145,7 @@ def top_n_weeks(ps, n):
     return res
 
 def player_hist(request):
-    rs = PlayerRanking.objects.all().select_related("week", "player__player").order_by('player_id', 'serial_id')
+    rs = PlayerRanking.objects.filter(player__cancel_date__isnull=True).select_related("week", "player__player").order_by('player_id', 'serial_id')
 
     data = {}
     for r in rs:

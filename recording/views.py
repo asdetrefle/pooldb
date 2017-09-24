@@ -217,11 +217,12 @@ def init_submit(request, type_, match_id):
         selected_home_players = []
         selected_away_players = []
         nb_selected_players = 5
+
         for i in range(nb_selected_players):
             selected_home_players.append(int(request.POST['home{}'.format(i)]))
             selected_away_players.append(int(request.POST['away{}'.format(i)]))
         print selected_away_players
-        match.initialize(selected_away_players, selected_home_players)
+        match.initialize(selected_away_players, selected_home_players, lag=request.POST['lag'])
         return redirect('match_view', type_=type_, match_id=match_id)
     else:
         raise Http404

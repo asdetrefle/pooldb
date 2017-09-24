@@ -64,23 +64,29 @@
     </script>
 
     <style>
-    .players li.playing {background: #74ce86
-    }
-    .players li.resting {background: #de8e8a
-    }
-    .players { list-style-type: none; margin: 0; padding: 0; width: 60%; }
-    .players li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1.4em; height: 18px; width: 200px}
+
+    .players { margin: 0; padding:0 ; width: 60%;list-style-position:inside; }
+    .players li { list-style-type: none;list-style-position:inside;  margin: 0 3px 3px 3px; padding: 0.4em; font-size: 1.2em; height: 18px; width: 180px; background:'transparent'}
+    .players li.playing {background: #74ce86}
+    .players li.resting {background: #de8e8a}
     </style>
 {% endblock %}
 
 {% block content %}
 
 {% if user.is_active or match.is_initialized %}
+<form action="{% url 'match_init_submit' 'LeagueMatch' match.id %}" method="post">
+    {% csrf_token %}    
+    <h3> Lag winner: </h3>
+    <div>
+        <input type="radio" name="lag" value="home" checked="checked" /><label> Home </label> &nbsp;
+        <input type="radio" name="lag" value="away" /><label> Away </label>
+    </div>
 
-<p> Drag to choose the players who play and rank them in desired orders. </p>
+<h3> Player Roster: </h3>
 <table border="0">    
-    <col width="400">
-    <col width="400">
+    <col width="300">
+    <col width="300">
     <tr>
         <td align="center"><h2> {{ match.home }} </h2></td>
         <td align="center"><h2> {{ match.away }} </h2></td>
@@ -106,15 +112,15 @@
 
 <div style="height:10px"></div>
 <p>
-    <form action="{% url 'match_init_submit' 'LeagueMatch' match.id %}" method="post">
-    {% csrf_token %}
-    <input type="submit" value="Initialize Match">
-    {% for ind in inds %}
-        <input type="hidden" name="home{{ ind }}" value="">
-        <input type="hidden" name="away{{ ind }}" value="">
-    {% endfor %}
-    </form>
+
+        <input type="submit" value="Initialize Match">
+        {% for ind in inds %}
+            <input type="hidden" name="home{{ ind }}" value="">
+            <input type="hidden" name="away{{ ind }}" value="">
+        {% endfor %}
+
 </p>
+</form>
 <p id="info"></p>
 {% else %}
     <p>This match has not started or has not been updated. Please come back later.</p>

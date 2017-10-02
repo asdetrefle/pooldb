@@ -3,7 +3,7 @@
 from schedule.models import MatchWeek, Season
 from recording.models import LeagueMatch
 from administration.models import Team, Player, Member
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -120,6 +120,41 @@ def add_members():
     print [ m.player.username for m in all_members if m.player.username not in all_user]
 
     return
+
+
+def export_to_cal(s):
+    from django.utils import timezone
+    from icalendar import Calendar, Event
+
+    season = Season.objects.get(season=s)
+    mws = season.matchweek_set.filter(season=season)
+
+    td = {}
+
+    for w in mws:
+        ms = w.leaguematch_set.all()
+        for m in ms:
+            td.setdefault(m.home, []).append(m)
+            td.setdefault(m.away, []).append(m)
+
+    for t, ms in td.items():
+        cal = Calendar()
+        for m in ms:
+            opponent = m.home if t==m.away else m.away
+            event = Event()
+            event.add('summary', 'Match {} vs. {}'.format(m.home, m.away))
+            event.add('dtstart', m.match_date)
+            event.add('dtend', m.match_date+timedelta(hours=3))
+            event.add('location', m.venue)
+            cal.add_component(event)
+
+        cal_name = '{}.ics'.format(t).replace(" ", "_").replace("'", "")
+
+        f = open(cal_name, 'wb')
+        f.write(cal.to_ical())
+        f.close()
+    pass
+
 
 
 def main():

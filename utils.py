@@ -43,55 +43,101 @@ def start_of_week():
     return sow
 
 def reset_submit(lgpk, week):
-    from administration.models import League
+    from stats.models import PlayerRanking, TeamRanking
+    from administration.models import League, Member
     from recording.models import LeagueMatch
     lg = League.objects.get(pk=lgpk)
-    ts = lg.team_set.all()
+    ts = lg.team_set.filter(close_date__isnull=True)
+    print len(ts), ts
 
     """
-    lms = LeagueMatch.objects.filter(is_submitted=True)
+    lms = LeagueMatch.objects.filter(pk__gt=116, pk__lt=125)
+    print len(lms), lms
     for lm in lms:
+        lm.is_completed = False
         lm.is_submitted = False
         lm.save()
         ms = lm.get_matches()
         for m in ms:
+            m.is_completed = False
             m.is_submitted = False
             m.save()
 
-    for t in ts:
-        for m in t.member_set.all():
-            m.points = 200.
-            m.raw_points = 0
-            m.ranking = 0
-            m.handicap = -1
-            m._point_adj = 0
-            m.total_matches_played = 0
-            m.total_matches_won = 0
-            m.total_clearances = 0
-            m.season_matches_played = 0
-            m.season_matches_won = 0
-            m.season_clearances = 0
-            m.save()
 
-        t.ranking = 0
-        t.total_matches_played = 0
-        t.total_matches_won   = 0
-        t.season_matches_played = 0
-        t.season_matches_won   = 0
-        t.total_legs_played   = 0
-        t.total_legs_won      = 0
-        t.season_legs_played  = 0
-        t.season_legs_won     = 0
+    for t in ts:
+        print t
+        tr = t.teamranking_set.get(week__serial_id=15)
+        t.ranking = tr.ranking
+        t.season_points = tr.season_points
+        t.total_points = tr.total_points
+        t.season_clearances = tr.season_clearances
+        t.total_clearances = tr.total_clearances
+        t.total_matches_played = tr.total_matches_played
+        t.total_matches_won   = tr.total_matches_won
+        t.season_matches_played = tr.season_matches_played
+        t.season_matches_won   = tr.season_matches_won
+        t.total_legs_played   = tr.total_legs_played
+        t.total_legs_won      = tr.total_legs_won
+        t.season_legs_played  = tr.season_legs_played
+        t.season_legs_won     = tr.season_legs_won
         t.save()
+
+        pass
     """
 
-    for i in [week]:
-        lms = LeagueMatch.objects.filter(week_id=i)
+    prs = PlayerRanking.objects.filter(week__serial_id=15)
+    rms = [r.player for r in prs]
+
+    ms = Member.objects.filter(cancel_date__isnull=True)
+
+
+    for m in ms:
+        if m in rms:
+            mr = m.playerranking_set.get(week__serial_id=15)
+            mr.ranking = m.ranking
+            mr.save()
+    """
+            m.points = mr.elo_points
+            m.ranking = mr.ranking
+            m.season_points = mr.season_points
+            m.total_points = mr.total_points
+            m.handicap = mr.handicap
+            m._point_adj = 0
+            m.season_clearances = mr.season_clearances
+            m.total_clearances = mr.total_clearances
+            m.total_matches_played = mr.total_matches_played
+            m.total_matches_won = mr.total_matches_won
+            m.season_matches_played = mr.season_matches_played
+            m.season_matches_won = mr.season_matches_won
+            m.save()
+        else:
+            m.points = 200.
+            m.ranking = 0
+            m.handicap = -1.0
+            m.season_points = 0
+            m.total_points = 0
+            m._point_adj = 0
+            m.season_clearances = 0
+            m.total_clearances = 0
+            m.total_matches_played = 0
+            m.total_matches_won = 0
+            m.season_matches_played = 0
+            m.season_matches_won = 0
+            m.save()
+    lg.rank_players()
+    lg.rank_teams()
+
+    """
+
+    for i in [16, 17]:
+        lms = LeagueMatch.objects.filter(week__serial_id=i)
         for lm in lms:
+            lm.completes()
             lm.submits()
+        lg.update_players_handicap(i-14)
         lg.rank_players()
         lg.rank_teams()
-        lg.create_ranking(i)
+        lg.create_ranking(i-14)
 
     return
 

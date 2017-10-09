@@ -364,38 +364,47 @@ def approve(request, match_id, type_):
     # TODO: use django model form; add validation; how to represent properly the lists of players via POST?
     if type_ == 'LeagueMatch':
         match = get_object_or_404(LeagueMatch.objects.select_related("home__captain__player__user", "away__captain__player__user"), pk=match_id)
-        if not request.user.has_perm('recording.approve_leaguematch', match):
-            return render(request, 'base_site.html', {'content': 'Permission Denied.'})
 
         if match._has_blank():
             return redirect('match_view', type_=type_, match_id=match_id)
 
-        home_players = match.home.member_set.exclude(cancel_date__isnull=False).order_by('-season_matches_played')
-        away_players = match.away.member_set.exclude(cancel_date__isnull=False).order_by('-season_matches_played')
+        if request.user.has_perm('recording.record_leaguematch', match):
+            if match.home_approved is None:
+                match.home_approved = timezone.now()
+            else:
+                pass
 
-        side = None
+            if match.away_approved is None:
+                match.away_approved = timezone.now()
+            else:
+                pass
 
-        p = request.user.player
-
-        if p in {p.player for p in home_players}:
-            side = 'home_players'
-            match.home_approved = timezone.now()
             match.save()
-        elif p in {p.player for p in away_players}:
-            side = 'away_players'
-            match.away_approved = timezone.now()
-            match.save()
-        else:
-            return render(request, 'base_site.html', {'content': 'Permission Denied.'})
-
-        if match.home_approved is not None and match.away_approved is not None:
             match.completes()
+            return redirect('match_view', type_=type_, match_id=match_id)
 
-        #if 'home' in _submitted and 'away' in _submitted:
-        #    return render(request, 'base_site.html', {'content': 'Both teams have already submitted. You are no longer able to modify team roster.'})
+        elif request.user.has_perm('recording.approve_leaguematch', match):
 
-        if request.method == 'POST':
-            print "toto"
+            home_players = match.home.member_set.exclude(cancel_date__isnull=False).order_by('-season_matches_played')
+            away_players = match.away.member_set.exclude(cancel_date__isnull=False).order_by('-season_matches_played')
+
+            side = None
+
+            p = request.user.player
+
+            if p in {p.player for p in home_players}:
+                side = 'home_players'
+                match.home_approved = timezone.now()
+                match.save()
+            elif p in {p.player for p in away_players}:
+                side = 'away_players'
+                match.away_approved = timezone.now()
+                match.save()
+            else:
+                return render(request, 'base_site.html', {'content': 'Permission Denied.'})
+
+            if match.home_approved is not None and match.away_approved is not None:
+                match.completes()
 
             msg = """
             Hello,
@@ -413,12 +422,12 @@ def approve(request, match_id, type_):
             m = MailManager(subject="Team %s approved the match." % getattr(match, side[:4]), content=msg)
             m.add_bcc(match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email, 'qjchv@protonmail.ch')
             #m.add_bcc('qjchv@protonmail.ch')
-            print "tata"
             m.send()
 
             return render(request, 'base_site.html', {'content': 'Successfully approved. You will receive an email for confirmation.'})
+
         else:
-            raise Http404
+            return render(request, 'base_site.html', {'content': 'Permission Denied.'})
     else:
         raise Http404
 

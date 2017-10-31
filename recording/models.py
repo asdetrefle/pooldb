@@ -322,11 +322,11 @@ class LeagueMatch(AbstractMatch):
         return res
 
     def _create_ordered_players(self, away_players=None, home_players=None):
-        if home_players is not None:
-            self._home_ordered_players = '_'.join([str(x) for x in home_players])
+        #if home_players is not None:
+        self._home_ordered_players = '_'.join([str(x) for x in home_players])
 
-        if away_players is not None:
-            self._away_ordered_players = '_'.join([str(x) for x in away_players])
+        #if away_players is not None:
+        self._away_ordered_players = '_'.join([str(x) for x in away_players])
 
         self.save()
         return
@@ -374,6 +374,58 @@ class LeagueMatch(AbstractMatch):
         self.is_initialized = True
         self.save()
         return
+
+    def reinitialize(self, home_players, away_players, matching=None, lag=None):
+        self._create_ordered_players(away_players, home_players)
+
+        rounds = self.legs / 2
+        num_players = len(home_players)
+
+        if matching is None:
+            def matching(num_players, round_):
+                order = range(num_players)
+                return order[round_-1:] + order[:round_-1]
+
+        lag_offset = 1 if lag=='away' else 0
+
+        matches = self.get_matches()
+        frames = self.frames()
+
+        c = 0
+        q = 0
+
+        for r in range(1, rounds+1):
+            l = matching(num_players, r)
+            for i, p in enumerate(l):
+                players = [Member.objects.get(pk=home_players[i]),
+                           Member.objects.get(pk=away_players[p])]
+                m = matches[c]
+                print m.pk
+                m.home = players[0]
+                m.away = players[1]
+                m.save()
+                print players[0], m.home
+                print players[1], m.away
+                print 'toto'
+
+                for j in range(2):
+                    f = frames[q]
+                    f.match = m
+                    f.home_player = players[0]
+                    f.away_player = players[1]
+                    f.break_player= players[(j+lag_offset)%2]
+                    f.frame_number = j+1
+                    f.leg_number = 2*r+j-1
+                    f.save()
+                    q += 1
+                    print 'papa'
+                c += 1
+
+        self.set_handicap()
+        self.save()
+        return
+
+
 
     def set_handicap(self, max_handicap=15):
         players = self._get_ordered_players()
@@ -451,7 +503,11 @@ class LeagueMatch(AbstractMatch):
         for f in frames:
             match_set.add(f.match)
 
-        return list(match_set)
+        matches = list(match_set)
+
+        sorted(matches, key=lambda m: m.pk)
+
+        return matches
 
 
     def _has_blank(self):

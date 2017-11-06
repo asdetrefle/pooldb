@@ -149,7 +149,7 @@ def initialize(request, match_id, type_):
 
                     m = MailManager(subject="Team %s successfully submitted the roster" % getattr(match, side[:4]), content=msg)
                     print match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email
-                    m.add_bcc('qjchv@protonmail.ch')
+                    m.add_bcc(match.home.captain.player.user.email, match.away.captain.player.user.email, p.user.email, 'qjchv@protonmail.ch')
                     m.send()
 
                 return render(request, 'base_site.html', {'content': 'Successfully Submitted.'})

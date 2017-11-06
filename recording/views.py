@@ -6,7 +6,7 @@ from .forms import FrameForm
 from administration.models import Member, Team, League
 from django.contrib import messages
 import re, ast
-from utils import end_of_week
+from utils import end_of_week, default_season
 from django.contrib.auth.decorators import login_required, permission_required as _need_perm
 from mail import MailManager
 from django.utils import timezone
@@ -39,7 +39,7 @@ def listarchive(request, type_):
     elif type_=='LeagueMatch':
         matches = LeagueMatch.objects.filter(is_completed=True).order_by('-match_date')
 
-    paginator = Paginator(matches, 30)
+    paginator = Paginator(matches, 50)
 
     page = request.GET.get('page')
     try:
@@ -427,8 +427,35 @@ def approve(request, match_id, type_):
             return render(request, 'base_site.html', {'content': 'Successfully approved. You will receive an email for confirmation.'})
 
         else:
-            return render(request, 'base_site.html', {'content': 'Permission Denied.'})
+            return render(request, 'base_siterhtml', {'content': 'Permission Denied.'})
     else:
         raise Http404
 
+@_need_login
+def update_weekly_stats(request, week_number):
+    # currently only provide initialize method for LeagueMatch
+    # initialize method is also useful for Match in case of a tournament.
+    # We know all matchs ahead but will only know players before the Match
+    # TODO: use django model form; add validation; how to represent properly the lists of players via POST?
+
+    if request.user.is_superuser:
+        s = default_season()
+        matches = LeagueMatch.objects.filter(season__season=s, week__week_number=week_number)
+
+        for m in matches:
+            print m
+            print m.is_completed, m.is_submitted
+            m.completes()
+            m.submits()
+
+        lg = League.objects.get(pk=1)
+        lg.update_players_handicap(week_number)
+        lg.rank_players()
+        lg.rank_teams()
+        lg.create_ranking(week_number)
+
+        return render(request, 'base_site.html', {'content': 'Successfully updated.'})
+
+    else:
+        return render(request, 'base_site.html', {'content': 'Permission Denied.'})
 

@@ -14,6 +14,6 @@ urlpatterns = [
     url(r'^live/(?P<type_>\w+)/id/(?P<match_id>\d+)/approve/$', views.approve, name='match_approve'),
     url(r'^live/(?P<type_>\w+)/id/(?P<match_id>\d+)/init/submit/$', views.init_submit, name='match_init_submit'),
     url(r'^live/(?P<type_>\w+)/id/(?P<match_id>\d+)/edit/$', views.edit, name='match_edit'),
-    #url(r'^leg/(?P<leg_id>\d+)/$', views.leg_view, name='leg_view'),
+    url(r'^update/week/(?P<week_number>\d+)/$', views.update_weekly_stats, name='update_weekly_stats'),
     #url(r'^leg/(?P<leg_id>\d+)/close/$', views.leg_close, name='leg_close'),
 ]

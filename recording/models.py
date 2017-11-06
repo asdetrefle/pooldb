@@ -322,11 +322,11 @@ class LeagueMatch(AbstractMatch):
         return res
 
     def _create_ordered_players(self, away_players=None, home_players=None):
-        #if home_players is not None:
-        self._home_ordered_players = '_'.join([str(x) for x in home_players])
+        if home_players is not None:
+            self._home_ordered_players = '_'.join([str(x) for x in home_players])
 
-        #if away_players is not None:
-        self._away_ordered_players = '_'.join([str(x) for x in away_players])
+        if away_players is not None:
+            self._away_ordered_players = '_'.join([str(x) for x in away_players])
 
         self.save()
         return

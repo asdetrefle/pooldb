@@ -5,7 +5,7 @@ import json
 from .models import PlayerRanking
 from django.contrib.auth.decorators import login_required, permission_required as _need_perm
 from utils import local_date, default_season
-
+import heapq
 
 _need_login = login_required(login_url='/login/')
 
@@ -93,7 +93,7 @@ def weekly_summary(request):
             new_res[str(k)] = r
         return new_res
 
-    def process_dict_id(d):
+    def process_dict_id(d, n, bold, *args):
         new_res = {}
         for k, v in d.items():
             r = []
@@ -108,14 +108,20 @@ def weekly_summary(request):
                         continue
                 if s == 0:
                     continue
-                tmp.append(['', s])
+
+                if k in args:
+                    s = sum_n_largest(tmp, n, bold)
+                else:
+                    s = sum_n_largest(tmp, 14, 1)
+                tmp.append(['', s, 1])
                 r.append(tmp)
                 r = sorted(r, key=lambda x: (-x[-1][1], x[0]))
             new_res[str(k)] = r
         return new_res
 
-    ts = process_dict_id(ts)
-    ps = process_dict_id(ps)
+    ts = process_dict_id(ts, 14, 1)
+    ps = process_dict_id(ps, 9, 1, 'points')
+
     #top10w = top_n_weeks(ps['points'], 9)
 
     return render(request, 'summary_id.html', {'last_update': lg.last_update, "weeks": range(1,15), "ts": ts, "ps": ps})
@@ -163,4 +169,38 @@ def player_hist(request):
     return render(request, 'champaths.html', {'data': res})
 
 
+def sum_n_largest(a, n, bold=0):
+    if len(a)==0:
+        return 0
+    else:
+        a[0].append(1)
+
+    if len(a)<n+1:
+        for e in a[1:]:
+            if e[-1]!='':
+                e.append(bold)
+            else:
+                e.append(0)
+    else:
+        res = []
+        for i, e in enumerate(a[1:]):
+            if e[-1]!='':
+                heapq.heappush(res, (e[-1], i+1))
+
+                if len(res)>n:
+                    heapq.heappop(res)
+                else:
+                    pass
+            else:
+                pass
+
+        t = res[0]
+        s = 0
+        for i, e in enumerate(a[1:]):
+            if e[1]=='' or e[1]<t[0] or (e[1]==t[0] and i+1<t[1]):
+                e.append(0)
+            else:
+                e.append(bold)
+                s += e[1]
+    return s
 

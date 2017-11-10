@@ -75,6 +75,9 @@
                     cell.appendChild(tNode);
                 }
                 cell.style.textAlign = 'center';
+                if (cellData[2] == '0') {
+                    cell.style.fontWeight = "lighter";
+                }
                 row.appendChild(cell);
             });
             tbody.append(row);
@@ -104,7 +107,7 @@ summary for
   <option value="3" selected="selected">team</option>
 </select>.
 
-Last Update: {{ last_update }}
+Last Update: {{ last_update }}. Please note that the total for individual player is the sum of the 9 highest weeks.
 
  <table border="0" id='summary'>    
     <col width="50">

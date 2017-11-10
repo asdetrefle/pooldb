@@ -112,7 +112,7 @@
         <td align="center"> {% if m.player.sex == "F" %} <span class="female"> {{ m.player.sex }} </span> {% else %} {{ m.player.sex }} {% endif %}</td>
         <td align="center"> {% if m.ranking > 0 %} {{ m.points|floatformat:0 }} {% else %} - {% endif %} </td>
         <td align="center"> {{ m.season_points|floatformat:"0" }} </td>
-        <td align="center"> {% if m.ranking > 0 %} {{ m.handicap|floatformat:2 }} {% else %} - {% endif %} </td>
+        <td align="center"> {% if m.handicap >= 0 %} {{ m.handicap|floatformat:2 }} {% else %} - {% endif %} </td>
         <td align="center"> {{ m.season_matches_played }} </td>
         <td align="center"> {{ m.season_matches_won }} </td>
         <td align="center"> {{ m.season_clearances }} </td>

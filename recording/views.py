@@ -86,8 +86,8 @@ def initialize(request, match_id, type_):
         #if match.match_date>=end_of_week():
         #    raise Http404
 
-        home_players = match.home.member_set.exclude(cancel_date__isnull=False).order_by('-season_matches_played')
-        away_players = match.away.member_set.exclude(cancel_date__isnull=False).order_by('-season_matches_played')
+        home_players = match.home.member_set.filter(cancel_date__isnull=True, handicap__gt=0).order_by('-season_matches_played')
+        away_players = match.away.member_set.filter(cancel_date__isnull=True, handicap__gt=0).order_by('-season_matches_played')
 
         _submitted = match._get_ordered_players()
         nb_selected_players = 5

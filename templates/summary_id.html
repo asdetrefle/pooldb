@@ -70,13 +70,18 @@
                     $('<a>' + cellData[1] + '</a>').attr({
                         'href': '/recording/LeagueMatch/id/' + cellData[0]
                     }).appendTo(cell);
+                        
                 } else {
                     var tNode = document.createTextNode(cellData[1]);
                     cell.appendChild(tNode);
                 }
                 cell.style.textAlign = 'center';
                 if (cellData[2] == '0') {
+                    //cell.style("fontWeight", "lighter");
                     cell.style.fontWeight = "lighter";
+                    cell.style.textDecoration = "line-through";
+                    //cell.css('textDecoration', 'line-through')
+                    //cell.addClass("low_score");
                 }
                 row.appendChild(cell);
             });

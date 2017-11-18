@@ -102,7 +102,7 @@ def standings(request, season=default_season()):
 
     #top10w = top_n_weeks(ps['points'], 9)
 
-    return render(request, 'standings.html', {"season": season, "weeks": range(1,15), "ts": ts, "ps": ps, 'last_update': lg.last_update})
+    return render(request, 'standings.html', {"season": str(season), "weeks": range(1,15), "ts": ts, "ps": ps, 'last_update': lg.last_update})
 
 
 

@@ -66,32 +66,10 @@ def team_summary(request, team_pk):
     return render(request, 'ranking.html', {'ranking': ranking, 'last_update': ""})
 
 
-def weekly_summary(request):
+def standings(request, season=default_season()):
     lg = League.objects.get(pk=1)
 
-    #ts, ps = lg.get_weekly_summary()
-    ts, ps = lg.get_weekly_summary_id()
-
-    def process_dict(d):
-        new_res = {}
-        for k, v in d.items():
-            r = []
-            for kk, vv in v.items():
-                tmp = [str(kk)]
-                s = 0
-                for i in range(1,15):
-                    tmp.append(vv.get(i, ''))
-                    try:
-                        s += max(tmp[-1], 0)
-                    except TypeError:
-                        continue
-                if s == 0:
-                    continue
-                tmp.append(s)
-                r.append(tmp)
-                r = sorted(r, key=lambda x: (-x[-1], x[0]))
-            new_res[str(k)] = r
-        return new_res
+    ts, ps = lg.get_weekly_summary_id(season)
 
     def process_dict_id(d, n, bold, *args):
         new_res = {}
@@ -124,7 +102,7 @@ def weekly_summary(request):
 
     #top10w = top_n_weeks(ps['points'], 9)
 
-    return render(request, 'summary_id.html', {'last_update': lg.last_update, "weeks": range(1,15), "ts": ts, "ps": ps})
+    return render(request, 'standings.html', {"season": season, "weeks": range(1,15), "ts": ts, "ps": ps, 'last_update': lg.last_update})
 
 
 

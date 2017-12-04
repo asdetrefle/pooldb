@@ -28,7 +28,7 @@
             }
         }
 
-        var info = "Indicative handicap: " + handicap.toFixed(1) + "<br>";
+        var info = "Indicative handicap: " + handicap.toFixed(2) + "<br>";
         $("#info").html(info);
 
         players.removeClass("playing resting").addClass(update_class);
@@ -69,7 +69,7 @@
          <td align="center">
             <ul id="players">
             {% for p in players %}
-                <li value="{{ p.id }}" handicap="{{ p.handicap }}">{{ p.player }}{% if p.handicap > 0 %} ({{ p.handicap|floatformat:1 }}){% endif %}</li>
+                <li value="{{ p.id }}" handicap="{{ p.handicap }}">{{ p.player }}{% if p.handicap > 0 %} ({{ p.handicap|floatformat:2 }}){% endif %}</li>
             {% endfor %}
             </ul>
         </td>       

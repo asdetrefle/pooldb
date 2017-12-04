@@ -81,7 +81,7 @@ p.loading {
 <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
-var width = 0, height = 0, selected, chart = "ranking", ymin=0, ymax=70, yrev=true, showTrends = 0;
+var width = 0, height = 0, selected, chart = "ranking", ymin=0, ymax=90, yrev=true, showTrends = 0;
 
 var parseTime = d3.timeParse("%Y-%m-%d");
 String.prototype.capitalize = function() {
@@ -239,7 +239,7 @@ function chartChange(a) {
     chart = a;
     if (a=='ranking') {
         ymin=0;
-        ymax=70;
+        ymax=90;
         yrev=true;
     } else if (a=='elo') {
         ymin=100;

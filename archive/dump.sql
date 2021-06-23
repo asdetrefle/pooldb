@@ -2,18 +2,33 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.2
--- Dumped by pg_dump version 11.2
+-- Dumped from database version 10.1
+-- Dumped by pg_dump version 10.1
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET row_security = off;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET search_path = public, pg_catalog;
 
 SET default_tablespace = '';
 
@@ -23,7 +38,7 @@ SET default_with_oids = false;
 -- Name: administration_group; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.administration_group (
+CREATE TABLE administration_group (
     id integer NOT NULL,
     name character varying(200) NOT NULL,
     size integer NOT NULL,
@@ -33,13 +48,13 @@ CREATE TABLE public.administration_group (
 );
 
 
-ALTER TABLE public.administration_group OWNER TO qijiec;
+ALTER TABLE administration_group OWNER TO qijiec;
 
 --
 -- Name: administration_group_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.administration_group_id_seq
+CREATE SEQUENCE administration_group_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -47,20 +62,20 @@ CREATE SEQUENCE public.administration_group_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.administration_group_id_seq OWNER TO qijiec;
+ALTER TABLE administration_group_id_seq OWNER TO qijiec;
 
 --
 -- Name: administration_group_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.administration_group_id_seq OWNED BY public.administration_group.id;
+ALTER SEQUENCE administration_group_id_seq OWNED BY administration_group.id;
 
 
 --
 -- Name: administration_league; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.administration_league (
+CREATE TABLE administration_league (
     id integer NOT NULL,
     name character varying(200) NOT NULL,
     create_date timestamp with time zone NOT NULL,
@@ -70,13 +85,13 @@ CREATE TABLE public.administration_league (
 );
 
 
-ALTER TABLE public.administration_league OWNER TO qijiec;
+ALTER TABLE administration_league OWNER TO qijiec;
 
 --
 -- Name: administration_league_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.administration_league_id_seq
+CREATE SEQUENCE administration_league_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -84,20 +99,20 @@ CREATE SEQUENCE public.administration_league_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.administration_league_id_seq OWNER TO qijiec;
+ALTER TABLE administration_league_id_seq OWNER TO qijiec;
 
 --
 -- Name: administration_league_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.administration_league_id_seq OWNED BY public.administration_league.id;
+ALTER SEQUENCE administration_league_id_seq OWNED BY administration_league.id;
 
 
 --
 -- Name: administration_member; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.administration_member (
+CREATE TABLE administration_member (
     id integer NOT NULL,
     create_date timestamp with time zone NOT NULL,
     cancel_date timestamp with time zone,
@@ -118,13 +133,13 @@ CREATE TABLE public.administration_member (
 );
 
 
-ALTER TABLE public.administration_member OWNER TO qijiec;
+ALTER TABLE administration_member OWNER TO qijiec;
 
 --
 -- Name: administration_member_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.administration_member_id_seq
+CREATE SEQUENCE administration_member_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -132,20 +147,20 @@ CREATE SEQUENCE public.administration_member_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.administration_member_id_seq OWNER TO qijiec;
+ALTER TABLE administration_member_id_seq OWNER TO qijiec;
 
 --
 -- Name: administration_member_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.administration_member_id_seq OWNED BY public.administration_member.id;
+ALTER SEQUENCE administration_member_id_seq OWNED BY administration_member.id;
 
 
 --
 -- Name: administration_player; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.administration_player (
+CREATE TABLE administration_player (
     id integer NOT NULL,
     name character varying(200) NOT NULL,
     username character varying(200) NOT NULL,
@@ -157,13 +172,13 @@ CREATE TABLE public.administration_player (
 );
 
 
-ALTER TABLE public.administration_player OWNER TO qijiec;
+ALTER TABLE administration_player OWNER TO qijiec;
 
 --
 -- Name: administration_player_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.administration_player_id_seq
+CREATE SEQUENCE administration_player_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -171,20 +186,20 @@ CREATE SEQUENCE public.administration_player_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.administration_player_id_seq OWNER TO qijiec;
+ALTER TABLE administration_player_id_seq OWNER TO qijiec;
 
 --
 -- Name: administration_player_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.administration_player_id_seq OWNED BY public.administration_player.id;
+ALTER SEQUENCE administration_player_id_seq OWNED BY administration_player.id;
 
 
 --
 -- Name: administration_team; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.administration_team (
+CREATE TABLE administration_team (
     group_ptr_id integer NOT NULL,
     ranking integer NOT NULL,
     total_legs_played integer NOT NULL,
@@ -207,13 +222,13 @@ CREATE TABLE public.administration_team (
 );
 
 
-ALTER TABLE public.administration_team OWNER TO qijiec;
+ALTER TABLE administration_team OWNER TO qijiec;
 
 --
 -- Name: administration_teamseasonal; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.administration_teamseasonal (
+CREATE TABLE administration_teamseasonal (
     id integer NOT NULL,
     team_number integer NOT NULL,
     ranking integer NOT NULL,
@@ -230,13 +245,13 @@ CREATE TABLE public.administration_teamseasonal (
 );
 
 
-ALTER TABLE public.administration_teamseasonal OWNER TO qijiec;
+ALTER TABLE administration_teamseasonal OWNER TO qijiec;
 
 --
 -- Name: administration_teamseasonal_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.administration_teamseasonal_id_seq
+CREATE SEQUENCE administration_teamseasonal_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -244,32 +259,32 @@ CREATE SEQUENCE public.administration_teamseasonal_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.administration_teamseasonal_id_seq OWNER TO qijiec;
+ALTER TABLE administration_teamseasonal_id_seq OWNER TO qijiec;
 
 --
 -- Name: administration_teamseasonal_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.administration_teamseasonal_id_seq OWNED BY public.administration_teamseasonal.id;
+ALTER SEQUENCE administration_teamseasonal_id_seq OWNED BY administration_teamseasonal.id;
 
 
 --
 -- Name: auth_group; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.auth_group (
+CREATE TABLE auth_group (
     id integer NOT NULL,
     name character varying(80) NOT NULL
 );
 
 
-ALTER TABLE public.auth_group OWNER TO qijiec;
+ALTER TABLE auth_group OWNER TO qijiec;
 
 --
 -- Name: auth_group_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.auth_group_id_seq
+CREATE SEQUENCE auth_group_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -277,33 +292,33 @@ CREATE SEQUENCE public.auth_group_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_group_id_seq OWNER TO qijiec;
+ALTER TABLE auth_group_id_seq OWNER TO qijiec;
 
 --
 -- Name: auth_group_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.auth_group_id_seq OWNED BY public.auth_group.id;
+ALTER SEQUENCE auth_group_id_seq OWNED BY auth_group.id;
 
 
 --
 -- Name: auth_group_permissions; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.auth_group_permissions (
+CREATE TABLE auth_group_permissions (
     id integer NOT NULL,
     group_id integer NOT NULL,
     permission_id integer NOT NULL
 );
 
 
-ALTER TABLE public.auth_group_permissions OWNER TO qijiec;
+ALTER TABLE auth_group_permissions OWNER TO qijiec;
 
 --
 -- Name: auth_group_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.auth_group_permissions_id_seq
+CREATE SEQUENCE auth_group_permissions_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -311,20 +326,20 @@ CREATE SEQUENCE public.auth_group_permissions_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_group_permissions_id_seq OWNER TO qijiec;
+ALTER TABLE auth_group_permissions_id_seq OWNER TO qijiec;
 
 --
 -- Name: auth_group_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.auth_group_permissions_id_seq OWNED BY public.auth_group_permissions.id;
+ALTER SEQUENCE auth_group_permissions_id_seq OWNED BY auth_group_permissions.id;
 
 
 --
 -- Name: auth_permission; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.auth_permission (
+CREATE TABLE auth_permission (
     id integer NOT NULL,
     name character varying(255) NOT NULL,
     content_type_id integer NOT NULL,
@@ -332,13 +347,13 @@ CREATE TABLE public.auth_permission (
 );
 
 
-ALTER TABLE public.auth_permission OWNER TO qijiec;
+ALTER TABLE auth_permission OWNER TO qijiec;
 
 --
 -- Name: auth_permission_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.auth_permission_id_seq
+CREATE SEQUENCE auth_permission_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -346,20 +361,20 @@ CREATE SEQUENCE public.auth_permission_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_permission_id_seq OWNER TO qijiec;
+ALTER TABLE auth_permission_id_seq OWNER TO qijiec;
 
 --
 -- Name: auth_permission_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.auth_permission_id_seq OWNED BY public.auth_permission.id;
+ALTER SEQUENCE auth_permission_id_seq OWNED BY auth_permission.id;
 
 
 --
 -- Name: auth_user; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.auth_user (
+CREATE TABLE auth_user (
     id integer NOT NULL,
     password character varying(128) NOT NULL,
     last_login timestamp with time zone,
@@ -374,26 +389,26 @@ CREATE TABLE public.auth_user (
 );
 
 
-ALTER TABLE public.auth_user OWNER TO qijiec;
+ALTER TABLE auth_user OWNER TO qijiec;
 
 --
 -- Name: auth_user_groups; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.auth_user_groups (
+CREATE TABLE auth_user_groups (
     id integer NOT NULL,
     user_id integer NOT NULL,
     group_id integer NOT NULL
 );
 
 
-ALTER TABLE public.auth_user_groups OWNER TO qijiec;
+ALTER TABLE auth_user_groups OWNER TO qijiec;
 
 --
 -- Name: auth_user_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.auth_user_groups_id_seq
+CREATE SEQUENCE auth_user_groups_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -401,20 +416,20 @@ CREATE SEQUENCE public.auth_user_groups_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_user_groups_id_seq OWNER TO qijiec;
+ALTER TABLE auth_user_groups_id_seq OWNER TO qijiec;
 
 --
 -- Name: auth_user_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.auth_user_groups_id_seq OWNED BY public.auth_user_groups.id;
+ALTER SEQUENCE auth_user_groups_id_seq OWNED BY auth_user_groups.id;
 
 
 --
 -- Name: auth_user_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.auth_user_id_seq
+CREATE SEQUENCE auth_user_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -422,33 +437,33 @@ CREATE SEQUENCE public.auth_user_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_user_id_seq OWNER TO qijiec;
+ALTER TABLE auth_user_id_seq OWNER TO qijiec;
 
 --
 -- Name: auth_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.auth_user_id_seq OWNED BY public.auth_user.id;
+ALTER SEQUENCE auth_user_id_seq OWNED BY auth_user.id;
 
 
 --
 -- Name: auth_user_user_permissions; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.auth_user_user_permissions (
+CREATE TABLE auth_user_user_permissions (
     id integer NOT NULL,
     user_id integer NOT NULL,
     permission_id integer NOT NULL
 );
 
 
-ALTER TABLE public.auth_user_user_permissions OWNER TO qijiec;
+ALTER TABLE auth_user_user_permissions OWNER TO qijiec;
 
 --
 -- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.auth_user_user_permissions_id_seq
+CREATE SEQUENCE auth_user_user_permissions_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -456,20 +471,20 @@ CREATE SEQUENCE public.auth_user_user_permissions_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_user_user_permissions_id_seq OWNER TO qijiec;
+ALTER TABLE auth_user_user_permissions_id_seq OWNER TO qijiec;
 
 --
 -- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.auth_user_user_permissions_id_seq OWNED BY public.auth_user_user_permissions.id;
+ALTER SEQUENCE auth_user_user_permissions_id_seq OWNED BY auth_user_user_permissions.id;
 
 
 --
 -- Name: django_admin_log; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.django_admin_log (
+CREATE TABLE django_admin_log (
     id integer NOT NULL,
     action_time timestamp with time zone NOT NULL,
     object_id text,
@@ -482,13 +497,13 @@ CREATE TABLE public.django_admin_log (
 );
 
 
-ALTER TABLE public.django_admin_log OWNER TO qijiec;
+ALTER TABLE django_admin_log OWNER TO qijiec;
 
 --
 -- Name: django_admin_log_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.django_admin_log_id_seq
+CREATE SEQUENCE django_admin_log_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -496,20 +511,20 @@ CREATE SEQUENCE public.django_admin_log_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.django_admin_log_id_seq OWNER TO qijiec;
+ALTER TABLE django_admin_log_id_seq OWNER TO qijiec;
 
 --
 -- Name: django_admin_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.django_admin_log_id_seq OWNED BY public.django_admin_log.id;
+ALTER SEQUENCE django_admin_log_id_seq OWNED BY django_admin_log.id;
 
 
 --
 -- Name: django_celery_beat_crontabschedule; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.django_celery_beat_crontabschedule (
+CREATE TABLE django_celery_beat_crontabschedule (
     id integer NOT NULL,
     minute character varying(64) NOT NULL,
     hour character varying(64) NOT NULL,
@@ -519,13 +534,13 @@ CREATE TABLE public.django_celery_beat_crontabschedule (
 );
 
 
-ALTER TABLE public.django_celery_beat_crontabschedule OWNER TO qijiec;
+ALTER TABLE django_celery_beat_crontabschedule OWNER TO qijiec;
 
 --
 -- Name: django_celery_beat_crontabschedule_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.django_celery_beat_crontabschedule_id_seq
+CREATE SEQUENCE django_celery_beat_crontabschedule_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -533,33 +548,33 @@ CREATE SEQUENCE public.django_celery_beat_crontabschedule_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.django_celery_beat_crontabschedule_id_seq OWNER TO qijiec;
+ALTER TABLE django_celery_beat_crontabschedule_id_seq OWNER TO qijiec;
 
 --
 -- Name: django_celery_beat_crontabschedule_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.django_celery_beat_crontabschedule_id_seq OWNED BY public.django_celery_beat_crontabschedule.id;
+ALTER SEQUENCE django_celery_beat_crontabschedule_id_seq OWNED BY django_celery_beat_crontabschedule.id;
 
 
 --
 -- Name: django_celery_beat_intervalschedule; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.django_celery_beat_intervalschedule (
+CREATE TABLE django_celery_beat_intervalschedule (
     id integer NOT NULL,
     every integer NOT NULL,
     period character varying(24) NOT NULL
 );
 
 
-ALTER TABLE public.django_celery_beat_intervalschedule OWNER TO qijiec;
+ALTER TABLE django_celery_beat_intervalschedule OWNER TO qijiec;
 
 --
 -- Name: django_celery_beat_intervalschedule_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.django_celery_beat_intervalschedule_id_seq
+CREATE SEQUENCE django_celery_beat_intervalschedule_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -567,20 +582,20 @@ CREATE SEQUENCE public.django_celery_beat_intervalschedule_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.django_celery_beat_intervalschedule_id_seq OWNER TO qijiec;
+ALTER TABLE django_celery_beat_intervalschedule_id_seq OWNER TO qijiec;
 
 --
 -- Name: django_celery_beat_intervalschedule_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.django_celery_beat_intervalschedule_id_seq OWNED BY public.django_celery_beat_intervalschedule.id;
+ALTER SEQUENCE django_celery_beat_intervalschedule_id_seq OWNED BY django_celery_beat_intervalschedule.id;
 
 
 --
 -- Name: django_celery_beat_periodictask; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.django_celery_beat_periodictask (
+CREATE TABLE django_celery_beat_periodictask (
     id integer NOT NULL,
     name character varying(200) NOT NULL,
     task character varying(200) NOT NULL,
@@ -601,13 +616,13 @@ CREATE TABLE public.django_celery_beat_periodictask (
 );
 
 
-ALTER TABLE public.django_celery_beat_periodictask OWNER TO qijiec;
+ALTER TABLE django_celery_beat_periodictask OWNER TO qijiec;
 
 --
 -- Name: django_celery_beat_periodictask_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.django_celery_beat_periodictask_id_seq
+CREATE SEQUENCE django_celery_beat_periodictask_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -615,45 +630,45 @@ CREATE SEQUENCE public.django_celery_beat_periodictask_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.django_celery_beat_periodictask_id_seq OWNER TO qijiec;
+ALTER TABLE django_celery_beat_periodictask_id_seq OWNER TO qijiec;
 
 --
 -- Name: django_celery_beat_periodictask_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.django_celery_beat_periodictask_id_seq OWNED BY public.django_celery_beat_periodictask.id;
+ALTER SEQUENCE django_celery_beat_periodictask_id_seq OWNED BY django_celery_beat_periodictask.id;
 
 
 --
 -- Name: django_celery_beat_periodictasks; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.django_celery_beat_periodictasks (
+CREATE TABLE django_celery_beat_periodictasks (
     ident smallint NOT NULL,
     last_update timestamp with time zone NOT NULL
 );
 
 
-ALTER TABLE public.django_celery_beat_periodictasks OWNER TO qijiec;
+ALTER TABLE django_celery_beat_periodictasks OWNER TO qijiec;
 
 --
 -- Name: django_content_type; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.django_content_type (
+CREATE TABLE django_content_type (
     id integer NOT NULL,
     app_label character varying(100) NOT NULL,
     model character varying(100) NOT NULL
 );
 
 
-ALTER TABLE public.django_content_type OWNER TO qijiec;
+ALTER TABLE django_content_type OWNER TO qijiec;
 
 --
 -- Name: django_content_type_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.django_content_type_id_seq
+CREATE SEQUENCE django_content_type_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -661,20 +676,20 @@ CREATE SEQUENCE public.django_content_type_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.django_content_type_id_seq OWNER TO qijiec;
+ALTER TABLE django_content_type_id_seq OWNER TO qijiec;
 
 --
 -- Name: django_content_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.django_content_type_id_seq OWNED BY public.django_content_type.id;
+ALTER SEQUENCE django_content_type_id_seq OWNED BY django_content_type.id;
 
 
 --
 -- Name: django_migrations; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.django_migrations (
+CREATE TABLE django_migrations (
     id integer NOT NULL,
     app character varying(255) NOT NULL,
     name character varying(255) NOT NULL,
@@ -682,13 +697,13 @@ CREATE TABLE public.django_migrations (
 );
 
 
-ALTER TABLE public.django_migrations OWNER TO qijiec;
+ALTER TABLE django_migrations OWNER TO qijiec;
 
 --
 -- Name: django_migrations_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.django_migrations_id_seq
+CREATE SEQUENCE django_migrations_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -696,33 +711,33 @@ CREATE SEQUENCE public.django_migrations_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.django_migrations_id_seq OWNER TO qijiec;
+ALTER TABLE django_migrations_id_seq OWNER TO qijiec;
 
 --
 -- Name: django_migrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.django_migrations_id_seq OWNED BY public.django_migrations.id;
+ALTER SEQUENCE django_migrations_id_seq OWNED BY django_migrations.id;
 
 
 --
 -- Name: django_session; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.django_session (
+CREATE TABLE django_session (
     session_key character varying(40) NOT NULL,
     session_data text NOT NULL,
     expire_date timestamp with time zone NOT NULL
 );
 
 
-ALTER TABLE public.django_session OWNER TO qijiec;
+ALTER TABLE django_session OWNER TO qijiec;
 
 --
 -- Name: guardian_groupobjectpermission; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.guardian_groupobjectpermission (
+CREATE TABLE guardian_groupobjectpermission (
     id integer NOT NULL,
     object_pk character varying(255) NOT NULL,
     content_type_id integer NOT NULL,
@@ -731,13 +746,13 @@ CREATE TABLE public.guardian_groupobjectpermission (
 );
 
 
-ALTER TABLE public.guardian_groupobjectpermission OWNER TO qijiec;
+ALTER TABLE guardian_groupobjectpermission OWNER TO qijiec;
 
 --
 -- Name: guardian_groupobjectpermission_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.guardian_groupobjectpermission_id_seq
+CREATE SEQUENCE guardian_groupobjectpermission_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -745,20 +760,20 @@ CREATE SEQUENCE public.guardian_groupobjectpermission_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.guardian_groupobjectpermission_id_seq OWNER TO qijiec;
+ALTER TABLE guardian_groupobjectpermission_id_seq OWNER TO qijiec;
 
 --
 -- Name: guardian_groupobjectpermission_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.guardian_groupobjectpermission_id_seq OWNED BY public.guardian_groupobjectpermission.id;
+ALTER SEQUENCE guardian_groupobjectpermission_id_seq OWNED BY guardian_groupobjectpermission.id;
 
 
 --
 -- Name: guardian_userobjectpermission; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.guardian_userobjectpermission (
+CREATE TABLE guardian_userobjectpermission (
     id integer NOT NULL,
     object_pk character varying(255) NOT NULL,
     content_type_id integer NOT NULL,
@@ -767,13 +782,13 @@ CREATE TABLE public.guardian_userobjectpermission (
 );
 
 
-ALTER TABLE public.guardian_userobjectpermission OWNER TO qijiec;
+ALTER TABLE guardian_userobjectpermission OWNER TO qijiec;
 
 --
 -- Name: guardian_userobjectpermission_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.guardian_userobjectpermission_id_seq
+CREATE SEQUENCE guardian_userobjectpermission_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -781,20 +796,20 @@ CREATE SEQUENCE public.guardian_userobjectpermission_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.guardian_userobjectpermission_id_seq OWNER TO qijiec;
+ALTER TABLE guardian_userobjectpermission_id_seq OWNER TO qijiec;
 
 --
 -- Name: guardian_userobjectpermission_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.guardian_userobjectpermission_id_seq OWNED BY public.guardian_userobjectpermission.id;
+ALTER SEQUENCE guardian_userobjectpermission_id_seq OWNED BY guardian_userobjectpermission.id;
 
 
 --
 -- Name: recording_frame; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.recording_frame (
+CREATE TABLE recording_frame (
     id integer NOT NULL,
     frame_number integer NOT NULL,
     home_score integer,
@@ -806,13 +821,13 @@ CREATE TABLE public.recording_frame (
 );
 
 
-ALTER TABLE public.recording_frame OWNER TO qijiec;
+ALTER TABLE recording_frame OWNER TO qijiec;
 
 --
 -- Name: recording_frame_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.recording_frame_id_seq
+CREATE SEQUENCE recording_frame_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -820,20 +835,20 @@ CREATE SEQUENCE public.recording_frame_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.recording_frame_id_seq OWNER TO qijiec;
+ALTER TABLE recording_frame_id_seq OWNER TO qijiec;
 
 --
 -- Name: recording_frame_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.recording_frame_id_seq OWNED BY public.recording_frame.id;
+ALTER SEQUENCE recording_frame_id_seq OWNED BY recording_frame.id;
 
 
 --
 -- Name: recording_leagueframe; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.recording_leagueframe (
+CREATE TABLE recording_leagueframe (
     frame_ptr_id integer NOT NULL,
     leg_number integer NOT NULL,
     away_player_id integer NOT NULL,
@@ -842,13 +857,13 @@ CREATE TABLE public.recording_leagueframe (
 );
 
 
-ALTER TABLE public.recording_leagueframe OWNER TO qijiec;
+ALTER TABLE recording_leagueframe OWNER TO qijiec;
 
 --
 -- Name: recording_leaguematch; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.recording_leaguematch (
+CREATE TABLE recording_leaguematch (
     id integer NOT NULL,
     venue character varying(200),
     match_date timestamp with time zone NOT NULL,
@@ -879,13 +894,13 @@ CREATE TABLE public.recording_leaguematch (
 );
 
 
-ALTER TABLE public.recording_leaguematch OWNER TO qijiec;
+ALTER TABLE recording_leaguematch OWNER TO qijiec;
 
 --
 -- Name: recording_leaguematch_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.recording_leaguematch_id_seq
+CREATE SEQUENCE recording_leaguematch_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -893,20 +908,20 @@ CREATE SEQUENCE public.recording_leaguematch_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.recording_leaguematch_id_seq OWNER TO qijiec;
+ALTER TABLE recording_leaguematch_id_seq OWNER TO qijiec;
 
 --
 -- Name: recording_leaguematch_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.recording_leaguematch_id_seq OWNED BY public.recording_leaguematch.id;
+ALTER SEQUENCE recording_leaguematch_id_seq OWNED BY recording_leaguematch.id;
 
 
 --
 -- Name: recording_match; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.recording_match (
+CREATE TABLE recording_match (
     id integer NOT NULL,
     venue character varying(200),
     match_date timestamp with time zone NOT NULL,
@@ -930,13 +945,13 @@ CREATE TABLE public.recording_match (
 );
 
 
-ALTER TABLE public.recording_match OWNER TO qijiec;
+ALTER TABLE recording_match OWNER TO qijiec;
 
 --
 -- Name: recording_match_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.recording_match_id_seq
+CREATE SEQUENCE recording_match_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -944,20 +959,20 @@ CREATE SEQUENCE public.recording_match_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.recording_match_id_seq OWNER TO qijiec;
+ALTER TABLE recording_match_id_seq OWNER TO qijiec;
 
 --
 -- Name: recording_match_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.recording_match_id_seq OWNED BY public.recording_match.id;
+ALTER SEQUENCE recording_match_id_seq OWNED BY recording_match.id;
 
 
 --
 -- Name: schedule_matchweek; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.schedule_matchweek (
+CREATE TABLE schedule_matchweek (
     id integer NOT NULL,
     week_number integer NOT NULL,
     start_date timestamp with time zone NOT NULL,
@@ -967,13 +982,13 @@ CREATE TABLE public.schedule_matchweek (
 );
 
 
-ALTER TABLE public.schedule_matchweek OWNER TO qijiec;
+ALTER TABLE schedule_matchweek OWNER TO qijiec;
 
 --
 -- Name: schedule_matchweek_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.schedule_matchweek_id_seq
+CREATE SEQUENCE schedule_matchweek_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -981,20 +996,20 @@ CREATE SEQUENCE public.schedule_matchweek_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.schedule_matchweek_id_seq OWNER TO qijiec;
+ALTER TABLE schedule_matchweek_id_seq OWNER TO qijiec;
 
 --
 -- Name: schedule_matchweek_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.schedule_matchweek_id_seq OWNED BY public.schedule_matchweek.id;
+ALTER SEQUENCE schedule_matchweek_id_seq OWNED BY schedule_matchweek.id;
 
 
 --
 -- Name: schedule_season; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.schedule_season (
+CREATE TABLE schedule_season (
     id integer NOT NULL,
     season integer NOT NULL,
     league_id integer NOT NULL,
@@ -1002,13 +1017,13 @@ CREATE TABLE public.schedule_season (
 );
 
 
-ALTER TABLE public.schedule_season OWNER TO qijiec;
+ALTER TABLE schedule_season OWNER TO qijiec;
 
 --
 -- Name: schedule_season_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.schedule_season_id_seq
+CREATE SEQUENCE schedule_season_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1016,20 +1031,20 @@ CREATE SEQUENCE public.schedule_season_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.schedule_season_id_seq OWNER TO qijiec;
+ALTER TABLE schedule_season_id_seq OWNER TO qijiec;
 
 --
 -- Name: schedule_season_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.schedule_season_id_seq OWNED BY public.schedule_season.id;
+ALTER SEQUENCE schedule_season_id_seq OWNED BY schedule_season.id;
 
 
 --
 -- Name: stats_playerranking; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.stats_playerranking (
+CREATE TABLE stats_playerranking (
     id integer NOT NULL,
     date timestamp with time zone NOT NULL,
     serial_id integer NOT NULL,
@@ -1051,13 +1066,13 @@ CREATE TABLE public.stats_playerranking (
 );
 
 
-ALTER TABLE public.stats_playerranking OWNER TO qijiec;
+ALTER TABLE stats_playerranking OWNER TO qijiec;
 
 --
 -- Name: stats_playerranking_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.stats_playerranking_id_seq
+CREATE SEQUENCE stats_playerranking_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1065,20 +1080,20 @@ CREATE SEQUENCE public.stats_playerranking_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.stats_playerranking_id_seq OWNER TO qijiec;
+ALTER TABLE stats_playerranking_id_seq OWNER TO qijiec;
 
 --
 -- Name: stats_playerranking_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.stats_playerranking_id_seq OWNED BY public.stats_playerranking.id;
+ALTER SEQUENCE stats_playerranking_id_seq OWNED BY stats_playerranking.id;
 
 
 --
 -- Name: stats_teamranking; Type: TABLE; Schema: public; Owner: qijiec
 --
 
-CREATE TABLE public.stats_teamranking (
+CREATE TABLE stats_teamranking (
     id integer NOT NULL,
     date timestamp with time zone NOT NULL,
     serial_id integer NOT NULL,
@@ -1104,13 +1119,13 @@ CREATE TABLE public.stats_teamranking (
 );
 
 
-ALTER TABLE public.stats_teamranking OWNER TO qijiec;
+ALTER TABLE stats_teamranking OWNER TO qijiec;
 
 --
 -- Name: stats_teamranking_id_seq; Type: SEQUENCE; Schema: public; Owner: qijiec
 --
 
-CREATE SEQUENCE public.stats_teamranking_id_seq
+CREATE SEQUENCE stats_teamranking_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1118,202 +1133,202 @@ CREATE SEQUENCE public.stats_teamranking_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.stats_teamranking_id_seq OWNER TO qijiec;
+ALTER TABLE stats_teamranking_id_seq OWNER TO qijiec;
 
 --
 -- Name: stats_teamranking_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qijiec
 --
 
-ALTER SEQUENCE public.stats_teamranking_id_seq OWNED BY public.stats_teamranking.id;
+ALTER SEQUENCE stats_teamranking_id_seq OWNED BY stats_teamranking.id;
 
 
 --
 -- Name: administration_group id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.administration_group ALTER COLUMN id SET DEFAULT nextval('public.administration_group_id_seq'::regclass);
+ALTER TABLE ONLY administration_group ALTER COLUMN id SET DEFAULT nextval('administration_group_id_seq'::regclass);
 
 
 --
 -- Name: administration_league id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.administration_league ALTER COLUMN id SET DEFAULT nextval('public.administration_league_id_seq'::regclass);
+ALTER TABLE ONLY administration_league ALTER COLUMN id SET DEFAULT nextval('administration_league_id_seq'::regclass);
 
 
 --
 -- Name: administration_member id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.administration_member ALTER COLUMN id SET DEFAULT nextval('public.administration_member_id_seq'::regclass);
+ALTER TABLE ONLY administration_member ALTER COLUMN id SET DEFAULT nextval('administration_member_id_seq'::regclass);
 
 
 --
 -- Name: administration_player id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.administration_player ALTER COLUMN id SET DEFAULT nextval('public.administration_player_id_seq'::regclass);
+ALTER TABLE ONLY administration_player ALTER COLUMN id SET DEFAULT nextval('administration_player_id_seq'::regclass);
 
 
 --
 -- Name: administration_teamseasonal id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.administration_teamseasonal ALTER COLUMN id SET DEFAULT nextval('public.administration_teamseasonal_id_seq'::regclass);
+ALTER TABLE ONLY administration_teamseasonal ALTER COLUMN id SET DEFAULT nextval('administration_teamseasonal_id_seq'::regclass);
 
 
 --
 -- Name: auth_group id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_group ALTER COLUMN id SET DEFAULT nextval('public.auth_group_id_seq'::regclass);
+ALTER TABLE ONLY auth_group ALTER COLUMN id SET DEFAULT nextval('auth_group_id_seq'::regclass);
 
 
 --
 -- Name: auth_group_permissions id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_group_permissions ALTER COLUMN id SET DEFAULT nextval('public.auth_group_permissions_id_seq'::regclass);
+ALTER TABLE ONLY auth_group_permissions ALTER COLUMN id SET DEFAULT nextval('auth_group_permissions_id_seq'::regclass);
 
 
 --
 -- Name: auth_permission id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_permission ALTER COLUMN id SET DEFAULT nextval('public.auth_permission_id_seq'::regclass);
+ALTER TABLE ONLY auth_permission ALTER COLUMN id SET DEFAULT nextval('auth_permission_id_seq'::regclass);
 
 
 --
 -- Name: auth_user id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_user ALTER COLUMN id SET DEFAULT nextval('public.auth_user_id_seq'::regclass);
+ALTER TABLE ONLY auth_user ALTER COLUMN id SET DEFAULT nextval('auth_user_id_seq'::regclass);
 
 
 --
 -- Name: auth_user_groups id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_user_groups ALTER COLUMN id SET DEFAULT nextval('public.auth_user_groups_id_seq'::regclass);
+ALTER TABLE ONLY auth_user_groups ALTER COLUMN id SET DEFAULT nextval('auth_user_groups_id_seq'::regclass);
 
 
 --
 -- Name: auth_user_user_permissions id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_user_user_permissions ALTER COLUMN id SET DEFAULT nextval('public.auth_user_user_permissions_id_seq'::regclass);
+ALTER TABLE ONLY auth_user_user_permissions ALTER COLUMN id SET DEFAULT nextval('auth_user_user_permissions_id_seq'::regclass);
 
 
 --
 -- Name: django_admin_log id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.django_admin_log ALTER COLUMN id SET DEFAULT nextval('public.django_admin_log_id_seq'::regclass);
+ALTER TABLE ONLY django_admin_log ALTER COLUMN id SET DEFAULT nextval('django_admin_log_id_seq'::regclass);
 
 
 --
 -- Name: django_celery_beat_crontabschedule id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.django_celery_beat_crontabschedule ALTER COLUMN id SET DEFAULT nextval('public.django_celery_beat_crontabschedule_id_seq'::regclass);
+ALTER TABLE ONLY django_celery_beat_crontabschedule ALTER COLUMN id SET DEFAULT nextval('django_celery_beat_crontabschedule_id_seq'::regclass);
 
 
 --
 -- Name: django_celery_beat_intervalschedule id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.django_celery_beat_intervalschedule ALTER COLUMN id SET DEFAULT nextval('public.django_celery_beat_intervalschedule_id_seq'::regclass);
+ALTER TABLE ONLY django_celery_beat_intervalschedule ALTER COLUMN id SET DEFAULT nextval('django_celery_beat_intervalschedule_id_seq'::regclass);
 
 
 --
 -- Name: django_celery_beat_periodictask id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.django_celery_beat_periodictask ALTER COLUMN id SET DEFAULT nextval('public.django_celery_beat_periodictask_id_seq'::regclass);
+ALTER TABLE ONLY django_celery_beat_periodictask ALTER COLUMN id SET DEFAULT nextval('django_celery_beat_periodictask_id_seq'::regclass);
 
 
 --
 -- Name: django_content_type id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.django_content_type ALTER COLUMN id SET DEFAULT nextval('public.django_content_type_id_seq'::regclass);
+ALTER TABLE ONLY django_content_type ALTER COLUMN id SET DEFAULT nextval('django_content_type_id_seq'::regclass);
 
 
 --
 -- Name: django_migrations id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.django_migrations ALTER COLUMN id SET DEFAULT nextval('public.django_migrations_id_seq'::regclass);
+ALTER TABLE ONLY django_migrations ALTER COLUMN id SET DEFAULT nextval('django_migrations_id_seq'::regclass);
 
 
 --
 -- Name: guardian_groupobjectpermission id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.guardian_groupobjectpermission ALTER COLUMN id SET DEFAULT nextval('public.guardian_groupobjectpermission_id_seq'::regclass);
+ALTER TABLE ONLY guardian_groupobjectpermission ALTER COLUMN id SET DEFAULT nextval('guardian_groupobjectpermission_id_seq'::regclass);
 
 
 --
 -- Name: guardian_userobjectpermission id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.guardian_userobjectpermission ALTER COLUMN id SET DEFAULT nextval('public.guardian_userobjectpermission_id_seq'::regclass);
+ALTER TABLE ONLY guardian_userobjectpermission ALTER COLUMN id SET DEFAULT nextval('guardian_userobjectpermission_id_seq'::regclass);
 
 
 --
 -- Name: recording_frame id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_frame ALTER COLUMN id SET DEFAULT nextval('public.recording_frame_id_seq'::regclass);
+ALTER TABLE ONLY recording_frame ALTER COLUMN id SET DEFAULT nextval('recording_frame_id_seq'::regclass);
 
 
 --
 -- Name: recording_leaguematch id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_leaguematch ALTER COLUMN id SET DEFAULT nextval('public.recording_leaguematch_id_seq'::regclass);
+ALTER TABLE ONLY recording_leaguematch ALTER COLUMN id SET DEFAULT nextval('recording_leaguematch_id_seq'::regclass);
 
 
 --
 -- Name: recording_match id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_match ALTER COLUMN id SET DEFAULT nextval('public.recording_match_id_seq'::regclass);
+ALTER TABLE ONLY recording_match ALTER COLUMN id SET DEFAULT nextval('recording_match_id_seq'::regclass);
 
 
 --
 -- Name: schedule_matchweek id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.schedule_matchweek ALTER COLUMN id SET DEFAULT nextval('public.schedule_matchweek_id_seq'::regclass);
+ALTER TABLE ONLY schedule_matchweek ALTER COLUMN id SET DEFAULT nextval('schedule_matchweek_id_seq'::regclass);
 
 
 --
 -- Name: schedule_season id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.schedule_season ALTER COLUMN id SET DEFAULT nextval('public.schedule_season_id_seq'::regclass);
+ALTER TABLE ONLY schedule_season ALTER COLUMN id SET DEFAULT nextval('schedule_season_id_seq'::regclass);
 
 
 --
 -- Name: stats_playerranking id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.stats_playerranking ALTER COLUMN id SET DEFAULT nextval('public.stats_playerranking_id_seq'::regclass);
+ALTER TABLE ONLY stats_playerranking ALTER COLUMN id SET DEFAULT nextval('stats_playerranking_id_seq'::regclass);
 
 
 --
 -- Name: stats_teamranking id; Type: DEFAULT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.stats_teamranking ALTER COLUMN id SET DEFAULT nextval('public.stats_teamranking_id_seq'::regclass);
+ALTER TABLE ONLY stats_teamranking ALTER COLUMN id SET DEFAULT nextval('stats_teamranking_id_seq'::regclass);
 
 
 --
 -- Data for Name: administration_group; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.administration_group (id, name, size, create_date, close_date, logo) FROM stdin;
+COPY administration_group (id, name, size, create_date, close_date, logo) FROM stdin;
 9	Les Trois Mousquetaires	0	2017-03-12 12:11:01+08	\N	\N
 4	Pink Platypuses	0	2017-02-08 22:32:23+08	2017-08-22 23:59:59+08	male_YVlC1q2.png
 2	Just the Tip	0	2017-02-07 21:32:04+08	\N	male_H6KLx5T.png
@@ -1331,7 +1346,7 @@ COPY public.administration_group (id, name, size, create_date, close_date, logo)
 -- Data for Name: administration_league; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.administration_league (id, name, create_date, level, size, last_update) FROM stdin;
+COPY administration_league (id, name, create_date, level, size, last_update) FROM stdin;
 1	Poke n Hope HK 8-Ball	2017-02-07 21:26:20+08	1	0	2017-11-30 12:10:34.081992+08
 \.
 
@@ -1340,7 +1355,7 @@ COPY public.administration_league (id, name, create_date, level, size, last_upda
 -- Data for Name: administration_member; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.administration_member (id, create_date, cancel_date, points, ranking, _point_adj, total_matches_played, total_matches_won, total_clearances, season_matches_played, season_matches_won, season_clearances, group_id, player_id, season_points, handicap, total_points) FROM stdin;
+COPY administration_member (id, create_date, cancel_date, points, ranking, _point_adj, total_matches_played, total_matches_won, total_clearances, season_matches_played, season_matches_won, season_clearances, group_id, player_id, season_points, handicap, total_points) FROM stdin;
 46	2017-02-26 22:05:05.62+08	2017-08-22 23:59:59+08	227.890818715684986	18	0	39	24	7	39	24	7	4	16	612	7.84615384615385025	612
 48	2017-02-26 22:05:05.645+08	2017-08-22 23:59:59+08	177.284844463995	50	0	18	5	0	18	5	0	4	18	246	6.83333333333333037	246
 50	2017-02-26 22:05:05.663+08	2017-08-22 23:59:59+08	200	0	0	0	0	0	0	0	0	4	20	0	-1	0
@@ -1468,7 +1483,7 @@ COPY public.administration_member (id, create_date, cancel_date, points, ranking
 -- Data for Name: administration_player; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.administration_player (id, name, username, sex, phone, email, nb_groups, user_id) FROM stdin;
+COPY administration_player (id, name, username, sex, phone, email, nb_groups, user_id) FROM stdin;
 4	Jay Gonzalez	jayg	M			0	\N
 5	Henrik Pedersen	henrikp	M			0	\N
 9	Clara Szeto	claras	F			0	\N
@@ -1583,7 +1598,7 @@ COPY public.administration_player (id, name, username, sex, phone, email, nb_gro
 -- Data for Name: administration_team; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.administration_team (group_ptr_id, ranking, total_legs_played, total_legs_won, season_legs_played, season_legs_won, league_id, team_number, total_matches_played, total_matches_won, season_matches_played, season_matches_won, season_clearances, season_points, captain_id, season_leg_average, season_median, total_clearances, total_points) FROM stdin;
+COPY administration_team (group_ptr_id, ranking, total_legs_played, total_legs_won, season_legs_played, season_legs_won, league_id, team_number, total_matches_played, total_matches_won, season_matches_played, season_matches_won, season_clearances, season_points, captain_id, season_leg_average, season_median, total_clearances, total_points) FROM stdin;
 4	5	98	44	98	44	1	1	14	6	14	6	13	3155	4	0	0	13	3155
 2	2	189	120	91	58	1	4	27	18	13	9	5	3148	2	39.5897435897435983	8.0340909090908994	18	6595
 6	8	189	70	91	27	1	3	27	7	13	2	3	2862	52	33.4743589743589993	7.66666666666666963	16	6058
@@ -1600,7 +1615,7 @@ COPY public.administration_team (group_ptr_id, ranking, total_legs_played, total
 -- Data for Name: administration_teamseasonal; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.administration_teamseasonal (id, team_number, ranking, points, clearances, matches_played, matches_won, legs_played, legs_won, season_id, team_id, leg_average, median) FROM stdin;
+COPY administration_teamseasonal (id, team_number, ranking, points, clearances, matches_played, matches_won, legs_played, legs_won, season_id, team_id, leg_average, median) FROM stdin;
 9	5	0	0	0	0	0	0	0	2	1	0	0
 10	4	0	0	0	0	0	0	0	2	2	0	0
 11	8	0	0	0	0	0	0	0	2	3	0	0
@@ -1624,7 +1639,7 @@ COPY public.administration_teamseasonal (id, team_number, ranking, points, clear
 -- Data for Name: auth_group; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.auth_group (id, name) FROM stdin;
+COPY auth_group (id, name) FROM stdin;
 \.
 
 
@@ -1632,7 +1647,7 @@ COPY public.auth_group (id, name) FROM stdin;
 -- Data for Name: auth_group_permissions; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.auth_group_permissions (id, group_id, permission_id) FROM stdin;
+COPY auth_group_permissions (id, group_id, permission_id) FROM stdin;
 \.
 
 
@@ -1640,7 +1655,7 @@ COPY public.auth_group_permissions (id, group_id, permission_id) FROM stdin;
 -- Data for Name: auth_permission; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
+COPY auth_permission (id, name, content_type_id, codename) FROM stdin;
 4	Can add league	2	add_league
 5	Can change league	2	change_league
 6	Can delete league	2	delete_league
@@ -1734,7 +1749,7 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 -- Data for Name: auth_user; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
+COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
 2	pbkdf2_sha256$30000$qqNZ3YwKlCB1$usTEYFKh0glaZuPPpVgBbnr4Hwfnw3NpjVuqAcorn5w=	2017-05-30 10:59:15+08	f	scorer				f	t	2017-05-30 10:56:11+08
 4	pbkdf2_sha256$36000$NSLSkC9BRwhz$GnNyafwV1TGgR+zkQc+x+jTksNqUNrTOsIfeRCNC2ZQ=	2017-06-17 16:52:21.10197+08	f	kawangl	Kawang	Lau		f	t	2017-06-17 16:44:44+08
 7	!VktNRiQTeiJfXONLtVYQ3V27wWxmxy154sE3Es4L	\N	f	AnonymousUser				f	t	2017-08-23 11:48:01.348948+08
@@ -1758,7 +1773,7 @@ COPY public.auth_user (id, password, last_login, is_superuser, username, first_n
 -- Data for Name: auth_user_groups; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.auth_user_groups (id, user_id, group_id) FROM stdin;
+COPY auth_user_groups (id, user_id, group_id) FROM stdin;
 \.
 
 
@@ -1766,7 +1781,7 @@ COPY public.auth_user_groups (id, user_id, group_id) FROM stdin;
 -- Data for Name: auth_user_user_permissions; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.auth_user_user_permissions (id, user_id, permission_id) FROM stdin;
+COPY auth_user_user_permissions (id, user_id, permission_id) FROM stdin;
 1	2	16
 2	2	20
 3	2	22
@@ -1781,7 +1796,7 @@ COPY public.auth_user_user_permissions (id, user_id, permission_id) FROM stdin;
 -- Data for Name: django_admin_log; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.django_admin_log (id, action_time, object_id, object_repr, action_flag, change_message, content_type_id, user_id) FROM stdin;
+COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, change_message, content_type_id, user_id) FROM stdin;
 1	2017-02-07 21:26:56.858+08	1	Poke n Hope HK 8-Ball	1	[{"added": {}}]	2	1
 2	2017-02-07 21:28:12.082+08	1	Mancy Howe	1	[{"added": {}}]	3	1
 3	2017-02-07 21:28:40.523+08	2	Brad Tsui	1	[{"added": {}}]	3	1
@@ -2645,7 +2660,7 @@ COPY public.django_admin_log (id, action_time, object_id, object_repr, action_fl
 -- Data for Name: django_celery_beat_crontabschedule; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.django_celery_beat_crontabschedule (id, minute, hour, day_of_week, day_of_month, month_of_year) FROM stdin;
+COPY django_celery_beat_crontabschedule (id, minute, hour, day_of_week, day_of_month, month_of_year) FROM stdin;
 \.
 
 
@@ -2653,7 +2668,7 @@ COPY public.django_celery_beat_crontabschedule (id, minute, hour, day_of_week, d
 -- Data for Name: django_celery_beat_intervalschedule; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.django_celery_beat_intervalschedule (id, every, period) FROM stdin;
+COPY django_celery_beat_intervalschedule (id, every, period) FROM stdin;
 \.
 
 
@@ -2661,7 +2676,7 @@ COPY public.django_celery_beat_intervalschedule (id, every, period) FROM stdin;
 -- Data for Name: django_celery_beat_periodictask; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.django_celery_beat_periodictask (id, name, task, args, kwargs, queue, exchange, routing_key, expires, enabled, last_run_at, total_run_count, date_changed, description, crontab_id, interval_id) FROM stdin;
+COPY django_celery_beat_periodictask (id, name, task, args, kwargs, queue, exchange, routing_key, expires, enabled, last_run_at, total_run_count, date_changed, description, crontab_id, interval_id) FROM stdin;
 \.
 
 
@@ -2669,7 +2684,7 @@ COPY public.django_celery_beat_periodictask (id, name, task, args, kwargs, queue
 -- Data for Name: django_celery_beat_periodictasks; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.django_celery_beat_periodictasks (ident, last_update) FROM stdin;
+COPY django_celery_beat_periodictasks (ident, last_update) FROM stdin;
 \.
 
 
@@ -2677,7 +2692,7 @@ COPY public.django_celery_beat_periodictasks (ident, last_update) FROM stdin;
 -- Data for Name: django_content_type; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.django_content_type (id, app_label, model) FROM stdin;
+COPY django_content_type (id, app_label, model) FROM stdin;
 2	administration	league
 3	administration	player
 5	administration	member
@@ -2711,7 +2726,7 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 -- Data for Name: django_migrations; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.django_migrations (id, app, name, applied) FROM stdin;
+COPY django_migrations (id, app, name, applied) FROM stdin;
 1	contenttypes	0001_initial	2017-05-18 23:23:30.913437+08
 2	auth	0001_initial	2017-05-18 23:23:30.97185+08
 3	admin	0001_initial	2017-05-18 23:23:31.003287+08
@@ -2792,7 +2807,7 @@ COPY public.django_migrations (id, app, name, applied) FROM stdin;
 -- Data for Name: django_session; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.django_session (session_key, session_data, expire_date) FROM stdin;
+COPY django_session (session_key, session_data, expire_date) FROM stdin;
 2rahcgh5m29l7ov1z1mpeztpv71xw06i	MmMxNDMyYjg1OWU5ZjQ5M2FhNWJkYzEyMjlhM2Y5ODEyYTFiZDAyYjp7Il9hdXRoX3VzZXJfaGFzaCI6IjllNjdkM2E2ZjVhODkzZWUyNmI1YzM3NmFlMzNkOGEyYjQwMjUzNTkiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-03-12 21:33:27.643+08
 8kngnbhxj55pio5no0no1elhha0qy2tm	MmMxNDMyYjg1OWU5ZjQ5M2FhNWJkYzEyMjlhM2Y5ODEyYTFiZDAyYjp7Il9hdXRoX3VzZXJfaGFzaCI6IjllNjdkM2E2ZjVhODkzZWUyNmI1YzM3NmFlMzNkOGEyYjQwMjUzNTkiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-03-08 23:02:08.364+08
 91vn8ig9fkcyai1n6sv6wrmjyejkat6j	MmMxNDMyYjg1OWU5ZjQ5M2FhNWJkYzEyMjlhM2Y5ODEyYTFiZDAyYjp7Il9hdXRoX3VzZXJfaGFzaCI6IjllNjdkM2E2ZjVhODkzZWUyNmI1YzM3NmFlMzNkOGEyYjQwMjUzNTkiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2017-04-12 23:12:02.286+08
@@ -2943,7 +2958,7 @@ kx9gurjknk3xkqeg1zvf0hi7gccllh1e	MzU2MzM1NGE0MTE0YWJmODRlN2Y4ZDc0YzEyOGZlYjAxNDA
 -- Data for Name: guardian_groupobjectpermission; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.guardian_groupobjectpermission (id, object_pk, content_type_id, group_id, permission_id) FROM stdin;
+COPY guardian_groupobjectpermission (id, object_pk, content_type_id, group_id, permission_id) FROM stdin;
 \.
 
 
@@ -2951,7 +2966,7 @@ COPY public.guardian_groupobjectpermission (id, object_pk, content_type_id, grou
 -- Data for Name: guardian_userobjectpermission; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.guardian_userobjectpermission (id, object_pk, content_type_id, permission_id, user_id) FROM stdin;
+COPY guardian_userobjectpermission (id, object_pk, content_type_id, permission_id, user_id) FROM stdin;
 1	113	7	80	13
 2	113	7	80	6
 3	114	7	80	12
@@ -3225,7 +3240,7 @@ COPY public.guardian_userobjectpermission (id, object_pk, content_type_id, permi
 -- Data for Name: recording_frame; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.recording_frame (id, frame_number, home_score, away_score, is_clearance, break_player_id, cleared_by_id, match_id) FROM stdin;
+COPY recording_frame (id, frame_number, home_score, away_score, is_clearance, break_player_id, cleared_by_id, match_id) FROM stdin;
 61	1	10	6	f	70	\N	31
 62	2	10	7	t	42	70	31
 63	1	10	4	f	49	\N	32
@@ -6512,7 +6527,7 @@ COPY public.recording_frame (id, frame_number, home_score, away_score, is_cleara
 -- Data for Name: recording_leagueframe; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.recording_leagueframe (frame_ptr_id, leg_number, away_player_id, home_player_id, league_match_id) FROM stdin;
+COPY recording_leagueframe (frame_ptr_id, leg_number, away_player_id, home_player_id, league_match_id) FROM stdin;
 61	1	42	70	57
 62	2	42	70	57
 63	1	3	49	57
@@ -9760,7 +9775,7 @@ COPY public.recording_leagueframe (frame_ptr_id, leg_number, away_player_id, hom
 -- Data for Name: recording_leaguematch; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.recording_leaguematch (id, venue, match_date, number_frames, table_size, is_completed, is_submitted, pool_type, score_type, home_score, away_score, home_points_raw, away_points_raw, legs, handicap, away_id, home_id, week_id, winner_id, is_initialized, _away_ordered_players, _home_ordered_players, break_type, season_id, league_id, away_approved, home_approved) FROM stdin;
+COPY recording_leaguematch (id, venue, match_date, number_frames, table_size, is_completed, is_submitted, pool_type, score_type, home_score, away_score, home_points_raw, away_points_raw, legs, handicap, away_id, home_id, week_id, winner_id, is_initialized, _away_ordered_players, _home_ordered_players, break_type, season_id, league_id, away_approved, home_approved) FROM stdin;
 66	Billidart	2017-03-22 20:00:00+08	0	9	t	t	8-Ball	P	5	2	225	212	6	0	6	7	3	7	t	53_56_106_55_52	6_7_81_89_90	A	1	1	\N	\N
 67	Racks	2017-03-22 20:00:00+08	0	9	t	t	8-Ball	P	5	2	270	232	6	5	1	8	3	8	t	79_91_80_1_83	69_62_61_66_64	A	1	1	\N	\N
 68	Racks	2017-03-21 20:00:00+08	0	9	t	t	8-Ball	P	5	2	258	224	6	5	5	4	3	4	t	82_77_78_76_5	49_4_47_46_70	A	1	1	\N	\N
@@ -9880,7 +9895,7 @@ COPY public.recording_leaguematch (id, venue, match_date, number_frames, table_s
 -- Data for Name: recording_match; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.recording_match (id, venue, match_date, number_frames, table_size, is_completed, is_submitted, pool_type, score_type, home_score, away_score, race_to, match_type, away_id, home_id, week_id, winner_id, is_initialized, break_type, season_id) FROM stdin;
+COPY recording_match (id, venue, match_date, number_frames, table_size, is_completed, is_submitted, pool_type, score_type, home_score, away_score, race_to, match_type, away_id, home_id, week_id, winner_id, is_initialized, break_type, season_id) FROM stdin;
 92	Sun Mong	2017-03-12 16:30:00+08	13	9	t	t	8-Ball	F	6	7	7	I	102	101	\N	102	f	W	\N
 93		2017-03-12 19:19:58+08	13	9	t	t	8-Ball	F	6	7	7	I	101	102	\N	101	f	W	\N
 155	Sun Mong	2017-03-19 15:52:34+08	13	9	t	t	8-Ball	F	6	7	7	I	102	101	\N	102	f	W	\N
@@ -11511,7 +11526,7 @@ COPY public.recording_match (id, venue, match_date, number_frames, table_size, i
 -- Data for Name: schedule_matchweek; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.schedule_matchweek (id, week_number, start_date, end_date, season_id, serial_id) FROM stdin;
+COPY schedule_matchweek (id, week_number, start_date, end_date, season_id, serial_id) FROM stdin;
 1	1	2017-02-26 00:00:00+08	2017-03-12 00:00:00+08	1	1
 2	2	2017-03-12 00:00:00+08	2017-03-19 00:00:00+08	1	2
 3	3	2017-03-19 00:00:00+08	2017-03-26 00:00:00+08	1	3
@@ -11547,7 +11562,7 @@ COPY public.schedule_matchweek (id, week_number, start_date, end_date, season_id
 -- Data for Name: schedule_season; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.schedule_season (id, season, league_id, name) FROM stdin;
+COPY schedule_season (id, season, league_id, name) FROM stdin;
 1	3	1	2017 Spring
 2	4	1	2017 Autumn
 \.
@@ -11557,7 +11572,7 @@ COPY public.schedule_season (id, season, league_id, name) FROM stdin;
 -- Data for Name: stats_playerranking; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.stats_playerranking (id, date, serial_id, ranking, elo_points, total_points, handicap, season_matches_played, season_matches_won, season_clearances, player_id, league_id, week_id, season_id, season_points, total_clearances, total_matches_played, total_matches_won) FROM stdin;
+COPY stats_playerranking (id, date, serial_id, ranking, elo_points, total_points, handicap, season_matches_played, season_matches_won, season_clearances, player_id, league_id, week_id, season_id, season_points, total_clearances, total_matches_played, total_matches_won) FROM stdin;
 48	2017-06-27 22:01:15.247147+08	1	14	210.585489538448002	52	8.66666666666666963	3	2	0	93	1	2	1	52	0	3	2
 47	2017-06-27 22:01:15.24585+08	2	36	193.714285714286007	41	6.83333333333333037	3	0	0	90	1	2	1	41	0	3	0
 51	2017-06-27 22:01:15.251206+08	2	27	197.84443049751701	91	7.58333333333333037	6	3	0	89	1	2	1	91	0	6	3
@@ -13505,7 +13520,7 @@ COPY public.stats_playerranking (id, date, serial_id, ranking, elo_points, total
 -- Data for Name: stats_teamranking; Type: TABLE DATA; Schema: public; Owner: qijiec
 --
 
-COPY public.stats_teamranking (id, date, serial_id, ranking, elo_points, total_points, handicap, season_clearances, season_matches_played, season_matches_won, season_legs_played, season_legs_won, league_id, season_id, team_id, week_id, season_points, total_clearances, total_legs_played, total_legs_won, total_matches_played, total_matches_won) FROM stdin;
+COPY stats_teamranking (id, date, serial_id, ranking, elo_points, total_points, handicap, season_clearances, season_matches_played, season_matches_won, season_legs_played, season_legs_won, league_id, season_id, team_id, week_id, season_points, total_clearances, total_legs_played, total_legs_won, total_matches_played, total_matches_won) FROM stdin;
 7	2017-06-27 21:26:43.236172+08	1	8	\N	164	\N	0	1	0	7	0	1	1	6	1	164	0	7	0	1	0
 6	2017-06-27 21:26:43.234416+08	1	3	\N	246	\N	3	1	1	7	5	1	1	3	1	246	3	7	5	1	1
 4	2017-06-27 21:26:43.2309+08	1	2	\N	259	\N	0	1	1	7	6	1	1	2	1	259	0	7	6	1	1
@@ -13729,189 +13744,189 @@ COPY public.stats_teamranking (id, date, serial_id, ranking, elo_points, total_p
 -- Name: administration_group_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.administration_group_id_seq', 10, true);
+SELECT pg_catalog.setval('administration_group_id_seq', 10, true);
 
 
 --
 -- Name: administration_league_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.administration_league_id_seq', 1, true);
+SELECT pg_catalog.setval('administration_league_id_seq', 1, true);
 
 
 --
 -- Name: administration_member_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.administration_member_id_seq', 154, true);
+SELECT pg_catalog.setval('administration_member_id_seq', 154, true);
 
 
 --
 -- Name: administration_player_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.administration_player_id_seq', 108, true);
+SELECT pg_catalog.setval('administration_player_id_seq', 108, true);
 
 
 --
 -- Name: administration_teamseasonal_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.administration_teamseasonal_id_seq', 16, true);
+SELECT pg_catalog.setval('administration_teamseasonal_id_seq', 16, true);
 
 
 --
 -- Name: auth_group_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.auth_group_id_seq', 1, false);
+SELECT pg_catalog.setval('auth_group_id_seq', 1, false);
 
 
 --
 -- Name: auth_group_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.auth_group_permissions_id_seq', 1, false);
+SELECT pg_catalog.setval('auth_group_permissions_id_seq', 1, false);
 
 
 --
 -- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.auth_permission_id_seq', 86, true);
+SELECT pg_catalog.setval('auth_permission_id_seq', 86, true);
 
 
 --
 -- Name: auth_user_groups_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.auth_user_groups_id_seq', 1, false);
+SELECT pg_catalog.setval('auth_user_groups_id_seq', 1, false);
 
 
 --
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.auth_user_id_seq', 16, true);
+SELECT pg_catalog.setval('auth_user_id_seq', 16, true);
 
 
 --
 -- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.auth_user_user_permissions_id_seq', 7, true);
+SELECT pg_catalog.setval('auth_user_user_permissions_id_seq', 7, true);
 
 
 --
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.django_admin_log_id_seq', 856, true);
+SELECT pg_catalog.setval('django_admin_log_id_seq', 856, true);
 
 
 --
 -- Name: django_celery_beat_crontabschedule_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.django_celery_beat_crontabschedule_id_seq', 1, false);
+SELECT pg_catalog.setval('django_celery_beat_crontabschedule_id_seq', 1, false);
 
 
 --
 -- Name: django_celery_beat_intervalschedule_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.django_celery_beat_intervalschedule_id_seq', 1, false);
+SELECT pg_catalog.setval('django_celery_beat_intervalschedule_id_seq', 1, false);
 
 
 --
 -- Name: django_celery_beat_periodictask_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.django_celery_beat_periodictask_id_seq', 1, false);
+SELECT pg_catalog.setval('django_celery_beat_periodictask_id_seq', 1, false);
 
 
 --
 -- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.django_content_type_id_seq', 26, true);
+SELECT pg_catalog.setval('django_content_type_id_seq', 26, true);
 
 
 --
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.django_migrations_id_seq', 73, true);
+SELECT pg_catalog.setval('django_migrations_id_seq', 73, true);
 
 
 --
 -- Name: guardian_groupobjectpermission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.guardian_groupobjectpermission_id_seq', 1, false);
+SELECT pg_catalog.setval('guardian_groupobjectpermission_id_seq', 1, false);
 
 
 --
 -- Name: guardian_userobjectpermission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.guardian_userobjectpermission_id_seq', 266, true);
+SELECT pg_catalog.setval('guardian_userobjectpermission_id_seq', 266, true);
 
 
 --
 -- Name: recording_frame_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.recording_frame_id_seq', 3401, true);
+SELECT pg_catalog.setval('recording_frame_id_seq', 3401, true);
 
 
 --
 -- Name: recording_leaguematch_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.recording_leaguematch_id_seq', 168, true);
+SELECT pg_catalog.setval('recording_leaguematch_id_seq', 168, true);
 
 
 --
 -- Name: recording_match_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.recording_match_id_seq', 1685, true);
+SELECT pg_catalog.setval('recording_match_id_seq', 1685, true);
 
 
 --
 -- Name: schedule_matchweek_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.schedule_matchweek_id_seq', 28, true);
+SELECT pg_catalog.setval('schedule_matchweek_id_seq', 28, true);
 
 
 --
 -- Name: schedule_season_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.schedule_season_id_seq', 2, true);
+SELECT pg_catalog.setval('schedule_season_id_seq', 2, true);
 
 
 --
 -- Name: stats_playerranking_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.stats_playerranking_id_seq', 1940, true);
+SELECT pg_catalog.setval('stats_playerranking_id_seq', 1940, true);
 
 
 --
 -- Name: stats_teamranking_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qijiec
 --
 
-SELECT pg_catalog.setval('public.stats_teamranking_id_seq', 216, true);
+SELECT pg_catalog.setval('stats_teamranking_id_seq', 216, true);
 
 
 --
 -- Name: administration_group administration_group_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.administration_group
+ALTER TABLE ONLY administration_group
     ADD CONSTRAINT administration_group_pkey PRIMARY KEY (id);
 
 
@@ -13919,7 +13934,7 @@ ALTER TABLE ONLY public.administration_group
 -- Name: administration_league administration_league_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.administration_league
+ALTER TABLE ONLY administration_league
     ADD CONSTRAINT administration_league_pkey PRIMARY KEY (id);
 
 
@@ -13927,7 +13942,7 @@ ALTER TABLE ONLY public.administration_league
 -- Name: administration_member administration_member_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.administration_member
+ALTER TABLE ONLY administration_member
     ADD CONSTRAINT administration_member_pkey PRIMARY KEY (id);
 
 
@@ -13935,7 +13950,7 @@ ALTER TABLE ONLY public.administration_member
 -- Name: administration_player administration_player_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.administration_player
+ALTER TABLE ONLY administration_player
     ADD CONSTRAINT administration_player_pkey PRIMARY KEY (id);
 
 
@@ -13943,7 +13958,7 @@ ALTER TABLE ONLY public.administration_player
 -- Name: administration_player administration_player_user_id_key; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.administration_player
+ALTER TABLE ONLY administration_player
     ADD CONSTRAINT administration_player_user_id_key UNIQUE (user_id);
 
 
@@ -13951,7 +13966,7 @@ ALTER TABLE ONLY public.administration_player
 -- Name: administration_team administration_team_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.administration_team
+ALTER TABLE ONLY administration_team
     ADD CONSTRAINT administration_team_pkey PRIMARY KEY (group_ptr_id);
 
 
@@ -13959,7 +13974,7 @@ ALTER TABLE ONLY public.administration_team
 -- Name: administration_teamseasonal administration_teamseasonal_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.administration_teamseasonal
+ALTER TABLE ONLY administration_teamseasonal
     ADD CONSTRAINT administration_teamseasonal_pkey PRIMARY KEY (id);
 
 
@@ -13967,7 +13982,7 @@ ALTER TABLE ONLY public.administration_teamseasonal
 -- Name: auth_group auth_group_name_key; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_group
+ALTER TABLE ONLY auth_group
     ADD CONSTRAINT auth_group_name_key UNIQUE (name);
 
 
@@ -13975,7 +13990,7 @@ ALTER TABLE ONLY public.auth_group
 -- Name: auth_group_permissions auth_group_permissions_group_id_0cd325b0_uniq; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_group_permissions
+ALTER TABLE ONLY auth_group_permissions
     ADD CONSTRAINT auth_group_permissions_group_id_0cd325b0_uniq UNIQUE (group_id, permission_id);
 
 
@@ -13983,7 +13998,7 @@ ALTER TABLE ONLY public.auth_group_permissions
 -- Name: auth_group_permissions auth_group_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_group_permissions
+ALTER TABLE ONLY auth_group_permissions
     ADD CONSTRAINT auth_group_permissions_pkey PRIMARY KEY (id);
 
 
@@ -13991,7 +14006,7 @@ ALTER TABLE ONLY public.auth_group_permissions
 -- Name: auth_group auth_group_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_group
+ALTER TABLE ONLY auth_group
     ADD CONSTRAINT auth_group_pkey PRIMARY KEY (id);
 
 
@@ -13999,7 +14014,7 @@ ALTER TABLE ONLY public.auth_group
 -- Name: auth_permission auth_permission_content_type_id_01ab375a_uniq; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_permission
+ALTER TABLE ONLY auth_permission
     ADD CONSTRAINT auth_permission_content_type_id_01ab375a_uniq UNIQUE (content_type_id, codename);
 
 
@@ -14007,7 +14022,7 @@ ALTER TABLE ONLY public.auth_permission
 -- Name: auth_permission auth_permission_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_permission
+ALTER TABLE ONLY auth_permission
     ADD CONSTRAINT auth_permission_pkey PRIMARY KEY (id);
 
 
@@ -14015,7 +14030,7 @@ ALTER TABLE ONLY public.auth_permission
 -- Name: auth_user_groups auth_user_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_user_groups
+ALTER TABLE ONLY auth_user_groups
     ADD CONSTRAINT auth_user_groups_pkey PRIMARY KEY (id);
 
 
@@ -14023,7 +14038,7 @@ ALTER TABLE ONLY public.auth_user_groups
 -- Name: auth_user_groups auth_user_groups_user_id_94350c0c_uniq; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_user_groups
+ALTER TABLE ONLY auth_user_groups
     ADD CONSTRAINT auth_user_groups_user_id_94350c0c_uniq UNIQUE (user_id, group_id);
 
 
@@ -14031,7 +14046,7 @@ ALTER TABLE ONLY public.auth_user_groups
 -- Name: auth_user auth_user_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_user
+ALTER TABLE ONLY auth_user
     ADD CONSTRAINT auth_user_pkey PRIMARY KEY (id);
 
 
@@ -14039,7 +14054,7 @@ ALTER TABLE ONLY public.auth_user
 -- Name: auth_user_user_permissions auth_user_user_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_user_user_permissions
+ALTER TABLE ONLY auth_user_user_permissions
     ADD CONSTRAINT auth_user_user_permissions_pkey PRIMARY KEY (id);
 
 
@@ -14047,7 +14062,7 @@ ALTER TABLE ONLY public.auth_user_user_permissions
 -- Name: auth_user_user_permissions auth_user_user_permissions_user_id_14a6b632_uniq; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_user_user_permissions
+ALTER TABLE ONLY auth_user_user_permissions
     ADD CONSTRAINT auth_user_user_permissions_user_id_14a6b632_uniq UNIQUE (user_id, permission_id);
 
 
@@ -14055,7 +14070,7 @@ ALTER TABLE ONLY public.auth_user_user_permissions
 -- Name: auth_user auth_user_username_key; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_user
+ALTER TABLE ONLY auth_user
     ADD CONSTRAINT auth_user_username_key UNIQUE (username);
 
 
@@ -14063,7 +14078,7 @@ ALTER TABLE ONLY public.auth_user
 -- Name: django_admin_log django_admin_log_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.django_admin_log
+ALTER TABLE ONLY django_admin_log
     ADD CONSTRAINT django_admin_log_pkey PRIMARY KEY (id);
 
 
@@ -14071,7 +14086,7 @@ ALTER TABLE ONLY public.django_admin_log
 -- Name: django_celery_beat_crontabschedule django_celery_beat_crontabschedule_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.django_celery_beat_crontabschedule
+ALTER TABLE ONLY django_celery_beat_crontabschedule
     ADD CONSTRAINT django_celery_beat_crontabschedule_pkey PRIMARY KEY (id);
 
 
@@ -14079,7 +14094,7 @@ ALTER TABLE ONLY public.django_celery_beat_crontabschedule
 -- Name: django_celery_beat_intervalschedule django_celery_beat_intervalschedule_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.django_celery_beat_intervalschedule
+ALTER TABLE ONLY django_celery_beat_intervalschedule
     ADD CONSTRAINT django_celery_beat_intervalschedule_pkey PRIMARY KEY (id);
 
 
@@ -14087,7 +14102,7 @@ ALTER TABLE ONLY public.django_celery_beat_intervalschedule
 -- Name: django_celery_beat_periodictask django_celery_beat_periodictask_name_key; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.django_celery_beat_periodictask
+ALTER TABLE ONLY django_celery_beat_periodictask
     ADD CONSTRAINT django_celery_beat_periodictask_name_key UNIQUE (name);
 
 
@@ -14095,7 +14110,7 @@ ALTER TABLE ONLY public.django_celery_beat_periodictask
 -- Name: django_celery_beat_periodictask django_celery_beat_periodictask_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.django_celery_beat_periodictask
+ALTER TABLE ONLY django_celery_beat_periodictask
     ADD CONSTRAINT django_celery_beat_periodictask_pkey PRIMARY KEY (id);
 
 
@@ -14103,7 +14118,7 @@ ALTER TABLE ONLY public.django_celery_beat_periodictask
 -- Name: django_celery_beat_periodictasks django_celery_beat_periodictasks_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.django_celery_beat_periodictasks
+ALTER TABLE ONLY django_celery_beat_periodictasks
     ADD CONSTRAINT django_celery_beat_periodictasks_pkey PRIMARY KEY (ident);
 
 
@@ -14111,7 +14126,7 @@ ALTER TABLE ONLY public.django_celery_beat_periodictasks
 -- Name: django_content_type django_content_type_app_label_76bd3d3b_uniq; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.django_content_type
+ALTER TABLE ONLY django_content_type
     ADD CONSTRAINT django_content_type_app_label_76bd3d3b_uniq UNIQUE (app_label, model);
 
 
@@ -14119,7 +14134,7 @@ ALTER TABLE ONLY public.django_content_type
 -- Name: django_content_type django_content_type_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.django_content_type
+ALTER TABLE ONLY django_content_type
     ADD CONSTRAINT django_content_type_pkey PRIMARY KEY (id);
 
 
@@ -14127,7 +14142,7 @@ ALTER TABLE ONLY public.django_content_type
 -- Name: django_migrations django_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.django_migrations
+ALTER TABLE ONLY django_migrations
     ADD CONSTRAINT django_migrations_pkey PRIMARY KEY (id);
 
 
@@ -14135,7 +14150,7 @@ ALTER TABLE ONLY public.django_migrations
 -- Name: django_session django_session_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.django_session
+ALTER TABLE ONLY django_session
     ADD CONSTRAINT django_session_pkey PRIMARY KEY (session_key);
 
 
@@ -14143,7 +14158,7 @@ ALTER TABLE ONLY public.django_session
 -- Name: guardian_groupobjectpermission guardian_groupobjectperm_group_id_permission_id_o_3f189f7c_uniq; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.guardian_groupobjectpermission
+ALTER TABLE ONLY guardian_groupobjectpermission
     ADD CONSTRAINT guardian_groupobjectperm_group_id_permission_id_o_3f189f7c_uniq UNIQUE (group_id, permission_id, object_pk);
 
 
@@ -14151,7 +14166,7 @@ ALTER TABLE ONLY public.guardian_groupobjectpermission
 -- Name: guardian_groupobjectpermission guardian_groupobjectpermission_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.guardian_groupobjectpermission
+ALTER TABLE ONLY guardian_groupobjectpermission
     ADD CONSTRAINT guardian_groupobjectpermission_pkey PRIMARY KEY (id);
 
 
@@ -14159,7 +14174,7 @@ ALTER TABLE ONLY public.guardian_groupobjectpermission
 -- Name: guardian_userobjectpermission guardian_userobjectpermi_user_id_permission_id_ob_b0b3d2fc_uniq; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.guardian_userobjectpermission
+ALTER TABLE ONLY guardian_userobjectpermission
     ADD CONSTRAINT guardian_userobjectpermi_user_id_permission_id_ob_b0b3d2fc_uniq UNIQUE (user_id, permission_id, object_pk);
 
 
@@ -14167,7 +14182,7 @@ ALTER TABLE ONLY public.guardian_userobjectpermission
 -- Name: guardian_userobjectpermission guardian_userobjectpermission_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.guardian_userobjectpermission
+ALTER TABLE ONLY guardian_userobjectpermission
     ADD CONSTRAINT guardian_userobjectpermission_pkey PRIMARY KEY (id);
 
 
@@ -14175,7 +14190,7 @@ ALTER TABLE ONLY public.guardian_userobjectpermission
 -- Name: recording_frame recording_frame_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_frame
+ALTER TABLE ONLY recording_frame
     ADD CONSTRAINT recording_frame_pkey PRIMARY KEY (id);
 
 
@@ -14183,7 +14198,7 @@ ALTER TABLE ONLY public.recording_frame
 -- Name: recording_leagueframe recording_leagueframe_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_leagueframe
+ALTER TABLE ONLY recording_leagueframe
     ADD CONSTRAINT recording_leagueframe_pkey PRIMARY KEY (frame_ptr_id);
 
 
@@ -14191,7 +14206,7 @@ ALTER TABLE ONLY public.recording_leagueframe
 -- Name: recording_leaguematch recording_leaguematch_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_leaguematch
+ALTER TABLE ONLY recording_leaguematch
     ADD CONSTRAINT recording_leaguematch_pkey PRIMARY KEY (id);
 
 
@@ -14199,7 +14214,7 @@ ALTER TABLE ONLY public.recording_leaguematch
 -- Name: recording_match recording_match_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_match
+ALTER TABLE ONLY recording_match
     ADD CONSTRAINT recording_match_pkey PRIMARY KEY (id);
 
 
@@ -14207,7 +14222,7 @@ ALTER TABLE ONLY public.recording_match
 -- Name: schedule_matchweek schedule_matchweek_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.schedule_matchweek
+ALTER TABLE ONLY schedule_matchweek
     ADD CONSTRAINT schedule_matchweek_pkey PRIMARY KEY (id);
 
 
@@ -14215,7 +14230,7 @@ ALTER TABLE ONLY public.schedule_matchweek
 -- Name: schedule_season schedule_season_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.schedule_season
+ALTER TABLE ONLY schedule_season
     ADD CONSTRAINT schedule_season_pkey PRIMARY KEY (id);
 
 
@@ -14223,7 +14238,7 @@ ALTER TABLE ONLY public.schedule_season
 -- Name: stats_playerranking stats_playerranking_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.stats_playerranking
+ALTER TABLE ONLY stats_playerranking
     ADD CONSTRAINT stats_playerranking_pkey PRIMARY KEY (id);
 
 
@@ -14231,7 +14246,7 @@ ALTER TABLE ONLY public.stats_playerranking
 -- Name: stats_teamranking stats_teamranking_pkey; Type: CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.stats_teamranking
+ALTER TABLE ONLY stats_teamranking
     ADD CONSTRAINT stats_teamranking_pkey PRIMARY KEY (id);
 
 
@@ -14239,802 +14254,802 @@ ALTER TABLE ONLY public.stats_teamranking
 -- Name: administration_member_0e939a4f; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX administration_member_0e939a4f ON public.administration_member USING btree (group_id);
+CREATE INDEX administration_member_0e939a4f ON administration_member USING btree (group_id);
 
 
 --
 -- Name: administration_member_afe72417; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX administration_member_afe72417 ON public.administration_member USING btree (player_id);
+CREATE INDEX administration_member_afe72417 ON administration_member USING btree (player_id);
 
 
 --
 -- Name: administration_team_a07ab3f8; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX administration_team_a07ab3f8 ON public.administration_team USING btree (league_id);
+CREATE INDEX administration_team_a07ab3f8 ON administration_team USING btree (league_id);
 
 
 --
 -- Name: administration_team_captain_id_173a4b16; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX administration_team_captain_id_173a4b16 ON public.administration_team USING btree (captain_id);
+CREATE INDEX administration_team_captain_id_173a4b16 ON administration_team USING btree (captain_id);
 
 
 --
 -- Name: administration_teamseasonal_season_id_01888cd7; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX administration_teamseasonal_season_id_01888cd7 ON public.administration_teamseasonal USING btree (season_id);
+CREATE INDEX administration_teamseasonal_season_id_01888cd7 ON administration_teamseasonal USING btree (season_id);
 
 
 --
 -- Name: administration_teamseasonal_team_id_9589746a; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX administration_teamseasonal_team_id_9589746a ON public.administration_teamseasonal USING btree (team_id);
+CREATE INDEX administration_teamseasonal_team_id_9589746a ON administration_teamseasonal USING btree (team_id);
 
 
 --
 -- Name: auth_group_name_a6ea08ec_like; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX auth_group_name_a6ea08ec_like ON public.auth_group USING btree (name varchar_pattern_ops);
+CREATE INDEX auth_group_name_a6ea08ec_like ON auth_group USING btree (name varchar_pattern_ops);
 
 
 --
 -- Name: auth_group_permissions_0e939a4f; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX auth_group_permissions_0e939a4f ON public.auth_group_permissions USING btree (group_id);
+CREATE INDEX auth_group_permissions_0e939a4f ON auth_group_permissions USING btree (group_id);
 
 
 --
 -- Name: auth_group_permissions_8373b171; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX auth_group_permissions_8373b171 ON public.auth_group_permissions USING btree (permission_id);
+CREATE INDEX auth_group_permissions_8373b171 ON auth_group_permissions USING btree (permission_id);
 
 
 --
 -- Name: auth_permission_417f1b1c; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX auth_permission_417f1b1c ON public.auth_permission USING btree (content_type_id);
+CREATE INDEX auth_permission_417f1b1c ON auth_permission USING btree (content_type_id);
 
 
 --
 -- Name: auth_user_groups_0e939a4f; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX auth_user_groups_0e939a4f ON public.auth_user_groups USING btree (group_id);
+CREATE INDEX auth_user_groups_0e939a4f ON auth_user_groups USING btree (group_id);
 
 
 --
 -- Name: auth_user_groups_e8701ad4; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX auth_user_groups_e8701ad4 ON public.auth_user_groups USING btree (user_id);
+CREATE INDEX auth_user_groups_e8701ad4 ON auth_user_groups USING btree (user_id);
 
 
 --
 -- Name: auth_user_user_permissions_8373b171; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX auth_user_user_permissions_8373b171 ON public.auth_user_user_permissions USING btree (permission_id);
+CREATE INDEX auth_user_user_permissions_8373b171 ON auth_user_user_permissions USING btree (permission_id);
 
 
 --
 -- Name: auth_user_user_permissions_e8701ad4; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX auth_user_user_permissions_e8701ad4 ON public.auth_user_user_permissions USING btree (user_id);
+CREATE INDEX auth_user_user_permissions_e8701ad4 ON auth_user_user_permissions USING btree (user_id);
 
 
 --
 -- Name: auth_user_username_6821ab7c_like; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX auth_user_username_6821ab7c_like ON public.auth_user USING btree (username varchar_pattern_ops);
+CREATE INDEX auth_user_username_6821ab7c_like ON auth_user USING btree (username varchar_pattern_ops);
 
 
 --
 -- Name: django_admin_log_417f1b1c; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX django_admin_log_417f1b1c ON public.django_admin_log USING btree (content_type_id);
+CREATE INDEX django_admin_log_417f1b1c ON django_admin_log USING btree (content_type_id);
 
 
 --
 -- Name: django_admin_log_e8701ad4; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX django_admin_log_e8701ad4 ON public.django_admin_log USING btree (user_id);
+CREATE INDEX django_admin_log_e8701ad4 ON django_admin_log USING btree (user_id);
 
 
 --
 -- Name: django_celery_beat_periodictask_1dcd7040; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX django_celery_beat_periodictask_1dcd7040 ON public.django_celery_beat_periodictask USING btree (interval_id);
+CREATE INDEX django_celery_beat_periodictask_1dcd7040 ON django_celery_beat_periodictask USING btree (interval_id);
 
 
 --
 -- Name: django_celery_beat_periodictask_f3f0d72a; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX django_celery_beat_periodictask_f3f0d72a ON public.django_celery_beat_periodictask USING btree (crontab_id);
+CREATE INDEX django_celery_beat_periodictask_f3f0d72a ON django_celery_beat_periodictask USING btree (crontab_id);
 
 
 --
 -- Name: django_celery_beat_periodictask_name_265a36b7_like; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX django_celery_beat_periodictask_name_265a36b7_like ON public.django_celery_beat_periodictask USING btree (name varchar_pattern_ops);
+CREATE INDEX django_celery_beat_periodictask_name_265a36b7_like ON django_celery_beat_periodictask USING btree (name varchar_pattern_ops);
 
 
 --
 -- Name: django_session_de54fa62; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX django_session_de54fa62 ON public.django_session USING btree (expire_date);
+CREATE INDEX django_session_de54fa62 ON django_session USING btree (expire_date);
 
 
 --
 -- Name: django_session_session_key_c0390e0f_like; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX django_session_session_key_c0390e0f_like ON public.django_session USING btree (session_key varchar_pattern_ops);
+CREATE INDEX django_session_session_key_c0390e0f_like ON django_session USING btree (session_key varchar_pattern_ops);
 
 
 --
 -- Name: guardian_groupobjectpermission_content_type_id_7ade36b8; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX guardian_groupobjectpermission_content_type_id_7ade36b8 ON public.guardian_groupobjectpermission USING btree (content_type_id);
+CREATE INDEX guardian_groupobjectpermission_content_type_id_7ade36b8 ON guardian_groupobjectpermission USING btree (content_type_id);
 
 
 --
 -- Name: guardian_groupobjectpermission_group_id_4bbbfb62; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX guardian_groupobjectpermission_group_id_4bbbfb62 ON public.guardian_groupobjectpermission USING btree (group_id);
+CREATE INDEX guardian_groupobjectpermission_group_id_4bbbfb62 ON guardian_groupobjectpermission USING btree (group_id);
 
 
 --
 -- Name: guardian_groupobjectpermission_permission_id_36572738; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX guardian_groupobjectpermission_permission_id_36572738 ON public.guardian_groupobjectpermission USING btree (permission_id);
+CREATE INDEX guardian_groupobjectpermission_permission_id_36572738 ON guardian_groupobjectpermission USING btree (permission_id);
 
 
 --
 -- Name: guardian_userobjectpermission_content_type_id_2e892405; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX guardian_userobjectpermission_content_type_id_2e892405 ON public.guardian_userobjectpermission USING btree (content_type_id);
+CREATE INDEX guardian_userobjectpermission_content_type_id_2e892405 ON guardian_userobjectpermission USING btree (content_type_id);
 
 
 --
 -- Name: guardian_userobjectpermission_permission_id_71807bfc; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX guardian_userobjectpermission_permission_id_71807bfc ON public.guardian_userobjectpermission USING btree (permission_id);
+CREATE INDEX guardian_userobjectpermission_permission_id_71807bfc ON guardian_userobjectpermission USING btree (permission_id);
 
 
 --
 -- Name: guardian_userobjectpermission_user_id_d5c1e964; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX guardian_userobjectpermission_user_id_d5c1e964 ON public.guardian_userobjectpermission USING btree (user_id);
+CREATE INDEX guardian_userobjectpermission_user_id_d5c1e964 ON guardian_userobjectpermission USING btree (user_id);
 
 
 --
 -- Name: recording_frame_299556bf; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX recording_frame_299556bf ON public.recording_frame USING btree (break_player_id);
+CREATE INDEX recording_frame_299556bf ON recording_frame USING btree (break_player_id);
 
 
 --
 -- Name: recording_frame_afdcbe7c; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX recording_frame_afdcbe7c ON public.recording_frame USING btree (cleared_by_id);
+CREATE INDEX recording_frame_afdcbe7c ON recording_frame USING btree (cleared_by_id);
 
 
 --
 -- Name: recording_frame_ff9c4e4a; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX recording_frame_ff9c4e4a ON public.recording_frame USING btree (match_id);
+CREATE INDEX recording_frame_ff9c4e4a ON recording_frame USING btree (match_id);
 
 
 --
 -- Name: recording_leagueframe_27b0f3d2; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX recording_leagueframe_27b0f3d2 ON public.recording_leagueframe USING btree (league_match_id);
+CREATE INDEX recording_leagueframe_27b0f3d2 ON recording_leagueframe USING btree (league_match_id);
 
 
 --
 -- Name: recording_leagueframe_b9b95ece; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX recording_leagueframe_b9b95ece ON public.recording_leagueframe USING btree (home_player_id);
+CREATE INDEX recording_leagueframe_b9b95ece ON recording_leagueframe USING btree (home_player_id);
 
 
 --
 -- Name: recording_leagueframe_d03d6086; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX recording_leagueframe_d03d6086 ON public.recording_leagueframe USING btree (away_player_id);
+CREATE INDEX recording_leagueframe_d03d6086 ON recording_leagueframe USING btree (away_player_id);
 
 
 --
 -- Name: recording_leaguematch_a07ab3f8; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX recording_leaguematch_a07ab3f8 ON public.recording_leaguematch USING btree (league_id);
+CREATE INDEX recording_leaguematch_a07ab3f8 ON recording_leaguematch USING btree (league_id);
 
 
 --
 -- Name: recording_leaguematch_b11701f0; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX recording_leaguematch_b11701f0 ON public.recording_leaguematch USING btree (season_id);
+CREATE INDEX recording_leaguematch_b11701f0 ON recording_leaguematch USING btree (season_id);
 
 
 --
 -- Name: recording_leaguematch_b9b95ece; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX recording_leaguematch_b9b95ece ON public.recording_leaguematch USING btree (home_id);
+CREATE INDEX recording_leaguematch_b9b95ece ON recording_leaguematch USING btree (home_id);
 
 
 --
 -- Name: recording_leaguematch_c01e06f5; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX recording_leaguematch_c01e06f5 ON public.recording_leaguematch USING btree (week_id);
+CREATE INDEX recording_leaguematch_c01e06f5 ON recording_leaguematch USING btree (week_id);
 
 
 --
 -- Name: recording_leaguematch_c8ac5278; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX recording_leaguematch_c8ac5278 ON public.recording_leaguematch USING btree (winner_id);
+CREATE INDEX recording_leaguematch_c8ac5278 ON recording_leaguematch USING btree (winner_id);
 
 
 --
 -- Name: recording_leaguematch_d03d6086; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX recording_leaguematch_d03d6086 ON public.recording_leaguematch USING btree (away_id);
+CREATE INDEX recording_leaguematch_d03d6086 ON recording_leaguematch USING btree (away_id);
 
 
 --
 -- Name: recording_match_b11701f0; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX recording_match_b11701f0 ON public.recording_match USING btree (season_id);
+CREATE INDEX recording_match_b11701f0 ON recording_match USING btree (season_id);
 
 
 --
 -- Name: recording_match_b9b95ece; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX recording_match_b9b95ece ON public.recording_match USING btree (home_id);
+CREATE INDEX recording_match_b9b95ece ON recording_match USING btree (home_id);
 
 
 --
 -- Name: recording_match_c01e06f5; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX recording_match_c01e06f5 ON public.recording_match USING btree (week_id);
+CREATE INDEX recording_match_c01e06f5 ON recording_match USING btree (week_id);
 
 
 --
 -- Name: recording_match_c8ac5278; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX recording_match_c8ac5278 ON public.recording_match USING btree (winner_id);
+CREATE INDEX recording_match_c8ac5278 ON recording_match USING btree (winner_id);
 
 
 --
 -- Name: recording_match_d03d6086; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX recording_match_d03d6086 ON public.recording_match USING btree (away_id);
+CREATE INDEX recording_match_d03d6086 ON recording_match USING btree (away_id);
 
 
 --
 -- Name: schedule_season_league_id_d8f0e37d; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX schedule_season_league_id_d8f0e37d ON public.schedule_season USING btree (league_id);
+CREATE INDEX schedule_season_league_id_d8f0e37d ON schedule_season USING btree (league_id);
 
 
 --
 -- Name: stats_playerranking_league_id_61993566; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX stats_playerranking_league_id_61993566 ON public.stats_playerranking USING btree (league_id);
+CREATE INDEX stats_playerranking_league_id_61993566 ON stats_playerranking USING btree (league_id);
 
 
 --
 -- Name: stats_playerranking_player_id_642fa4b5; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX stats_playerranking_player_id_642fa4b5 ON public.stats_playerranking USING btree (player_id);
+CREATE INDEX stats_playerranking_player_id_642fa4b5 ON stats_playerranking USING btree (player_id);
 
 
 --
 -- Name: stats_playerranking_season_id_7f147cf9; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX stats_playerranking_season_id_7f147cf9 ON public.stats_playerranking USING btree (season_id);
+CREATE INDEX stats_playerranking_season_id_7f147cf9 ON stats_playerranking USING btree (season_id);
 
 
 --
 -- Name: stats_playerranking_week_id_d096cfb3; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX stats_playerranking_week_id_d096cfb3 ON public.stats_playerranking USING btree (week_id);
+CREATE INDEX stats_playerranking_week_id_d096cfb3 ON stats_playerranking USING btree (week_id);
 
 
 --
 -- Name: stats_teamranking_league_id_428b1874; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX stats_teamranking_league_id_428b1874 ON public.stats_teamranking USING btree (league_id);
+CREATE INDEX stats_teamranking_league_id_428b1874 ON stats_teamranking USING btree (league_id);
 
 
 --
 -- Name: stats_teamranking_season_id_fbdefe21; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX stats_teamranking_season_id_fbdefe21 ON public.stats_teamranking USING btree (season_id);
+CREATE INDEX stats_teamranking_season_id_fbdefe21 ON stats_teamranking USING btree (season_id);
 
 
 --
 -- Name: stats_teamranking_team_id_77341361; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX stats_teamranking_team_id_77341361 ON public.stats_teamranking USING btree (team_id);
+CREATE INDEX stats_teamranking_team_id_77341361 ON stats_teamranking USING btree (team_id);
 
 
 --
 -- Name: stats_teamranking_weak_id_83d32277; Type: INDEX; Schema: public; Owner: qijiec
 --
 
-CREATE INDEX stats_teamranking_weak_id_83d32277 ON public.stats_teamranking USING btree (week_id);
+CREATE INDEX stats_teamranking_weak_id_83d32277 ON stats_teamranking USING btree (week_id);
 
 
 --
 -- Name: administration_team administration_group_ptr_id_e2167439_fk_administration_group_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.administration_team
-    ADD CONSTRAINT administration_group_ptr_id_e2167439_fk_administration_group_id FOREIGN KEY (group_ptr_id) REFERENCES public.administration_group(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY administration_team
+    ADD CONSTRAINT administration_group_ptr_id_e2167439_fk_administration_group_id FOREIGN KEY (group_ptr_id) REFERENCES administration_group(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: administration_member administration_m_player_id_bfc18735_fk_administration_player_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.administration_member
-    ADD CONSTRAINT administration_m_player_id_bfc18735_fk_administration_player_id FOREIGN KEY (player_id) REFERENCES public.administration_player(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY administration_member
+    ADD CONSTRAINT administration_m_player_id_bfc18735_fk_administration_player_id FOREIGN KEY (player_id) REFERENCES administration_player(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: administration_member administration_mem_group_id_b91f06d0_fk_administration_group_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.administration_member
-    ADD CONSTRAINT administration_mem_group_id_b91f06d0_fk_administration_group_id FOREIGN KEY (group_id) REFERENCES public.administration_group(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY administration_member
+    ADD CONSTRAINT administration_mem_group_id_b91f06d0_fk_administration_group_id FOREIGN KEY (group_id) REFERENCES administration_group(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: administration_player administration_player_user_id_6aea7233_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.administration_player
-    ADD CONSTRAINT administration_player_user_id_6aea7233_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY administration_player
+    ADD CONSTRAINT administration_player_user_id_6aea7233_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: administration_team administration_t_league_id_7b6cb4c2_fk_administration_league_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.administration_team
-    ADD CONSTRAINT administration_t_league_id_7b6cb4c2_fk_administration_league_id FOREIGN KEY (league_id) REFERENCES public.administration_league(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY administration_team
+    ADD CONSTRAINT administration_t_league_id_7b6cb4c2_fk_administration_league_id FOREIGN KEY (league_id) REFERENCES administration_league(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: administration_team administration_team_captain_id_173a4b16_fk_administr; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.administration_team
-    ADD CONSTRAINT administration_team_captain_id_173a4b16_fk_administr FOREIGN KEY (captain_id) REFERENCES public.administration_member(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY administration_team
+    ADD CONSTRAINT administration_team_captain_id_173a4b16_fk_administr FOREIGN KEY (captain_id) REFERENCES administration_member(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: administration_teamseasonal administration_teams_season_id_01888cd7_fk_schedule_; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.administration_teamseasonal
-    ADD CONSTRAINT administration_teams_season_id_01888cd7_fk_schedule_ FOREIGN KEY (season_id) REFERENCES public.schedule_season(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY administration_teamseasonal
+    ADD CONSTRAINT administration_teams_season_id_01888cd7_fk_schedule_ FOREIGN KEY (season_id) REFERENCES schedule_season(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: administration_teamseasonal administration_teams_team_id_9589746a_fk_administr; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.administration_teamseasonal
-    ADD CONSTRAINT administration_teams_team_id_9589746a_fk_administr FOREIGN KEY (team_id) REFERENCES public.administration_team(group_ptr_id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY administration_teamseasonal
+    ADD CONSTRAINT administration_teams_team_id_9589746a_fk_administr FOREIGN KEY (team_id) REFERENCES administration_team(group_ptr_id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: auth_group_permissions auth_group_permiss_permission_id_84c5c92e_fk_auth_permission_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_group_permissions
-    ADD CONSTRAINT auth_group_permiss_permission_id_84c5c92e_fk_auth_permission_id FOREIGN KEY (permission_id) REFERENCES public.auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY auth_group_permissions
+    ADD CONSTRAINT auth_group_permiss_permission_id_84c5c92e_fk_auth_permission_id FOREIGN KEY (permission_id) REFERENCES auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: auth_group_permissions auth_group_permissions_group_id_b120cbf9_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_group_permissions
-    ADD CONSTRAINT auth_group_permissions_group_id_b120cbf9_fk_auth_group_id FOREIGN KEY (group_id) REFERENCES public.auth_group(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY auth_group_permissions
+    ADD CONSTRAINT auth_group_permissions_group_id_b120cbf9_fk_auth_group_id FOREIGN KEY (group_id) REFERENCES auth_group(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: auth_permission auth_permiss_content_type_id_2f476e4b_fk_django_content_type_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_permission
-    ADD CONSTRAINT auth_permiss_content_type_id_2f476e4b_fk_django_content_type_id FOREIGN KEY (content_type_id) REFERENCES public.django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY auth_permission
+    ADD CONSTRAINT auth_permiss_content_type_id_2f476e4b_fk_django_content_type_id FOREIGN KEY (content_type_id) REFERENCES django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: auth_user_groups auth_user_groups_group_id_97559544_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_user_groups
-    ADD CONSTRAINT auth_user_groups_group_id_97559544_fk_auth_group_id FOREIGN KEY (group_id) REFERENCES public.auth_group(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY auth_user_groups
+    ADD CONSTRAINT auth_user_groups_group_id_97559544_fk_auth_group_id FOREIGN KEY (group_id) REFERENCES auth_group(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: auth_user_groups auth_user_groups_user_id_6a12ed8b_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_user_groups
-    ADD CONSTRAINT auth_user_groups_user_id_6a12ed8b_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY auth_user_groups
+    ADD CONSTRAINT auth_user_groups_user_id_6a12ed8b_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: auth_user_user_permissions auth_user_user_per_permission_id_1fbb5f2c_fk_auth_permission_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_user_user_permissions
-    ADD CONSTRAINT auth_user_user_per_permission_id_1fbb5f2c_fk_auth_permission_id FOREIGN KEY (permission_id) REFERENCES public.auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY auth_user_user_permissions
+    ADD CONSTRAINT auth_user_user_per_permission_id_1fbb5f2c_fk_auth_permission_id FOREIGN KEY (permission_id) REFERENCES auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: auth_user_user_permissions auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.auth_user_user_permissions
-    ADD CONSTRAINT auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY auth_user_user_permissions
+    ADD CONSTRAINT auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: django_celery_beat_periodictask dj_crontab_id_d3cba168_fk_django_celery_beat_crontabschedule_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.django_celery_beat_periodictask
-    ADD CONSTRAINT dj_crontab_id_d3cba168_fk_django_celery_beat_crontabschedule_id FOREIGN KEY (crontab_id) REFERENCES public.django_celery_beat_crontabschedule(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY django_celery_beat_periodictask
+    ADD CONSTRAINT dj_crontab_id_d3cba168_fk_django_celery_beat_crontabschedule_id FOREIGN KEY (crontab_id) REFERENCES django_celery_beat_crontabschedule(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: django_admin_log django_admin_content_type_id_c4bce8eb_fk_django_content_type_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.django_admin_log
-    ADD CONSTRAINT django_admin_content_type_id_c4bce8eb_fk_django_content_type_id FOREIGN KEY (content_type_id) REFERENCES public.django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY django_admin_log
+    ADD CONSTRAINT django_admin_content_type_id_c4bce8eb_fk_django_content_type_id FOREIGN KEY (content_type_id) REFERENCES django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: django_admin_log django_admin_log_user_id_c564eba6_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.django_admin_log
-    ADD CONSTRAINT django_admin_log_user_id_c564eba6_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY django_admin_log
+    ADD CONSTRAINT django_admin_log_user_id_c564eba6_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: guardian_groupobjectpermission guardian_groupobject_content_type_id_7ade36b8_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.guardian_groupobjectpermission
-    ADD CONSTRAINT guardian_groupobject_content_type_id_7ade36b8_fk_django_co FOREIGN KEY (content_type_id) REFERENCES public.django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY guardian_groupobjectpermission
+    ADD CONSTRAINT guardian_groupobject_content_type_id_7ade36b8_fk_django_co FOREIGN KEY (content_type_id) REFERENCES django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: guardian_groupobjectpermission guardian_groupobject_group_id_4bbbfb62_fk_auth_grou; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.guardian_groupobjectpermission
-    ADD CONSTRAINT guardian_groupobject_group_id_4bbbfb62_fk_auth_grou FOREIGN KEY (group_id) REFERENCES public.auth_group(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY guardian_groupobjectpermission
+    ADD CONSTRAINT guardian_groupobject_group_id_4bbbfb62_fk_auth_grou FOREIGN KEY (group_id) REFERENCES auth_group(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: guardian_groupobjectpermission guardian_groupobject_permission_id_36572738_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.guardian_groupobjectpermission
-    ADD CONSTRAINT guardian_groupobject_permission_id_36572738_fk_auth_perm FOREIGN KEY (permission_id) REFERENCES public.auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY guardian_groupobjectpermission
+    ADD CONSTRAINT guardian_groupobject_permission_id_36572738_fk_auth_perm FOREIGN KEY (permission_id) REFERENCES auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: guardian_userobjectpermission guardian_userobjectp_content_type_id_2e892405_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.guardian_userobjectpermission
-    ADD CONSTRAINT guardian_userobjectp_content_type_id_2e892405_fk_django_co FOREIGN KEY (content_type_id) REFERENCES public.django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY guardian_userobjectpermission
+    ADD CONSTRAINT guardian_userobjectp_content_type_id_2e892405_fk_django_co FOREIGN KEY (content_type_id) REFERENCES django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: guardian_userobjectpermission guardian_userobjectp_permission_id_71807bfc_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.guardian_userobjectpermission
-    ADD CONSTRAINT guardian_userobjectp_permission_id_71807bfc_fk_auth_perm FOREIGN KEY (permission_id) REFERENCES public.auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY guardian_userobjectpermission
+    ADD CONSTRAINT guardian_userobjectp_permission_id_71807bfc_fk_auth_perm FOREIGN KEY (permission_id) REFERENCES auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: guardian_userobjectpermission guardian_userobjectpermission_user_id_d5c1e964_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.guardian_userobjectpermission
-    ADD CONSTRAINT guardian_userobjectpermission_user_id_d5c1e964_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY guardian_userobjectpermission
+    ADD CONSTRAINT guardian_userobjectpermission_user_id_d5c1e964_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: django_celery_beat_periodictask interval_id_a8ca27da_fk_django_celery_beat_intervalschedule_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.django_celery_beat_periodictask
-    ADD CONSTRAINT interval_id_a8ca27da_fk_django_celery_beat_intervalschedule_id FOREIGN KEY (interval_id) REFERENCES public.django_celery_beat_intervalschedule(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY django_celery_beat_periodictask
+    ADD CONSTRAINT interval_id_a8ca27da_fk_django_celery_beat_intervalschedule_id FOREIGN KEY (interval_id) REFERENCES django_celery_beat_intervalschedule(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: recording_leaguematch recordin_winner_id_4f92492a_fk_administration_team_group_ptr_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_leaguematch
-    ADD CONSTRAINT recordin_winner_id_4f92492a_fk_administration_team_group_ptr_id FOREIGN KEY (winner_id) REFERENCES public.administration_team(group_ptr_id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY recording_leaguematch
+    ADD CONSTRAINT recordin_winner_id_4f92492a_fk_administration_team_group_ptr_id FOREIGN KEY (winner_id) REFERENCES administration_team(group_ptr_id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: recording_leaguematch recording__away_id_83fd89da_fk_administration_team_group_ptr_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_leaguematch
-    ADD CONSTRAINT recording__away_id_83fd89da_fk_administration_team_group_ptr_id FOREIGN KEY (away_id) REFERENCES public.administration_team(group_ptr_id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY recording_leaguematch
+    ADD CONSTRAINT recording__away_id_83fd89da_fk_administration_team_group_ptr_id FOREIGN KEY (away_id) REFERENCES administration_team(group_ptr_id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: recording_frame recording__break_player_id_08b533cf_fk_administration_member_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_frame
-    ADD CONSTRAINT recording__break_player_id_08b533cf_fk_administration_member_id FOREIGN KEY (break_player_id) REFERENCES public.administration_member(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY recording_frame
+    ADD CONSTRAINT recording__break_player_id_08b533cf_fk_administration_member_id FOREIGN KEY (break_player_id) REFERENCES administration_member(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: recording_leaguematch recording__home_id_2f8f8541_fk_administration_team_group_ptr_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_leaguematch
-    ADD CONSTRAINT recording__home_id_2f8f8541_fk_administration_team_group_ptr_id FOREIGN KEY (home_id) REFERENCES public.administration_team(group_ptr_id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY recording_leaguematch
+    ADD CONSTRAINT recording__home_id_2f8f8541_fk_administration_team_group_ptr_id FOREIGN KEY (home_id) REFERENCES administration_team(group_ptr_id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: recording_leagueframe recording__league_match_id_494e32de_fk_recording_leaguematch_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_leagueframe
-    ADD CONSTRAINT recording__league_match_id_494e32de_fk_recording_leaguematch_id FOREIGN KEY (league_match_id) REFERENCES public.recording_leaguematch(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY recording_leagueframe
+    ADD CONSTRAINT recording__league_match_id_494e32de_fk_recording_leaguematch_id FOREIGN KEY (league_match_id) REFERENCES recording_leaguematch(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: recording_frame recording_fr_cleared_by_id_2188e55d_fk_administration_member_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_frame
-    ADD CONSTRAINT recording_fr_cleared_by_id_2188e55d_fk_administration_member_id FOREIGN KEY (cleared_by_id) REFERENCES public.administration_member(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY recording_frame
+    ADD CONSTRAINT recording_fr_cleared_by_id_2188e55d_fk_administration_member_id FOREIGN KEY (cleared_by_id) REFERENCES administration_member(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: recording_frame recording_frame_match_id_c5259287_fk_recording_match_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_frame
-    ADD CONSTRAINT recording_frame_match_id_c5259287_fk_recording_match_id FOREIGN KEY (match_id) REFERENCES public.recording_match(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY recording_frame
+    ADD CONSTRAINT recording_frame_match_id_c5259287_fk_recording_match_id FOREIGN KEY (match_id) REFERENCES recording_match(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: recording_leagueframe recording_l_away_player_id_e0a04ceb_fk_administration_member_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_leagueframe
-    ADD CONSTRAINT recording_l_away_player_id_e0a04ceb_fk_administration_member_id FOREIGN KEY (away_player_id) REFERENCES public.administration_member(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY recording_leagueframe
+    ADD CONSTRAINT recording_l_away_player_id_e0a04ceb_fk_administration_member_id FOREIGN KEY (away_player_id) REFERENCES administration_member(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: recording_leagueframe recording_l_home_player_id_956424a1_fk_administration_member_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_leagueframe
-    ADD CONSTRAINT recording_l_home_player_id_956424a1_fk_administration_member_id FOREIGN KEY (home_player_id) REFERENCES public.administration_member(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY recording_leagueframe
+    ADD CONSTRAINT recording_l_home_player_id_956424a1_fk_administration_member_id FOREIGN KEY (home_player_id) REFERENCES administration_member(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: recording_leaguematch recording_league_league_id_f49c0152_fk_administration_league_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_leaguematch
-    ADD CONSTRAINT recording_league_league_id_f49c0152_fk_administration_league_id FOREIGN KEY (league_id) REFERENCES public.administration_league(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY recording_leaguematch
+    ADD CONSTRAINT recording_league_league_id_f49c0152_fk_administration_league_id FOREIGN KEY (league_id) REFERENCES administration_league(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: recording_leagueframe recording_leaguefra_frame_ptr_id_be55a11d_fk_recording_frame_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_leagueframe
-    ADD CONSTRAINT recording_leaguefra_frame_ptr_id_be55a11d_fk_recording_frame_id FOREIGN KEY (frame_ptr_id) REFERENCES public.recording_frame(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY recording_leagueframe
+    ADD CONSTRAINT recording_leaguefra_frame_ptr_id_be55a11d_fk_recording_frame_id FOREIGN KEY (frame_ptr_id) REFERENCES recording_frame(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: recording_leaguematch recording_leaguematch_season_id_ff8bd255_fk_schedule_season_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_leaguematch
-    ADD CONSTRAINT recording_leaguematch_season_id_ff8bd255_fk_schedule_season_id FOREIGN KEY (season_id) REFERENCES public.schedule_season(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY recording_leaguematch
+    ADD CONSTRAINT recording_leaguematch_season_id_ff8bd255_fk_schedule_season_id FOREIGN KEY (season_id) REFERENCES schedule_season(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: recording_leaguematch recording_leaguematch_week_id_b3072ae8_fk_schedule_matchweek_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_leaguematch
-    ADD CONSTRAINT recording_leaguematch_week_id_b3072ae8_fk_schedule_matchweek_id FOREIGN KEY (week_id) REFERENCES public.schedule_matchweek(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY recording_leaguematch
+    ADD CONSTRAINT recording_leaguematch_week_id_b3072ae8_fk_schedule_matchweek_id FOREIGN KEY (week_id) REFERENCES schedule_matchweek(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: recording_match recording_match_away_id_e7a3ca03_fk_administration_member_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_match
-    ADD CONSTRAINT recording_match_away_id_e7a3ca03_fk_administration_member_id FOREIGN KEY (away_id) REFERENCES public.administration_member(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY recording_match
+    ADD CONSTRAINT recording_match_away_id_e7a3ca03_fk_administration_member_id FOREIGN KEY (away_id) REFERENCES administration_member(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: recording_match recording_match_home_id_e0cecce5_fk_administration_member_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_match
-    ADD CONSTRAINT recording_match_home_id_e0cecce5_fk_administration_member_id FOREIGN KEY (home_id) REFERENCES public.administration_member(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY recording_match
+    ADD CONSTRAINT recording_match_home_id_e0cecce5_fk_administration_member_id FOREIGN KEY (home_id) REFERENCES administration_member(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: recording_match recording_match_season_id_1f164f79_fk_schedule_season_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_match
-    ADD CONSTRAINT recording_match_season_id_1f164f79_fk_schedule_season_id FOREIGN KEY (season_id) REFERENCES public.schedule_season(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY recording_match
+    ADD CONSTRAINT recording_match_season_id_1f164f79_fk_schedule_season_id FOREIGN KEY (season_id) REFERENCES schedule_season(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: recording_match recording_match_week_id_c47b6110_fk_schedule_matchweek_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_match
-    ADD CONSTRAINT recording_match_week_id_c47b6110_fk_schedule_matchweek_id FOREIGN KEY (week_id) REFERENCES public.schedule_matchweek(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY recording_match
+    ADD CONSTRAINT recording_match_week_id_c47b6110_fk_schedule_matchweek_id FOREIGN KEY (week_id) REFERENCES schedule_matchweek(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: recording_match recording_match_winner_id_6a96f18f_fk_administration_member_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.recording_match
-    ADD CONSTRAINT recording_match_winner_id_6a96f18f_fk_administration_member_id FOREIGN KEY (winner_id) REFERENCES public.administration_member(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY recording_match
+    ADD CONSTRAINT recording_match_winner_id_6a96f18f_fk_administration_member_id FOREIGN KEY (winner_id) REFERENCES administration_member(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: schedule_matchweek schedule_matchweek_season_id_e01308a8_fk_schedule_season_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.schedule_matchweek
-    ADD CONSTRAINT schedule_matchweek_season_id_e01308a8_fk_schedule_season_id FOREIGN KEY (season_id) REFERENCES public.schedule_season(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY schedule_matchweek
+    ADD CONSTRAINT schedule_matchweek_season_id_e01308a8_fk_schedule_season_id FOREIGN KEY (season_id) REFERENCES schedule_season(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: schedule_season schedule_season_league_id_d8f0e37d_fk_administration_league_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.schedule_season
-    ADD CONSTRAINT schedule_season_league_id_d8f0e37d_fk_administration_league_id FOREIGN KEY (league_id) REFERENCES public.administration_league(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY schedule_season
+    ADD CONSTRAINT schedule_season_league_id_d8f0e37d_fk_administration_league_id FOREIGN KEY (league_id) REFERENCES administration_league(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: stats_playerranking stats_playerranking_league_id_61993566_fk_administr; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.stats_playerranking
-    ADD CONSTRAINT stats_playerranking_league_id_61993566_fk_administr FOREIGN KEY (league_id) REFERENCES public.administration_league(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY stats_playerranking
+    ADD CONSTRAINT stats_playerranking_league_id_61993566_fk_administr FOREIGN KEY (league_id) REFERENCES administration_league(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: stats_playerranking stats_playerranking_player_id_642fa4b5_fk_administr; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.stats_playerranking
-    ADD CONSTRAINT stats_playerranking_player_id_642fa4b5_fk_administr FOREIGN KEY (player_id) REFERENCES public.administration_member(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY stats_playerranking
+    ADD CONSTRAINT stats_playerranking_player_id_642fa4b5_fk_administr FOREIGN KEY (player_id) REFERENCES administration_member(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: stats_playerranking stats_playerranking_season_id_7f147cf9_fk_schedule_season_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.stats_playerranking
-    ADD CONSTRAINT stats_playerranking_season_id_7f147cf9_fk_schedule_season_id FOREIGN KEY (season_id) REFERENCES public.schedule_season(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY stats_playerranking
+    ADD CONSTRAINT stats_playerranking_season_id_7f147cf9_fk_schedule_season_id FOREIGN KEY (season_id) REFERENCES schedule_season(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: stats_playerranking stats_playerranking_week_id_d096cfb3_fk_schedule_matchweek_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.stats_playerranking
-    ADD CONSTRAINT stats_playerranking_week_id_d096cfb3_fk_schedule_matchweek_id FOREIGN KEY (week_id) REFERENCES public.schedule_matchweek(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY stats_playerranking
+    ADD CONSTRAINT stats_playerranking_week_id_d096cfb3_fk_schedule_matchweek_id FOREIGN KEY (week_id) REFERENCES schedule_matchweek(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: stats_teamranking stats_teamranking_league_id_428b1874_fk_administr; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.stats_teamranking
-    ADD CONSTRAINT stats_teamranking_league_id_428b1874_fk_administr FOREIGN KEY (league_id) REFERENCES public.administration_league(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY stats_teamranking
+    ADD CONSTRAINT stats_teamranking_league_id_428b1874_fk_administr FOREIGN KEY (league_id) REFERENCES administration_league(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: stats_teamranking stats_teamranking_season_id_fbdefe21_fk_schedule_season_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.stats_teamranking
-    ADD CONSTRAINT stats_teamranking_season_id_fbdefe21_fk_schedule_season_id FOREIGN KEY (season_id) REFERENCES public.schedule_season(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY stats_teamranking
+    ADD CONSTRAINT stats_teamranking_season_id_fbdefe21_fk_schedule_season_id FOREIGN KEY (season_id) REFERENCES schedule_season(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: stats_teamranking stats_teamranking_team_id_77341361_fk_administr; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.stats_teamranking
-    ADD CONSTRAINT stats_teamranking_team_id_77341361_fk_administr FOREIGN KEY (team_id) REFERENCES public.administration_team(group_ptr_id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY stats_teamranking
+    ADD CONSTRAINT stats_teamranking_team_id_77341361_fk_administr FOREIGN KEY (team_id) REFERENCES administration_team(group_ptr_id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
 -- Name: stats_teamranking stats_teamranking_week_id_285ad6e0_fk_schedule_matchweek_id; Type: FK CONSTRAINT; Schema: public; Owner: qijiec
 --
 
-ALTER TABLE ONLY public.stats_teamranking
-    ADD CONSTRAINT stats_teamranking_week_id_285ad6e0_fk_schedule_matchweek_id FOREIGN KEY (week_id) REFERENCES public.schedule_matchweek(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY stats_teamranking
+    ADD CONSTRAINT stats_teamranking_week_id_285ad6e0_fk_schedule_matchweek_id FOREIGN KEY (week_id) REFERENCES schedule_matchweek(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --

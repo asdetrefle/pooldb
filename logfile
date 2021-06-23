@@ -9,3 +9,70 @@ LOG:  database system was shut down at 2017-11-17 21:33:42 HKT
 LOG:  MultiXact member wraparound protections are now enabled
 LOG:  database system is ready to accept connections
 LOG:  autovacuum launcher started
+LOG:  received smart shutdown request
+LOG:  autovacuum launcher shutting down
+LOG:  shutting down
+LOG:  database system is shut down
+LOG:  database system was shut down at 2017-12-17 19:34:38 HKT
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+FATAL:  lock file "postmaster.pid" already exists
+HINT:  Is another postmaster (PID 598) running in data directory "/usr/local/var/postgres"?
+FATAL:  lock file "postmaster.pid" already exists
+HINT:  Is another postmaster (PID 598) running in data directory "/usr/local/var/postgres"?
+LOG:  database system was shut down at 2017-12-29 15:10:06 HKT
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  autovacuum launcher started
+LOG:  database system is ready to accept connections
+2018-01-14 18:00:54.591 HKT [10417] FATAL:  database files are incompatible with server
+2018-01-14 18:00:54.591 HKT [10417] DETAIL:  The data directory was initialized by PostgreSQL version 9.6, which is not compatible with this version 10.1.
+2018-01-14 18:02:04.930 HKT [10462] FATAL:  database files are incompatible with server
+2018-01-14 18:02:04.930 HKT [10462] DETAIL:  The data directory was initialized by PostgreSQL version 9.6, which is not compatible with this version 10.1.
+2018-01-14 18:06:26.611 HKT [10669] FATAL:  database files are incompatible with server
+2018-01-14 18:06:26.611 HKT [10669] DETAIL:  The data directory was initialized by PostgreSQL version 9.6, which is not compatible with this version 10.1.
+2018-01-14 21:47:42.591 HKT [1316] LOG:  listening on IPv6 address "::1", port 5432
+2018-01-14 21:47:42.592 HKT [1316] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2018-01-14 21:47:42.593 HKT [1316] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2018-01-14 21:47:42.620 HKT [1317] LOG:  database system was shut down at 2018-01-14 18:35:22 HKT
+2018-01-14 21:47:42.625 HKT [1316] LOG:  database system is ready to accept connections
+2018-01-30 18:58:50.894 HKT [697] LOG:  listening on IPv6 address "::1", port 5432
+2018-01-30 18:58:50.894 HKT [697] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2018-01-30 18:58:50.895 HKT [697] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2018-01-30 18:58:50.923 HKT [698] LOG:  database system was interrupted; last known up at 2018-01-19 12:16:32 HKT
+2018-01-30 18:58:51.107 HKT [698] LOG:  database system was not properly shut down; automatic recovery in progress
+2018-01-30 18:58:51.112 HKT [698] LOG:  redo starts at 0/943B170
+2018-01-30 18:58:51.112 HKT [698] LOG:  invalid record length at 0/943B250: wanted 24, got 0
+2018-01-30 18:58:51.112 HKT [698] LOG:  redo done at 0/943B218
+2018-01-30 18:58:51.131 HKT [697] LOG:  database system is ready to accept connections
+2018-02-04 22:55:39.684 HKT [697] LOG:  received smart shutdown request
+2018-02-04 22:55:39.690 HKT [697] LOG:  worker process: logical replication launcher (PID 704) exited with exit code 1
+2018-02-04 22:55:39.690 HKT [699] LOG:  shutting down
+2018-02-04 22:55:39.713 HKT [697] LOG:  database system is shut down
+2018-02-04 23:19:43.976 HKT [980] LOG:  listening on IPv6 address "::1", port 5432
+2018-02-04 23:19:43.976 HKT [980] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2018-02-04 23:19:43.977 HKT [980] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2018-02-04 23:19:44.034 HKT [981] LOG:  database system was shut down at 2018-02-04 22:55:39 HKT
+2018-02-04 23:19:44.050 HKT [980] LOG:  database system is ready to accept connections
+2018-02-12 22:14:06.501 HKT [18072] ERROR:  unrecognized configuration parameter "tables"
+2018-02-12 22:14:06.501 HKT [18072] STATEMENT:  show tables;
+2018-02-12 22:14:09.796 HKT [18072] ERROR:  syntax error at or near ";" at character 5
+2018-02-12 22:14:09.796 HKT [18072] STATEMENT:  show;
+2018-02-12 22:17:00.788 HKT [18120] ERROR:  syntax error at or near "select" at character 31
+2018-02-12 22:17:00.788 HKT [18120] STATEMENT:  select * from recording_match
+	select * from stats_teamranking
+	;
+2018-02-12 22:17:06.978 HKT [18120] ERROR:  syntax error at or near "select" at character 31
+2018-02-12 22:17:06.978 HKT [18120] STATEMENT:  select * from recording_match
+	select * from stats_teamranking;
+2019-02-09 18:59:30.460 HKT [31148] FATAL:  database files are incompatible with server
+2019-02-09 18:59:30.460 HKT [31148] DETAIL:  The data directory was initialized by PostgreSQL version 10, which is not compatible with this version 11.1.
+2019-03-07 17:37:00.656 HKT [53307] FATAL:  database files are incompatible with server
+2019-03-07 17:37:00.656 HKT [53307] DETAIL:  The data directory was initialized by PostgreSQL version 10, which is not compatible with this version 11.2.
+2019-03-07 17:46:31.800 HKT [55952] LOG:  could not bind IPv6 address "::1": Address already in use
+2019-03-07 17:46:31.800 HKT [55952] HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+2019-03-07 17:46:31.801 HKT [55952] LOG:  could not bind IPv4 address "127.0.0.1": Address already in use
+2019-03-07 17:46:31.801 HKT [55952] HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+2019-03-07 17:46:31.801 HKT [55952] WARNING:  could not create listen socket for "localhost"
+2019-03-07 17:46:31.801 HKT [55952] FATAL:  could not create any TCP/IP sockets
+2019-03-07 17:46:31.801 HKT [55952] LOG:  database system is shut down
